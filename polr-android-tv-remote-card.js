@@ -31,7 +31,7 @@ class PolrAndroidTvRemoteCard extends LitElement {
     this._entity_id = config["entity_id"];
 
     if (!config.apps) {
-      throw new Error("app must be specified");
+      throw new Error("apps must be specified");
     }
     this._disneyplus = config.apps.includes("disneyplus");
     this._hbomax = config.apps.includes("hbomax");
@@ -40,9 +40,6 @@ class PolrAndroidTvRemoteCard extends LitElement {
     this._prime = config.apps.includes("prime");
     this._youtube = config.apps.includes("youtube");
 
-    if (!config.power_action) {
-      throw new Error("power_action must be specified");
-    }
     this._power_action = config.power_action;
 
     this._title = config.title;
