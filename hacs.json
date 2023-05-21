@@ -1,6 +1,6 @@
 {
     "name": "Android TV Remote",
-    "filename": "polr-android-tv-remote.js",
+    "filename": "polr-android-tv-remote-card.js",
     "render_readme": true,
     "country": ["US"]
   }
