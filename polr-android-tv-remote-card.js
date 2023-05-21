@@ -433,7 +433,6 @@ class PolrAndroidTvRemoteCard extends LitElement {
 
   static styles = css`
     .card-content {
-      max-width: 250px;
       margin: auto;
       background-color: var(
         --ha-card-background,
