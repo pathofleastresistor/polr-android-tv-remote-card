@@ -30,15 +30,15 @@ class PolrAndroidTvRemoteCard extends LitElement {
     }
     this._entity_id = config["entity_id"];
 
-    if (!config.apps) {
-      throw new Error("apps must be specified");
+    this._apps = "apps" in config;
+    if (this._apps) {
+      this._disneyplus = config.apps.includes("disneyplus");
+      this._hbomax = config.apps.includes("hbomax");
+      this._hulu = config.apps.includes("hulu");
+      this._netflix = config.apps.includes("netflix");
+      this._prime = config.apps.includes("prime");
+      this._youtube = config.apps.includes("youtube");
     }
-    this._disneyplus = config.apps.includes("disneyplus");
-    this._hbomax = config.apps.includes("hbomax");
-    this._hulu = config.apps.includes("hulu");
-    this._netflix = config.apps.includes("netflix");
-    this._prime = config.apps.includes("prime");
-    this._youtube = config.apps.includes("youtube");
 
     this._power_action = config.power_action;
 
@@ -146,7 +146,7 @@ class PolrAndroidTvRemoteCard extends LitElement {
                 </svg>
               </div>
             </div>
-            ${this._render_apps()}
+            ${this._apps ? this._render_apps() : ``}
             <div class="grid volume-grid">
               <div @click=${this._press_volume_down} class="remote-button">
                 <svg
