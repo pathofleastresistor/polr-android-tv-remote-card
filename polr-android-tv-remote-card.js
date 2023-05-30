@@ -51,144 +51,117 @@ class PolrAndroidTvRemoteCard extends LitElement {
 
   render() {
     return html`
-
-        <div class="card-content">
-          <div class="grid card-grid">
-            <div class="grid remote-grid">
-              <div @click=${this._press_power} class="remote-button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M16.56,5.44L15.11,6.89C16.84,7.94 18,9.83 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12C6,9.83 7.16,7.94 8.88,6.88L7.44,5.44C5.36,6.88 4,9.28 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12C20,9.28 18.64,6.88 16.56,5.44M13,3H11V13H13"
-                  />
-                </svg>
-              </div>
-              <div @click=${this._press_up} class="remote-button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M7,15L12,10L17,15H7Z" />
-                </svg>
-              </div>
-              <div @click=${this._press_home} class="remote-button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" />
-                </svg>
-              </div>
-              <div @click=${this._press_left} class="remote-button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M14,7L9,12L14,17V7Z" />
-                </svg>
-              </div>
-              <div
-                @click=${this._press_center}
-                class="center remote-button"
-              ></div>
-              <div @click=${this._press_right} class="remote-button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M10,17L15,12L10,7V17Z" />
-                </svg>
-              </div>
-              <div @click=${this._press_back} class="remote-button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M13.5 21H6V17H13.5C15.43 17 17 15.43 17 13.5S15.43 10 13.5 10H11V14L4 8L11 2V6H13.5C17.64 6 21 9.36 21 13.5S17.64 21 13.5 21Z"
-                  />
-                </svg>
-              </div>
-              <div @click=${this._press_down} class="remote-button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M7,10L12,15L17,10H7Z" />
-                </svg>
-              </div>
-              <div @click=${this._press_favorite_2} class="remote-button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
-                  />
-                </svg>
-              </div>
-            </div>
-            ${this._apps ? this._render_apps() : ``}
-            <div class="grid volume-grid">
-              <div @click=${this._press_volume_down} class="remote-button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                >
-                  <title>volume-minus</title>
-                  <path d="M3,9H7L12,4V20L7,15H3V9M14,11H22V13H14V11Z" />
-                </svg>
-              </div>
-              <div @click=${this._press_volume_mute} class="remote-button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                >
-                  <title>volume-mute</title>
-                  <path
-                    d="M3,9H7L12,4V20L7,15H3V9M16.59,12L14,9.41L15.41,8L18,10.59L20.59,8L22,9.41L19.41,12L22,14.59L20.59,16L18,13.41L15.41,16L14,14.59L16.59,12Z"
-                  />
-                </svg>
-              </div>
-              <div @click=${this._press_volume_up} class="remote-button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                >
-                  <title>volume-plus</title>
-                  <path
-                    d="M3,9H7L12,4V20L7,15H3V9M14,11H17V8H19V11H22V13H19V16H17V13H14V11Z"
-                  />
-                </svg>
-              </div>
-            </div>
+      <div class="card-content">
+        <div class="grid power-grid">
+          <div @click=${this._press_power} class="remote-button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M16.56,5.44L15.11,6.89C16.84,7.94 18,9.83 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12C6,9.83 7.16,7.94 8.88,6.88L7.44,5.44C5.36,6.88 4,9.28 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12C20,9.28 18.64,6.88 16.56,5.44M13,3H11V13H13"
+              />
+            </svg>
           </div>
         </div>
-
+        <div class="grid card-grid">
+          <div class="pie">
+            <div class="slice">
+              <div id="top" class="slice-contents" @click=${this._press_up}>
+                top button
+              </div>
+            </div>
+            <div class="slice">
+              <div
+                id="right"
+                class="slice-contents"
+                @click=${this._press_right}
+              >
+                click 2
+              </div>
+            </div>
+            <div class="slice">
+              <div id="down" class="slice-contents" @click=${this._press_down}>
+                click 3
+              </div>
+            </div>
+            <div class="slice">
+              <div id="left" class="slice-contents" @click=${this._press_left}>
+                click 4
+              </div>
+            </div>
+            <div id="center" class="inner-pie" @click=${
+              this._press_center
+            }></li>
+          </div>
+        </div>
+        <div class="grid remote-grid">
+          <div @click=${this._press_home} class="remote-button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+            >
+              <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" />
+            </svg>
+          </div>
+          <div @click=${this._press_back} class="remote-button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M13.5 21H6V17H13.5C15.43 17 17 15.43 17 13.5S15.43 10 13.5 10H11V14L4 8L11 2V6H13.5C17.64 6 21 9.36 21 13.5S17.64 21 13.5 21Z"
+              />
+            </svg>
+          </div>
+        </div>
+        ${this._apps ? this._render_apps() : ``}
+        <div class="grid volume-grid">
+          <div @click=${this._press_volume_down} class="remote-button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+            >
+              <title>volume-minus</title>
+              <path d="M3,9H7L12,4V20L7,15H3V9M14,11H22V13H14V11Z" />
+            </svg>
+          </div>
+          <div @click=${this._press_volume_mute} class="remote-button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+            >
+              <title>volume-mute</title>
+              <path
+                d="M3,9H7L12,4V20L7,15H3V9M16.59,12L14,9.41L15.41,8L18,10.59L20.59,8L22,9.41L19.41,12L22,14.59L20.59,16L18,13.41L15.41,16L14,14.59L16.59,12Z"
+              />
+            </svg>
+          </div>
+          <div @click=${this._press_volume_up} class="remote-button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+            >
+              <title>volume-plus</title>
+              <path
+                d="M3,9H7L12,4V20L7,15H3V9M14,11H17V8H19V11H22V13H19V16H17V13H14V11Z"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
     `;
   }
 
@@ -259,17 +232,127 @@ class PolrAndroidTvRemoteCard extends LitElement {
     if (this._netflix) {
       return html`
         <div @click=${this._press_netflix} class="remote-button">
+          <!-- Shape: netflix -->
           <svg
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            fill="none"
+            width="96"
             xmlns="http://www.w3.org/2000/svg"
-            xml:space="preserve"
-            width="48"
-            height="48"
-            version="1.0"
-            viewBox="0 0 24 24"
+            style="-webkit-print-color-adjust:exact"
+            id="screenshot-2972c73a-5014-8016-8002-95e3786b6ba9"
+            version="1.1"
+            viewBox="418.7 524 96 96"
+            height="96"
           >
-            <path
-              d="M5.94 1v10.994c0 6.045.006 10.996.014 11.004.01.01.382-.029.834-.078a73.701 73.701 0 0 1 1.383-.139 80.63 80.628 0 0 1 2.06-.133c.05 0 .052-.246.058-4.655l.01-4.645.34.964c1.406 3.979 1.77 5.004 2.166 6.117v.002l.206.581.575 1.624c.003.003.292.02.642.038a48.332 48.33 0 0 1 3.37.29c.12.014.227.024.307.03.038.002.044 0 .067 0 .023 0 .062.003.067 0h.006c.003 0 .003-.967.005-1.382l.002-.435c.007-1.783.01-4.836.007-9.181l-.01-10.979h-4.311L13.73 5.88l-.01 4.859v.003l-.398-1.13V9.61v.002l-2.04-5.765v-.013l-.177-.501c-.422-1.195-.781-2.205-.795-2.251L10.28 1H8.107Z"
-            />
+            <g id="shape-2972c73a-5014-8016-8002-95e3786b6ba9" rx="0" ry="0">
+              <g id="shape-2972c73a-5014-8016-8002-95e3786bc3e6">
+                <g
+                  class="fills"
+                  id="fills-2972c73a-5014-8016-8002-95e3786bc3e6"
+                >
+                  <rect
+                    rx="0"
+                    ry="0"
+                    x="418.70000000000044"
+                    y="524"
+                    transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)"
+                    width="96.00000000000017"
+                    height="96"
+                  ></rect>
+                </g>
+              </g>
+              <g id="shape-2972c73a-5014-8016-8002-95e3786c56d6">
+                <g
+                  class="fills"
+                  id="fills-2972c73a-5014-8016-8002-95e3786c56d6"
+                >
+                  <path
+                    rx="0"
+                    ry="0"
+                    style="fill:#ffffff"
+                    d="M448.888,540.688L448.888,603.500L451.138,603.313L455.075,602.938L461.075,602.563L461.263,589.250L461.263,575.938L462.200,578.563L462.575,579.688L464.075,548.750L463.513,547.250L461.263,540.875L461.263,540.688L448.888,540.688ZZM471.013,540.688L471.013,568.438L469.888,565.250L468.388,596.188L470.638,602.375L472.513,602.563C476.148,602.735,479.776,603.048,483.387,603.500L483.388,540.688L471.013,540.688ZZ"
+                  ></path>
+                </g>
+              </g>
+              <g id="shape-2972c73a-5014-8016-8002-95e3786cd905">
+                <defs>
+                  <linearGradient
+                    x1="209"
+                    y1="271"
+                    x2="297"
+                    y2="241"
+                    id="rumext-id-220-a"
+                    gradientUnits="userSpaceOnUse"
+                    gradientTransform="matrix(0.187500, 0.000000, 0.000000, 0.187500, 418.700000, 524.000000)"
+                  >
+                    <stop offset="0" stop-color="#b20710"></stop>
+                    <stop offset=".5"></stop>
+                    <stop offset="1" stop-color="#b20710"></stop>
+                  </linearGradient>
+                  <linearGradient
+                    id="fill-color-gradient_rumext-id-220_0"
+                    x1="1.0113845615162123"
+                    y1="-0.003266046283186288"
+                    x2="-0.013009273716695557"
+                    y2="0.997461875359132"
+                    gradientTransform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)"
+                  >
+                    <stop
+                      offset="0"
+                      stop-color="#000000"
+                      stop-opacity="0.375"
+                    ></stop>
+                    <stop
+                      offset="1"
+                      stop-color="#B1B2B5"
+                      stop-opacity="0"
+                    ></stop>
+                  </linearGradient>
+                  <pattern
+                    patternUnits="userSpaceOnUse"
+                    x="448.8875000000004"
+                    y="540.6875"
+                    height="62.8125"
+                    width="34.500000000000455"
+                    data-loading="false"
+                    patternTransform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)"
+                    id="fill-0-rumext-id-220"
+                  >
+                    <g>
+                      <rect
+                        style="fill:url(#fill-color-gradient_rumext-id-220_0)"
+                        width="34.500000000000455"
+                        height="62.8125"
+                      ></rect>
+                    </g>
+                  </pattern>
+                </defs>
+                <g
+                  class="fills"
+                  id="fills-2972c73a-5014-8016-8002-95e3786cd905"
+                >
+                  <path
+                    rx="0"
+                    ry="0"
+                    d="M448.888,540.688C448.888,540.688,453.721,558.119,457.347,571.010C459.522,578.744,461.263,584.844,461.263,584.563L461.263,575.938L462.200,578.563L470.638,602.375L472.513,602.563C476.148,602.735,479.776,603.048,483.388,603.500L471.013,559.250L471.013,568.438L469.888,565.250L463.513,547.250L461.263,540.875L461.075,540.688L448.888,540.688ZL448.888,540.688ZL448.888,540.688Z"
+                    fill="url(#fill-0-rumext-id-220)"
+                  ></path>
+                </g>
+              </g>
+              <g id="shape-2972c73a-5014-8016-8002-95e3786d348d">
+                <g
+                  class="fills"
+                  id="fills-2972c73a-5014-8016-8002-95e3786d348d"
+                >
+                  <path
+                    rx="0"
+                    ry="0"
+                    style="fill:#ffffff"
+                    d="M448.888,540.688L461.263,575.938L462.200,578.563L470.638,602.375L472.513,602.563C476.148,602.735,479.776,603.048,483.387,603.500L471.013,568.438L469.888,565.250L463.513,547.250L461.263,540.875L461.263,540.688L448.888,540.688ZZ"
+                  ></path>
+                </g>
+              </g>
+            </g>
           </svg>
         </div>
       `;
@@ -442,7 +525,6 @@ class PolrAndroidTvRemoteCard extends LitElement {
         solid;
       padding: 15px;
       border-radius: 25px;
-
     }
     .grid {
       display: grid;
@@ -462,12 +544,17 @@ class PolrAndroidTvRemoteCard extends LitElement {
       padding: 0;
     }
 
-    .remote-grid {
+    .power-grid {
       grid-template-columns: repeat(3, 1fr);
     }
 
+    .remote-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
     .app-grid {
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
     }
 
     .volume-grid {
@@ -481,17 +568,18 @@ class PolrAndroidTvRemoteCard extends LitElement {
       justify-items: center;
       fill: var(--primary-text-color);
       border-radius: 25%;
-      background-color: var(
-        --ha-card-border-color,
-        var(--divider-color, #e0e0e0)
-      );
+      background-color: var(--ha-card-border-color, var(--divider-color, #e0e0e0));
       cursor: pointer;
       width: 30px;
       height: 30px;
     }
 
-    .remote-grid > .remote-button {
+    .power-grid > .remote-button {
       padding: 20px;
+    }
+
+    .remote-grid > .remote-button {
+      padding: 40px;
     }
 
     .center {
@@ -502,12 +590,83 @@ class PolrAndroidTvRemoteCard extends LitElement {
     }
 
     .volume-grid > .remote-button {
-      padding: 15px;
+      padding: 40px;
     }
 
     .app-grid > .remote-button {
-      padding: 10px;
+      padding: 20px;
+      height: 50px;
+      width: 50px;
     }
+
+    .pie {
+      position: relative;
+      margin: 1em auto;
+      border: 4px var(--ha-card-border-color, var(--divider-color, #e0e0e0)) solid;
+      padding: 0;
+      width: 25em;
+      height: 25em;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+
+    .slice {
+      overflow: hidden;
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 50%;
+      height: 50%;
+      transform-origin: 0% 100%;
+      border: 2px var(--ha-card-border-color, var(--divider-color, #e0e0e0)) solid;
+      box-sizing: border-box;
+    }
+
+    .slice-contents {
+      position: absolute;
+      left: -100%;
+      width: 200%;
+      height: 200%;
+      border-radius: 50%;
+    }
+
+    .slice:nth-child(1) {
+      transform: rotate(-45deg) scale(1.2);
+    }
+    .slice:nth-child(2) {
+      transform: rotate(45deg) scale(1.2);
+    }
+    .slice:nth-child(3) {
+      transform: rotate(135deg) scale(1.2);
+    }
+    .slice:nth-child(4) {
+      transform: rotate(225deg) scale(1.2);
+    }
+
+    .slice:nth-child(1) .slice-contents,
+    .slice:nth-child(2) .slice-contents,
+    .slice:nth-child(3) .slice-contents,
+      transform: skewY(-30deg);
+      // background-color: #222222;
+    }
+
+    .slice:nth-child(4) .slice-contents {
+      transform: skewY(-30deg);
+      // background-color: #222222;
+    }
+
+    .inner-pie {
+      position: absolute;
+      width: 10em;
+      height: 10em;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      border: 4px var(--ha-card-border-color, var(--divider-color, #e0e0e0)) solid;
+      background-color: #222222;
+    }
+
   `;
 }
 
