@@ -523,7 +523,7 @@ class PolrAndroidTvRemoteCard extends LitElement {
       );
       border: 1px var(--ha-card-border-color, var(--divider-color, #e0e0e0))
         solid;
-      padding: 15px;
+      padding: 15px 0 15px 0;
       border-radius: 25px;
     }
     .grid {
@@ -533,13 +533,11 @@ class PolrAndroidTvRemoteCard extends LitElement {
       justify-items: center;
       width: 90%;
       gap: 10px;
-      padding: 15px;
+      padding: 10px 0 10px 0;
     }
 
     .card-grid {
       grid-template-columns: repeat(1, 1fr);
-      border: none;
-      background: none;
       width: 100%;
       padding: 0;
     }
@@ -553,8 +551,7 @@ class PolrAndroidTvRemoteCard extends LitElement {
     }
 
     .app-grid {
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
+      grid-template-columns: repeat(5, 1fr);
     }
 
     .volume-grid {
@@ -570,16 +567,31 @@ class PolrAndroidTvRemoteCard extends LitElement {
       border-radius: 25%;
       background-color: var(--ha-card-border-color, var(--divider-color, #e0e0e0));
       cursor: pointer;
-      width: 30px;
-      height: 30px;
+      padding: 10px;
     }
 
     .power-grid > .remote-button {
-      padding: 20px;
+      padding: 10px;
+      width: 20px;
+      height: 20px;
     }
 
     .remote-grid > .remote-button {
-      padding: 40px;
+      padding: 10px;
+      height: 35px;
+      width: 35px;
+    }
+
+    .volume-grid > .remote-button {
+      padding: 10px;
+      height: 35px;
+      width: 35px;
+    }
+
+    .app-grid > .remote-button {
+      padding: 10px;
+      height: 35px;
+      width: 35px;
     }
 
     .center {
@@ -589,23 +601,13 @@ class PolrAndroidTvRemoteCard extends LitElement {
         solid;
     }
 
-    .volume-grid > .remote-button {
-      padding: 40px;
-    }
-
-    .app-grid > .remote-button {
-      padding: 20px;
-      height: 50px;
-      width: 50px;
-    }
-
     .pie {
       position: relative;
       margin: 1em auto;
       border: 4px var(--ha-card-border-color, var(--divider-color, #e0e0e0)) solid;
       padding: 0;
-      width: 25em;
-      height: 25em;
+      width: 15em;
+      height: 15em;
       border-radius: 50%;
       overflow: hidden;
     }
@@ -657,8 +659,8 @@ class PolrAndroidTvRemoteCard extends LitElement {
 
     .inner-pie {
       position: absolute;
-      width: 10em;
-      height: 10em;
+      width: 6em;
+      height: 6em;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
