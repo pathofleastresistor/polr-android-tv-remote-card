@@ -22,6 +22,12 @@ class PolrAndroidTvRemoteCard extends LitElement {
 
   constructor() {
     super();
+    this.active = false;
+    this.currentX = 0;
+    this.currentY = 0;
+    this.initialX;
+    this.initialY;
+    this._dragItem;
   }
 
   setConfig(config) {
@@ -29,6 +35,8 @@ class PolrAndroidTvRemoteCard extends LitElement {
       throw new Error("entity_id must be specified");
     }
     this._entity_id = config["entity_id"];
+
+    this._remote = config["remote"] || "default";
 
     this._apps = "apps" in config;
     if (this._apps) {
@@ -41,154 +49,229 @@ class PolrAndroidTvRemoteCard extends LitElement {
     }
 
     this._power_action = config.power_action;
-
-    this._title = config.title;
   }
 
   set hass(hass) {
     this._hass = hass;
   }
 
+  firstUpdated() {
+    this._touchpad = this.renderRoot.querySelector("#touchpad");
+    this._dragItem = this.renderRoot.querySelector("#nub");
+  }
+
+  _dragStart(e) {
+    e.preventDefault();
+    if (e.type === "touchstart") {
+      this.initialX = e.touches[0].clientX;
+      this.initialY = e.touches[0].clientY;
+    } else {
+      this.initialX = e.clientX;
+      this.initialY = e.clientY;
+    }
+
+    if (e.target === this._dragItem) {
+      this.active = true;
+    }
+  }
+
+  _dragEnd(e) {
+    this._setTranslate(0, 0, this._dragItem, "0.5s");
+    this.active = false;
+    let x = this.currentX / this._touchpad.offsetWidth;
+    let y = this.currentY / this._touchpad.offsetHeight;
+
+    this.currentX = 0;
+    this.currentY = 0;
+
+    console.log(x, y);
+    if (Math.abs(x) < 0.01 && Math.abs(y) < 0.01) {
+      this._press_center();
+      return;
+    }
+    if (Math.abs(x) >= Math.abs(y)) {
+      x < 0 ? this._press_left() : this._press_right();
+    } else {
+      y < 0 ? this._press_up() : this._press_down();
+    }
+  }
+
+  _drag(e) {
+    if (this.active) {
+      e.preventDefault();
+      if (e.type === "touchmove") {
+        this.currentX = e.touches[0].clientX - this.initialX;
+        this.currentY = e.touches[0].clientY - this.initialY;
+      } else {
+        this.currentX = e.clientX - this.initialX;
+        this.currentY = e.clientY - this.initialY;
+      }
+      this._setTranslate(this.currentX, this.currentY, this._dragItem, "0s");
+    }
+  }
+
+  _setTranslate(xPos, yPos, el, duration) {
+    el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
+    el.style.transitionDuration = duration;
+  }
+
   render() {
     return html`
-
-        <div class="card-content">
-          <div class="grid card-grid">
-            <div class="grid remote-grid">
-              <div @click=${this._press_power} class="remote-button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M16.56,5.44L15.11,6.89C16.84,7.94 18,9.83 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12C6,9.83 7.16,7.94 8.88,6.88L7.44,5.44C5.36,6.88 4,9.28 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12C20,9.28 18.64,6.88 16.56,5.44M13,3H11V13H13"
-                  />
-                </svg>
-              </div>
-              <div @click=${this._press_up} class="remote-button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M7,15L12,10L17,15H7Z" />
-                </svg>
-              </div>
-              <div @click=${this._press_home} class="remote-button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" />
-                </svg>
-              </div>
-              <div @click=${this._press_left} class="remote-button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M14,7L9,12L14,17V7Z" />
-                </svg>
-              </div>
-              <div
-                @click=${this._press_center}
-                class="center remote-button"
-              ></div>
-              <div @click=${this._press_right} class="remote-button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M10,17L15,12L10,7V17Z" />
-                </svg>
-              </div>
-              <div @click=${this._press_back} class="remote-button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M13.5 21H6V17H13.5C15.43 17 17 15.43 17 13.5S15.43 10 13.5 10H11V14L4 8L11 2V6H13.5C17.64 6 21 9.36 21 13.5S17.64 21 13.5 21Z"
-                  />
-                </svg>
-              </div>
-              <div @click=${this._press_down} class="remote-button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M7,10L12,15L17,10H7Z" />
-                </svg>
-              </div>
-              <div @click=${this._press_favorite_2} class="remote-button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
-                  />
-                </svg>
-              </div>
+      <div class="card-content">
+        <div class="grid card-grid">
+          ${this._remote == "touch" ? this._render_touchpad() : ``}
+          ${this._remote == "default" ? this._render_defaultpad() : ``}
+          ${this._apps ? this._render_apps() : ``}
+          <div class="grid volume-grid">
+            <div @click=${this._press_volume_down} class="remote-button">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+              >
+                <title>volume-minus</title>
+                <path d="M3,9H7L12,4V20L7,15H3V9M14,11H22V13H14V11Z" />
+              </svg>
             </div>
-            ${this._apps ? this._render_apps() : ``}
-            <div class="grid volume-grid">
-              <div @click=${this._press_volume_down} class="remote-button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                >
-                  <title>volume-minus</title>
-                  <path d="M3,9H7L12,4V20L7,15H3V9M14,11H22V13H14V11Z" />
-                </svg>
-              </div>
-              <div @click=${this._press_volume_mute} class="remote-button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                >
-                  <title>volume-mute</title>
-                  <path
-                    d="M3,9H7L12,4V20L7,15H3V9M16.59,12L14,9.41L15.41,8L18,10.59L20.59,8L22,9.41L19.41,12L22,14.59L20.59,16L18,13.41L15.41,16L14,14.59L16.59,12Z"
-                  />
-                </svg>
-              </div>
-              <div @click=${this._press_volume_up} class="remote-button">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                >
-                  <title>volume-plus</title>
-                  <path
-                    d="M3,9H7L12,4V20L7,15H3V9M14,11H17V8H19V11H22V13H19V16H17V13H14V11Z"
-                  />
-                </svg>
-              </div>
+            <div @click=${this._press_volume_mute} class="remote-button">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+              >
+                <title>volume-mute</title>
+                <path
+                  d="M3,9H7L12,4V20L7,15H3V9M16.59,12L14,9.41L15.41,8L18,10.59L20.59,8L22,9.41L19.41,12L22,14.59L20.59,16L18,13.41L15.41,16L14,14.59L16.59,12Z"
+                />
+              </svg>
+            </div>
+            <div @click=${this._press_volume_up} class="remote-button">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+              >
+                <title>volume-plus</title>
+                <path
+                  d="M3,9H7L12,4V20L7,15H3V9M14,11H17V8H19V11H22V13H19V16H17V13H14V11Z"
+                />
+              </svg>
             </div>
           </div>
         </div>
+      </div>
+    `;
+  }
 
+  _render_defaultpad() {
+    return html`
+      <div class="grid remote-grid">
+        <div @click=${this._press_power} class="remote-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="48"
+            height="48"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M16.56,5.44L15.11,6.89C16.84,7.94 18,9.83 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12C6,9.83 7.16,7.94 8.88,6.88L7.44,5.44C5.36,6.88 4,9.28 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12C20,9.28 18.64,6.88 16.56,5.44M13,3H11V13H13"
+            />
+          </svg>
+        </div>
+        <div @click=${this._press_up} class="remote-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="48"
+            height="48"
+            viewBox="0 0 24 24"
+          >
+            <path d="M7,15L12,10L17,15H7Z" />
+          </svg>
+        </div>
+        <div @click=${this._press_home} class="remote-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="48"
+            height="48"
+            viewBox="0 0 24 24"
+          >
+            <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" />
+          </svg>
+        </div>
+        <div @click=${this._press_left} class="remote-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="48"
+            height="48"
+            viewBox="0 0 24 24"
+          >
+            <path d="M14,7L9,12L14,17V7Z" />
+          </svg>
+        </div>
+        <div @click=${this._press_center} class="center remote-button"></div>
+        <div @click=${this._press_right} class="remote-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="48"
+            height="48"
+            viewBox="0 0 24 24"
+          >
+            <path d="M10,17L15,12L10,7V17Z" />
+          </svg>
+        </div>
+        <div @click=${this._press_back} class="remote-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="48"
+            height="48"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M13.5 21H6V17H13.5C15.43 17 17 15.43 17 13.5S15.43 10 13.5 10H11V14L4 8L11 2V6H13.5C17.64 6 21 9.36 21 13.5S17.64 21 13.5 21Z"
+            />
+          </svg>
+        </div>
+        <div @click=${this._press_down} class="remote-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="48"
+            height="48"
+            viewBox="0 0 24 24"
+          >
+            <path d="M7,10L12,15L17,10H7Z" />
+          </svg>
+        </div>
+        <div @click=${this._press_favorite_2} class="remote-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="48"
+            height="48"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
+            />
+          </svg>
+        </div>
+      </div>
+    `;
+  }
+  _render_touchpad() {
+    return html`
+      <div id="touchpad">
+        <div
+          @mousedown=${this._dragStart}
+          @mousemove=${this._drag}
+          @mouseup=${this._dragEnd}
+          @touchstart=${this._dragStart}
+          @touchmove=${this._drag}
+          @touchend=${this._dragEnd}
+          id="nub"
+        ></div>
+      </div>
     `;
   }
 
@@ -442,7 +525,6 @@ class PolrAndroidTvRemoteCard extends LitElement {
         solid;
       padding: 15px;
       border-radius: 25px;
-
     }
     .grid {
       display: grid;
@@ -507,6 +589,35 @@ class PolrAndroidTvRemoteCard extends LitElement {
 
     .app-grid > .remote-button {
       padding: 10px;
+    }
+
+    #touchpad {
+      width: 100%;
+      height: 300px;
+      background-color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-radius: 15px;
+      touch-action: none;
+    }
+
+    #nub {
+      width: 50px;
+      height: 50px;
+      background-color: rgb(255, 255, 255);
+      border: 10px solid rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+      touch-action: none;
+      user-select: none;
+    }
+    #nub:active {
+      background-color: rgba(168, 218, 220, 1);
+    }
+    #nub:hover {
+      cursor: pointer;
+      border-width: 20px;
     }
   `;
 }
