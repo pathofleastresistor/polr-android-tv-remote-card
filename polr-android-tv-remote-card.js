@@ -167,6 +167,34 @@ class PolrAndroidTvRemoteCard extends LitElement {
     `;
   }
 
+  _render_dpad() {
+    return html`
+      <div class="pie">
+        <div class="slice">
+          <div id="top" class="slice-contents" @click=${this._press_up}>
+            top button
+          </div>
+        </div>
+        <div class="slice">
+          <div id="right" class="slice-contents" @click=${this._press_right}>
+            click 2
+          </div>
+        </div>
+        <div class="slice">
+          <div id="down" class="slice-contents" @click=${this._press_down}>
+            click 3
+          </div>
+        </div>
+        <div class="slice">
+          <div id="left" class="slice-contents" @click=${this._press_left}>
+            click 4
+          </div>
+        </div>
+        <div id="center" class="inner-pie" @click=${this._press_center}></div>
+      </div>
+    `;
+  }
+
   _render_defaultpad() {
     return html`
       <div class="grid remote-grid">
