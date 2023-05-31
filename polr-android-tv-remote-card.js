@@ -119,8 +119,9 @@ class PolrAndroidTvRemoteCard extends LitElement {
     return html`
       <div class="card-content">
         <div class="grid card-grid">
-          ${this._remote == "touch" ? this._render_touchpad() : ``}
           ${this._remote == "default" ? this._render_defaultpad() : ``}
+          ${this._remote == "touch" ? this._render_touchpad() : ``}
+          ${this._remote == "dpad" ? this._render_dpad() : ``}
           ${this._apps ? this._render_apps() : ``}
           <div class="grid volume-grid">
             <div @click=${this._press_volume_down} class="remote-button">
@@ -618,6 +619,83 @@ class PolrAndroidTvRemoteCard extends LitElement {
     #nub:hover {
       cursor: pointer;
       border-width: 20px;
+    }
+
+    /** dpad **/
+
+    .center {
+      border-radius: 50%;
+      background-color: none;
+      border: 1px var(--ha-card-border-color, var(--divider-color, #e0e0e0))
+        solid;
+    }
+
+    .pie {
+      position: relative;
+      margin: 1em auto;
+      border: 4px var(--ha-card-border-color, var(--divider-color, #e0e0e0)) solid;
+      padding: 0;
+      width: 15em;
+      height: 15em;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+
+    .slice {
+      overflow: hidden;
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 50%;
+      height: 50%;
+      transform-origin: 0% 100%;
+      border: 2px var(--ha-card-border-color, var(--divider-color, #e0e0e0)) solid;
+      box-sizing: border-box;
+    }
+
+    .slice-contents {
+      position: absolute;
+      left: -100%;
+      width: 200%;
+      height: 200%;
+      border-radius: 50%;
+    }
+
+    .slice:nth-child(1) {
+      transform: rotate(-45deg) scale(1.2);
+    }
+    .slice:nth-child(2) {
+      transform: rotate(45deg) scale(1.2);
+    }
+    .slice:nth-child(3) {
+      transform: rotate(135deg) scale(1.2);
+    }
+    .slice:nth-child(4) {
+      transform: rotate(225deg) scale(1.2);
+    }
+
+    .slice:nth-child(1) .slice-contents,
+    .slice:nth-child(2) .slice-contents,
+    .slice:nth-child(3) .slice-contents,
+      transform: skewY(-30deg);
+      // background-color: #222222;
+    }
+
+    .slice:nth-child(4) .slice-contents {
+      transform: skewY(-30deg);
+      // background-color: #222222;
+    }
+
+    .inner-pie {
+      position: absolute;
+      width: 6em;
+      height: 6em;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      border: 4px var(--ha-card-border-color, var(--divider-color, #e0e0e0)) solid;
+      background-color: #222222;
     }
   `;
 }
