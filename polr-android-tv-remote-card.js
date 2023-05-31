@@ -76,24 +76,23 @@ class PolrAndroidTvRemoteCard extends LitElement {
   }
 
   _dragEnd(e) {
-    this._setTranslate(0, 0, this._dragItem, "0.5s");
-    this.active = false;
     let x = this.currentX / this._touchpad.offsetWidth;
     let y = this.currentY / this._touchpad.offsetHeight;
 
-    this.currentX = 0;
-    this.currentY = 0;
-
-    console.log(x, y);
     if (Math.abs(x) < 0.01 && Math.abs(y) < 0.01) {
       this._press_center();
-      return;
-    }
-    if (Math.abs(x) >= Math.abs(y)) {
-      x < 0 ? this._press_left() : this._press_right();
     } else {
-      y < 0 ? this._press_up() : this._press_down();
+      if (Math.abs(x) >= Math.abs(y)) {
+        x < 0 ? this._press_left() : this._press_right();
+      } else {
+        y < 0 ? this._press_up() : this._press_down();
+      }
     }
+
+    this._setTranslate(0, 0, this._dragItem, "0.5s");
+    this.active = false;
+    this.currentX = 0;
+    this.currentY = 0;
   }
 
   _drag(e) {
@@ -118,6 +117,7 @@ class PolrAndroidTvRemoteCard extends LitElement {
   render() {
     return html`
       <div class="card-content">
+        ${["touch", "dpad"].includes(this._remote) ? this._render_power() : ``}
         <div class="grid card-grid">
           ${this._remote == "default" ? this._render_defaultpad() : ``}
           ${this._remote == "touch" ? this._render_touchpad() : ``}
@@ -167,6 +167,25 @@ class PolrAndroidTvRemoteCard extends LitElement {
     `;
   }
 
+  _render_power() {
+    return html`
+      <div class="power-grid">
+        <div @click=${this._press_power} class="remote-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="48"
+            height="48"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M16.56,5.44L15.11,6.89C16.84,7.94 18,9.83 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12C6,9.83 7.16,7.94 8.88,6.88L7.44,5.44C5.36,6.88 4,9.28 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12C20,9.28 18.64,6.88 16.56,5.44M13,3H11V13H13"
+            />
+          </svg>
+        </div>
+      </div>
+    `;
+  }
+
   _render_dpad() {
     return html`
       <div class="pie">
@@ -191,6 +210,22 @@ class PolrAndroidTvRemoteCard extends LitElement {
           </div>
         </div>
         <div id="center" class="inner-pie" @click=${this._press_center}></div>
+      </div>
+    `;
+  }
+
+  _render_touchpad() {
+    return html`
+      <div id="touchpad">
+        <div
+          @mousedown=${this._dragStart}
+          @mousemove=${this._drag}
+          @mouseup=${this._dragEnd}
+          @touchstart=${this._dragStart}
+          @touchmove=${this._drag}
+          @touchend=${this._dragEnd}
+          id="nub"
+        ></div>
       </div>
     `;
   }
@@ -285,21 +320,6 @@ class PolrAndroidTvRemoteCard extends LitElement {
             />
           </svg>
         </div>
-      </div>
-    `;
-  }
-  _render_touchpad() {
-    return html`
-      <div id="touchpad">
-        <div
-          @mousedown=${this._dragStart}
-          @mousemove=${this._drag}
-          @mouseup=${this._dragEnd}
-          @touchstart=${this._dragStart}
-          @touchmove=${this._drag}
-          @touchend=${this._dragEnd}
-          id="nub"
-        ></div>
       </div>
     `;
   }
@@ -555,6 +575,7 @@ class PolrAndroidTvRemoteCard extends LitElement {
       padding: 15px;
       border-radius: 25px;
     }
+
     .grid {
       display: grid;
       align-items: center;
@@ -620,8 +641,20 @@ class PolrAndroidTvRemoteCard extends LitElement {
       padding: 10px;
     }
 
+    /** power **/
+    .power-grid {
+      display: flex;
+      justify-content: start;
+      padding: 10px 0 10px 0 ;
+    }
+
+    .power-grid > .remote-button {
+      padding: 5px;
+    }
+
+    /** touchpad **/
     #touchpad {
-      width: 100%;
+      width: 80%;
       height: 300px;
       background-color: #333;
       display: flex;
@@ -636,17 +669,13 @@ class PolrAndroidTvRemoteCard extends LitElement {
       width: 50px;
       height: 50px;
       background-color: rgb(255, 255, 255);
-      border: 10px solid rgba(255, 255, 255, 0.5);
       border-radius: 50%;
       touch-action: none;
       user-select: none;
     }
-    #nub:active {
-      background-color: rgba(168, 218, 220, 1);
-    }
+
     #nub:hover {
       cursor: pointer;
-      border-width: 20px;
     }
 
     /** dpad **/
