@@ -117,11 +117,16 @@ class PolrAndroidTvRemoteCard extends LitElement {
   render() {
     return html`
       <div class="card-content">
-        ${["touch", "dpad"].includes(this._remote) ? this._render_power() : ``}
         <div class="grid card-grid">
+          ${["touch", "dpad"].includes(this._remote)
+            ? this._render_power()
+            : ``}
           ${this._remote == "default" ? this._render_defaultpad() : ``}
           ${this._remote == "touch" ? this._render_touchpad() : ``}
           ${this._remote == "dpad" ? this._render_dpad() : ``}
+          ${["touch", "dpad"].includes(this._remote)
+            ? this._render_basic_buttons()
+            : ``}
           ${this._apps ? this._render_apps() : ``}
           <div class="grid volume-grid">
             <div @click=${this._press_volume_down} class="remote-button">
@@ -179,6 +184,35 @@ class PolrAndroidTvRemoteCard extends LitElement {
           >
             <path
               d="M16.56,5.44L15.11,6.89C16.84,7.94 18,9.83 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12C6,9.83 7.16,7.94 8.88,6.88L7.44,5.44C5.36,6.88 4,9.28 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12C20,9.28 18.64,6.88 16.56,5.44M13,3H11V13H13"
+            />
+          </svg>
+        </div>
+      </div>
+    `;
+  }
+
+  _render_basic_buttons() {
+    return html`
+      <div class="grid basic-grid">
+        <div @click=${this._press_home} class="remote-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="48"
+            height="48"
+            viewBox="0 0 24 24"
+          >
+            <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" />
+          </svg>
+        </div>
+        <div @click=${this._press_back} class="remote-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="48"
+            height="48"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M13.5 21H6V17H13.5C15.43 17 17 15.43 17 13.5S15.43 10 13.5 10H11V14L4 8L11 2V6H13.5C17.64 6 21 9.36 21 13.5S17.64 21 13.5 21Z"
             />
           </svg>
         </div>
@@ -598,6 +632,14 @@ class PolrAndroidTvRemoteCard extends LitElement {
       grid-template-columns: repeat(3, 1fr);
     }
 
+    .basic-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .basic-grid > .remote-button {
+      padding: 20px;
+    }
+
     .app-grid {
       grid-template-columns: repeat(4, 1fr);
     }
@@ -646,6 +688,8 @@ class PolrAndroidTvRemoteCard extends LitElement {
       display: flex;
       justify-content: start;
       padding: 10px 0 10px 0 ;
+      margin: auto;
+      width: 90%;
     }
 
     .power-grid > .remote-button {
