@@ -53,6 +53,16 @@ apps:
         </td>
         <td>Must be a remote entity created by the new Android TV integration</td>
     </tr>
+    <tr>
+        <td>volume</td>
+        <td>no</td>
+        <td>
+            <pre>
+volume: false
+            </pre>
+        </td>
+        <td>Must be a remote entity created by the new Android TV integration</td>
+    </tr>
 </table>
 
 ### Supported apps

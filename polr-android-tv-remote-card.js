@@ -119,7 +119,10 @@ class PoLRATVRemoteCard extends s$1 {
         if (!config.entity_id) {
             throw new Error("entity_id must be specified");
         }
-        this._config = config;
+        this._config = JSON.parse(JSON.stringify(config));
+        if (!this._config.hasOwnProperty("volume")) {
+            this._config.volume = true;
+        }
     }
     set hass(hass) {
         this._hass = hass;
@@ -139,7 +142,7 @@ class PoLRATVRemoteCard extends s$1 {
             ['dpad', () => this._render_dpad()],
         ])}
             ${this._render_apps()}
-            ${this._render_volume()}
+            ${(this._config.volume) ? this._render_volume() : x ``}
           </div>
         </div>
       </ha-card>

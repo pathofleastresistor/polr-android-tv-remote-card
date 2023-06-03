@@ -3,6 +3,7 @@ export interface ATVRemoteCardConfig {
     remote: string;
     apps: Array<App> | [];
     power_action: [] | string;
+    volume: boolean;
 }
 
 export interface App {

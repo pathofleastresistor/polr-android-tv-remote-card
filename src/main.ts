@@ -41,7 +41,12 @@ class PoLRATVRemoteCard extends LitElement {
     if (!config.entity_id) {
       throw new Error("entity_id must be specified");
     }
-    this._config = config;
+    this._config = JSON.parse(JSON.stringify(config));
+    
+    if (!this._config.hasOwnProperty("volume")) {
+      this._config.volume = true;
+    }
+    
   }
 
   set hass(hass) {
@@ -64,7 +69,7 @@ class PoLRATVRemoteCard extends LitElement {
               ['dpad', () => this._render_dpad() ],
             ])}
             ${ this._render_apps() }
-            ${ this._render_volume() }
+            ${ (this._config.volume) ? this._render_volume() : html`` }
           </div>
         </div>
       </ha-card>
