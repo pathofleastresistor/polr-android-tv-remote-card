@@ -1,4 +1,5 @@
 # polr-android-tv-remote-card
+
 A Lovelace card designed as a companion to the [Android TV Remote](https://www.home-assistant.io/integrations/androidtv_remote/) integration.
 
 ## Installation
@@ -14,11 +15,14 @@ A Lovelace card designed as a companion to the [Android TV Remote](https://www.h
 5. In the window that opens when you select it click om "Install This Repository in HACS"
 
 ### Manually
+
 1. Copy `polr-android-tv-remote-card.js` into your `<config>/<www>` folder
 2. Add `polr-android-tv-remote-card.js` as a dashboard resource.
 
 ## Usage
+
 ### Settings
+
 <table>
     <tr>
         <th>Field</th>
@@ -52,18 +56,20 @@ apps:
 </table>
 
 ### Supported apps
-| App | Value |
-| - | - |
-| Disney Plus | `disneyplus` |
-| HBO Max | `hbomax` |
-| Netflix | `netflix` |
-| Amazon Prime | `prime` |
+
+| App          | Value        |
+| ------------ | ------------ |
+| Disney Plus  | `disneyplus` |
+| HBO Max      | `hbomax`     |
+| Netflix      | `netflix`    |
+| Amazon Prime | `prime`      |
 
 ### Custom apps
+
 If the app you want isn't supported, you can still add it by including a `icon` and `url` in the `apps` array.
 
-
 ### Example
+
 ```
 type: custom:polr-android-tv-remote-card
 entity_id: remote.android_tv_remote
@@ -77,6 +83,7 @@ apps:
 ```
 
 ### Screenshot
+
 <p align="center">
-  <img width="300" src="images/remote-light.png">
+  <img width="300" src="images/touchpad-dark.png">
 </p>
