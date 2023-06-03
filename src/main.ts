@@ -124,7 +124,7 @@ class PoLRATVRemoteCard extends LitElement {
   _render_dpad() {
     return html`
       ${ this._render_power() }
-      <div class="pie">
+      <div class="dpad">
         <div class="slice">
           <div id="top" class="slice-contents" @click=${{ handleEvent: () => this._send_command("DPAD_UP") }}>
             top button
@@ -145,7 +145,7 @@ class PoLRATVRemoteCard extends LitElement {
             click 4
           </div>
         </div>
-        <div id="center" class="inner-pie" @click=${{ handleEvent: () => this._send_command("DPAD_CENTER") }}></div>
+        <div id="center" class="inner-dpad" @click=${{ handleEvent: () => this._send_command("DPAD_CENTER") }}></div>
       </div>
       ${ this._render_basic_buttons() }
     `;
@@ -570,11 +570,7 @@ class PoLRATVRemoteCard extends LitElement {
     .app-grid {
       grid-template-columns: repeat(4, 1fr);
     }
-
-    .volume-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-
+    
     .remote-button {
       display: flex;
       align-items: center;
@@ -600,6 +596,11 @@ class PoLRATVRemoteCard extends LitElement {
       background-color: none;
       border: 1px var(--ha-card-border-color, var(--divider-color, #e0e0e0))
         solid;
+    }
+
+    /** VOLUME **/
+    .volume-grid {
+      grid-template-columns: repeat(3, 1fr);
     }
 
     .volume-grid > .remote-button {
@@ -654,15 +655,7 @@ class PoLRATVRemoteCard extends LitElement {
     }
 
     /** dpad **/
-
-    .center {
-      border-radius: 50%;
-      background-color: none;
-      border: 1px var(--ha-card-border-color, var(--divider-color, #e0e0e0))
-        solid;
-    }
-
-    .pie {
+    .dpad {
       position: relative;
       margin: 1em auto;
       border: 4px var(--ha-card-border-color, var(--divider-color, #e0e0e0)) solid;
@@ -671,6 +664,13 @@ class PoLRATVRemoteCard extends LitElement {
       height: 15em;
       border-radius: 50%;
       overflow: hidden;
+    }
+
+    .center {
+      border-radius: 50%;
+      background-color: none;
+      border: 1px var(--ha-card-border-color, var(--divider-color, #e0e0e0))
+        solid;
     }
 
     .slice {
@@ -718,7 +718,7 @@ class PoLRATVRemoteCard extends LitElement {
       // background-color: #222222;
     }
 
-    .inner-pie {
+    .inner-dpad {
       position: absolute;
       width: 6em;
       height: 6em;
