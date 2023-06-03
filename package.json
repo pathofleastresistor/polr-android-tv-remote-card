@@ -1,0 +1,26 @@
+{
+  "name": "polr-android-tv-remote-card",
+  "version": "1.0.0",
+  "description": "This was designed to solve a personal need and I'm now trying to prepare it for others to use. That means several things can break between releases.",
+  "main": "polr-android-tv-remote-card.js",
+  "scripts": {
+    "build-lit": "npx watchify ./src/polr-android-tv-remote-card.js -o \"npx browserify -p esmify ./src/polr-android-tv-remote-card.js > polr-android-tv-remote-card.js\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pathofleastresistor/polr-android-tv-remote-card.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pathofleastresistor/polr-android-tv-remote-card/issues"
+  },
+  "homepage": "https://github.com/pathofleastresistor/polr-android-tv-remote-card#readme",
+  "devDependencies": {
+    "browser-resolve": "^2.0.0",
+    "browserify": "^17.0.0",
+    "esmify": "^2.1.1",
+    "lit": "^2.7.5",
+    "watchify": "^4.0.0"
+  }
+}
