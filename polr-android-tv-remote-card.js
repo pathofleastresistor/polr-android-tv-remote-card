@@ -1,154 +1,16 @@
-/******************************************************************************
-Copyright (c) Microsoft Corporation.
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
-AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-PERFORMANCE OF THIS SOFTWARE.
-***************************************************************************** */
-/* global Reflect, Promise */
-
-
-function __decorate(decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-}
-
-/**
- * @license
- * Copyright 2019 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */
-const t$2=window,e$4=t$2.ShadowRoot&&(void 0===t$2.ShadyCSS||t$2.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,s$4=Symbol(),n$5=new WeakMap;let o$4 = class o{constructor(t,e,n){if(this._$cssResult$=!0,n!==s$4)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e;}get styleSheet(){let t=this.o;const s=this.t;if(e$4&&void 0===t){const e=void 0!==s&&1===s.length;e&&(t=n$5.get(s)),void 0===t&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),e&&n$5.set(s,t));}return t}toString(){return this.cssText}};const r$3=t=>new o$4("string"==typeof t?t:t+"",void 0,s$4),i$3=(t,...e)=>{const n=1===t.length?t[0]:e.reduce(((e,s,n)=>e+(t=>{if(!0===t._$cssResult$)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(s)+t[n+1]),t[0]);return new o$4(n,t,s$4)},S$1=(s,n)=>{e$4?s.adoptedStyleSheets=n.map((t=>t instanceof CSSStyleSheet?t:t.styleSheet)):n.forEach((e=>{const n=document.createElement("style"),o=t$2.litNonce;void 0!==o&&n.setAttribute("nonce",o),n.textContent=e.cssText,s.appendChild(n);}));},c$3=e$4?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const s of t.cssRules)e+=s.cssText;return r$3(e)})(t):t;
-
-/**
- * @license
- * Copyright 2017 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */var s$3;const e$3=window,r$2=e$3.trustedTypes,h$1=r$2?r$2.emptyScript:"",o$3=e$3.reactiveElementPolyfillSupport,n$4={toAttribute(t,i){switch(i){case Boolean:t=t?h$1:null;break;case Object:case Array:t=null==t?t:JSON.stringify(t);}return t},fromAttribute(t,i){let s=t;switch(i){case Boolean:s=null!==t;break;case Number:s=null===t?null:Number(t);break;case Object:case Array:try{s=JSON.parse(t);}catch(t){s=null;}}return s}},a$1=(t,i)=>i!==t&&(i==i||t==t),l$3={attribute:!0,type:String,converter:n$4,reflect:!1,hasChanged:a$1},d$1="finalized";let u$3 = class u extends HTMLElement{constructor(){super(),this._$Ei=new Map,this.isUpdatePending=!1,this.hasUpdated=!1,this._$El=null,this.u();}static addInitializer(t){var i;this.finalize(),(null!==(i=this.h)&&void 0!==i?i:this.h=[]).push(t);}static get observedAttributes(){this.finalize();const t=[];return this.elementProperties.forEach(((i,s)=>{const e=this._$Ep(s,i);void 0!==e&&(this._$Ev.set(e,s),t.push(e));})),t}static createProperty(t,i=l$3){if(i.state&&(i.attribute=!1),this.finalize(),this.elementProperties.set(t,i),!i.noAccessor&&!this.prototype.hasOwnProperty(t)){const s="symbol"==typeof t?Symbol():"__"+t,e=this.getPropertyDescriptor(t,s,i);void 0!==e&&Object.defineProperty(this.prototype,t,e);}}static getPropertyDescriptor(t,i,s){return {get(){return this[i]},set(e){const r=this[t];this[i]=e,this.requestUpdate(t,r,s);},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)||l$3}static finalize(){if(this.hasOwnProperty(d$1))return !1;this[d$1]=!0;const t=Object.getPrototypeOf(this);if(t.finalize(),void 0!==t.h&&(this.h=[...t.h]),this.elementProperties=new Map(t.elementProperties),this._$Ev=new Map,this.hasOwnProperty("properties")){const t=this.properties,i=[...Object.getOwnPropertyNames(t),...Object.getOwnPropertySymbols(t)];for(const s of i)this.createProperty(s,t[s]);}return this.elementStyles=this.finalizeStyles(this.styles),!0}static finalizeStyles(i){const s=[];if(Array.isArray(i)){const e=new Set(i.flat(1/0).reverse());for(const i of e)s.unshift(c$3(i));}else void 0!==i&&s.push(c$3(i));return s}static _$Ep(t,i){const s=i.attribute;return !1===s?void 0:"string"==typeof s?s:"string"==typeof t?t.toLowerCase():void 0}u(){var t;this._$E_=new Promise((t=>this.enableUpdating=t)),this._$AL=new Map,this._$Eg(),this.requestUpdate(),null===(t=this.constructor.h)||void 0===t||t.forEach((t=>t(this)));}addController(t){var i,s;(null!==(i=this._$ES)&&void 0!==i?i:this._$ES=[]).push(t),void 0!==this.renderRoot&&this.isConnected&&(null===(s=t.hostConnected)||void 0===s||s.call(t));}removeController(t){var i;null===(i=this._$ES)||void 0===i||i.splice(this._$ES.indexOf(t)>>>0,1);}_$Eg(){this.constructor.elementProperties.forEach(((t,i)=>{this.hasOwnProperty(i)&&(this._$Ei.set(i,this[i]),delete this[i]);}));}createRenderRoot(){var t;const s=null!==(t=this.shadowRoot)&&void 0!==t?t:this.attachShadow(this.constructor.shadowRootOptions);return S$1(s,this.constructor.elementStyles),s}connectedCallback(){var t;void 0===this.renderRoot&&(this.renderRoot=this.createRenderRoot()),this.enableUpdating(!0),null===(t=this._$ES)||void 0===t||t.forEach((t=>{var i;return null===(i=t.hostConnected)||void 0===i?void 0:i.call(t)}));}enableUpdating(t){}disconnectedCallback(){var t;null===(t=this._$ES)||void 0===t||t.forEach((t=>{var i;return null===(i=t.hostDisconnected)||void 0===i?void 0:i.call(t)}));}attributeChangedCallback(t,i,s){this._$AK(t,s);}_$EO(t,i,s=l$3){var e;const r=this.constructor._$Ep(t,s);if(void 0!==r&&!0===s.reflect){const h=(void 0!==(null===(e=s.converter)||void 0===e?void 0:e.toAttribute)?s.converter:n$4).toAttribute(i,s.type);this._$El=t,null==h?this.removeAttribute(r):this.setAttribute(r,h),this._$El=null;}}_$AK(t,i){var s;const e=this.constructor,r=e._$Ev.get(t);if(void 0!==r&&this._$El!==r){const t=e.getPropertyOptions(r),h="function"==typeof t.converter?{fromAttribute:t.converter}:void 0!==(null===(s=t.converter)||void 0===s?void 0:s.fromAttribute)?t.converter:n$4;this._$El=r,this[r]=h.fromAttribute(i,t.type),this._$El=null;}}requestUpdate(t,i,s){let e=!0;void 0!==t&&(((s=s||this.constructor.getPropertyOptions(t)).hasChanged||a$1)(this[t],i)?(this._$AL.has(t)||this._$AL.set(t,i),!0===s.reflect&&this._$El!==t&&(void 0===this._$EC&&(this._$EC=new Map),this._$EC.set(t,s))):e=!1),!this.isUpdatePending&&e&&(this._$E_=this._$Ej());}async _$Ej(){this.isUpdatePending=!0;try{await this._$E_;}catch(t){Promise.reject(t);}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){var t;if(!this.isUpdatePending)return;this.hasUpdated,this._$Ei&&(this._$Ei.forEach(((t,i)=>this[i]=t)),this._$Ei=void 0);let i=!1;const s=this._$AL;try{i=this.shouldUpdate(s),i?(this.willUpdate(s),null===(t=this._$ES)||void 0===t||t.forEach((t=>{var i;return null===(i=t.hostUpdate)||void 0===i?void 0:i.call(t)})),this.update(s)):this._$Ek();}catch(t){throw i=!1,this._$Ek(),t}i&&this._$AE(s);}willUpdate(t){}_$AE(t){var i;null===(i=this._$ES)||void 0===i||i.forEach((t=>{var i;return null===(i=t.hostUpdated)||void 0===i?void 0:i.call(t)})),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t);}_$Ek(){this._$AL=new Map,this.isUpdatePending=!1;}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$E_}shouldUpdate(t){return !0}update(t){void 0!==this._$EC&&(this._$EC.forEach(((t,i)=>this._$EO(i,this[i],t))),this._$EC=void 0),this._$Ek();}updated(t){}firstUpdated(t){}};u$3[d$1]=!0,u$3.elementProperties=new Map,u$3.elementStyles=[],u$3.shadowRootOptions={mode:"open"},null==o$3||o$3({ReactiveElement:u$3}),(null!==(s$3=e$3.reactiveElementVersions)&&void 0!==s$3?s$3:e$3.reactiveElementVersions=[]).push("1.6.2");
-
-/**
- * @license
- * Copyright 2017 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */
-var t$1;const i$2=window,s$2=i$2.trustedTypes,e$2=s$2?s$2.createPolicy("lit-html",{createHTML:t=>t}):void 0,o$2="$lit$",n$3=`lit$${(Math.random()+"").slice(9)}$`,l$2="?"+n$3,h=`<${l$2}>`,r$1=document,d=()=>r$1.createComment(""),u$2=t=>null===t||"object"!=typeof t&&"function"!=typeof t,c$2=Array.isArray,v=t=>c$2(t)||"function"==typeof(null==t?void 0:t[Symbol.iterator]),a="[ \t\n\f\r]",f$1=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,_=/-->/g,m$1=/>/g,p$1=RegExp(`>|${a}(?:([^\\s"'>=/]+)(${a}*=${a}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),g=/'/g,$=/"/g,y=/^(?:script|style|textarea|title)$/i,w=t=>(i,...s)=>({_$litType$:t,strings:i,values:s}),x=w(1),T=Symbol.for("lit-noChange"),A=Symbol.for("lit-nothing"),E=new WeakMap,C=r$1.createTreeWalker(r$1,129,null,!1),P=(t,i)=>{const s=t.length-1,l=[];let r,d=2===i?"<svg>":"",u=f$1;for(let i=0;i<s;i++){const s=t[i];let e,c,v=-1,a=0;for(;a<s.length&&(u.lastIndex=a,c=u.exec(s),null!==c);)a=u.lastIndex,u===f$1?"!--"===c[1]?u=_:void 0!==c[1]?u=m$1:void 0!==c[2]?(y.test(c[2])&&(r=RegExp("</"+c[2],"g")),u=p$1):void 0!==c[3]&&(u=p$1):u===p$1?">"===c[0]?(u=null!=r?r:f$1,v=-1):void 0===c[1]?v=-2:(v=u.lastIndex-c[2].length,e=c[1],u=void 0===c[3]?p$1:'"'===c[3]?$:g):u===$||u===g?u=p$1:u===_||u===m$1?u=f$1:(u=p$1,r=void 0);const w=u===p$1&&t[i+1].startsWith("/>")?" ":"";d+=u===f$1?s+h:v>=0?(l.push(e),s.slice(0,v)+o$2+s.slice(v)+n$3+w):s+n$3+(-2===v?(l.push(void 0),i):w);}const c=d+(t[s]||"<?>")+(2===i?"</svg>":"");if(!Array.isArray(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return [void 0!==e$2?e$2.createHTML(c):c,l]};class V{constructor({strings:t,_$litType$:i},e){let h;this.parts=[];let r=0,u=0;const c=t.length-1,v=this.parts,[a,f]=P(t,i);if(this.el=V.createElement(a,e),C.currentNode=this.el.content,2===i){const t=this.el.content,i=t.firstChild;i.remove(),t.append(...i.childNodes);}for(;null!==(h=C.nextNode())&&v.length<c;){if(1===h.nodeType){if(h.hasAttributes()){const t=[];for(const i of h.getAttributeNames())if(i.endsWith(o$2)||i.startsWith(n$3)){const s=f[u++];if(t.push(i),void 0!==s){const t=h.getAttribute(s.toLowerCase()+o$2).split(n$3),i=/([.?@])?(.*)/.exec(s);v.push({type:1,index:r,name:i[2],strings:t,ctor:"."===i[1]?k:"?"===i[1]?I:"@"===i[1]?L:R});}else v.push({type:6,index:r});}for(const i of t)h.removeAttribute(i);}if(y.test(h.tagName)){const t=h.textContent.split(n$3),i=t.length-1;if(i>0){h.textContent=s$2?s$2.emptyScript:"";for(let s=0;s<i;s++)h.append(t[s],d()),C.nextNode(),v.push({type:2,index:++r});h.append(t[i],d());}}}else if(8===h.nodeType)if(h.data===l$2)v.push({type:2,index:r});else {let t=-1;for(;-1!==(t=h.data.indexOf(n$3,t+1));)v.push({type:7,index:r}),t+=n$3.length-1;}r++;}}static createElement(t,i){const s=r$1.createElement("template");return s.innerHTML=t,s}}function N(t,i,s=t,e){var o,n,l,h;if(i===T)return i;let r=void 0!==e?null===(o=s._$Co)||void 0===o?void 0:o[e]:s._$Cl;const d=u$2(i)?void 0:i._$litDirective$;return (null==r?void 0:r.constructor)!==d&&(null===(n=null==r?void 0:r._$AO)||void 0===n||n.call(r,!1),void 0===d?r=void 0:(r=new d(t),r._$AT(t,s,e)),void 0!==e?(null!==(l=(h=s)._$Co)&&void 0!==l?l:h._$Co=[])[e]=r:s._$Cl=r),void 0!==r&&(i=N(t,r._$AS(t,i.values),r,e)),i}class S{constructor(t,i){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=i;}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){var i;const{el:{content:s},parts:e}=this._$AD,o=(null!==(i=null==t?void 0:t.creationScope)&&void 0!==i?i:r$1).importNode(s,!0);C.currentNode=o;let n=C.nextNode(),l=0,h=0,d=e[0];for(;void 0!==d;){if(l===d.index){let i;2===d.type?i=new M(n,n.nextSibling,this,t):1===d.type?i=new d.ctor(n,d.name,d.strings,this,t):6===d.type&&(i=new z(n,this,t)),this._$AV.push(i),d=e[++h];}l!==(null==d?void 0:d.index)&&(n=C.nextNode(),l++);}return C.currentNode=r$1,o}v(t){let i=0;for(const s of this._$AV)void 0!==s&&(void 0!==s.strings?(s._$AI(t,s,i),i+=s.strings.length-2):s._$AI(t[i])),i++;}}class M{constructor(t,i,s,e){var o;this.type=2,this._$AH=A,this._$AN=void 0,this._$AA=t,this._$AB=i,this._$AM=s,this.options=e,this._$Cp=null===(o=null==e?void 0:e.isConnected)||void 0===o||o;}get _$AU(){var t,i;return null!==(i=null===(t=this._$AM)||void 0===t?void 0:t._$AU)&&void 0!==i?i:this._$Cp}get parentNode(){let t=this._$AA.parentNode;const i=this._$AM;return void 0!==i&&11===(null==t?void 0:t.nodeType)&&(t=i.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,i=this){t=N(this,t,i),u$2(t)?t===A||null==t||""===t?(this._$AH!==A&&this._$AR(),this._$AH=A):t!==this._$AH&&t!==T&&this._(t):void 0!==t._$litType$?this.g(t):void 0!==t.nodeType?this.$(t):v(t)?this.T(t):this._(t);}k(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}$(t){this._$AH!==t&&(this._$AR(),this._$AH=this.k(t));}_(t){this._$AH!==A&&u$2(this._$AH)?this._$AA.nextSibling.data=t:this.$(r$1.createTextNode(t)),this._$AH=t;}g(t){var i;const{values:s,_$litType$:e}=t,o="number"==typeof e?this._$AC(t):(void 0===e.el&&(e.el=V.createElement(e.h,this.options)),e);if((null===(i=this._$AH)||void 0===i?void 0:i._$AD)===o)this._$AH.v(s);else {const t=new S(o,this),i=t.u(this.options);t.v(s),this.$(i),this._$AH=t;}}_$AC(t){let i=E.get(t.strings);return void 0===i&&E.set(t.strings,i=new V(t)),i}T(t){c$2(this._$AH)||(this._$AH=[],this._$AR());const i=this._$AH;let s,e=0;for(const o of t)e===i.length?i.push(s=new M(this.k(d()),this.k(d()),this,this.options)):s=i[e],s._$AI(o),e++;e<i.length&&(this._$AR(s&&s._$AB.nextSibling,e),i.length=e);}_$AR(t=this._$AA.nextSibling,i){var s;for(null===(s=this._$AP)||void 0===s||s.call(this,!1,!0,i);t&&t!==this._$AB;){const i=t.nextSibling;t.remove(),t=i;}}setConnected(t){var i;void 0===this._$AM&&(this._$Cp=t,null===(i=this._$AP)||void 0===i||i.call(this,t));}}class R{constructor(t,i,s,e,o){this.type=1,this._$AH=A,this._$AN=void 0,this.element=t,this.name=i,this._$AM=e,this.options=o,s.length>2||""!==s[0]||""!==s[1]?(this._$AH=Array(s.length-1).fill(new String),this.strings=s):this._$AH=A;}get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}_$AI(t,i=this,s,e){const o=this.strings;let n=!1;if(void 0===o)t=N(this,t,i,0),n=!u$2(t)||t!==this._$AH&&t!==T,n&&(this._$AH=t);else {const e=t;let l,h;for(t=o[0],l=0;l<o.length-1;l++)h=N(this,e[s+l],i,l),h===T&&(h=this._$AH[l]),n||(n=!u$2(h)||h!==this._$AH[l]),h===A?t=A:t!==A&&(t+=(null!=h?h:"")+o[l+1]),this._$AH[l]=h;}n&&!e&&this.j(t);}j(t){t===A?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,null!=t?t:"");}}class k extends R{constructor(){super(...arguments),this.type=3;}j(t){this.element[this.name]=t===A?void 0:t;}}const H=s$2?s$2.emptyScript:"";class I extends R{constructor(){super(...arguments),this.type=4;}j(t){t&&t!==A?this.element.setAttribute(this.name,H):this.element.removeAttribute(this.name);}}class L extends R{constructor(t,i,s,e,o){super(t,i,s,e,o),this.type=5;}_$AI(t,i=this){var s;if((t=null!==(s=N(this,t,i,0))&&void 0!==s?s:A)===T)return;const e=this._$AH,o=t===A&&e!==A||t.capture!==e.capture||t.once!==e.once||t.passive!==e.passive,n=t!==A&&(e===A||o);o&&this.element.removeEventListener(this.name,this,e),n&&this.element.addEventListener(this.name,this,t),this._$AH=t;}handleEvent(t){var i,s;"function"==typeof this._$AH?this._$AH.call(null!==(s=null===(i=this.options)||void 0===i?void 0:i.host)&&void 0!==s?s:this.element,t):this._$AH.handleEvent(t);}}class z{constructor(t,i,s){this.element=t,this.type=6,this._$AN=void 0,this._$AM=i,this.options=s;}get _$AU(){return this._$AM._$AU}_$AI(t){N(this,t);}}const Z={O:o$2,P:n$3,A:l$2,C:1,M:P,L:S,D:v,R:N,I:M,V:R,H:I,N:L,U:k,F:z},j=i$2.litHtmlPolyfillSupport;null==j||j(V,M),(null!==(t$1=i$2.litHtmlVersions)&&void 0!==t$1?t$1:i$2.litHtmlVersions=[]).push("2.7.4");const B=(t,i,s)=>{var e,o;const n=null!==(e=null==s?void 0:s.renderBefore)&&void 0!==e?e:i;let l=n._$litPart$;if(void 0===l){const t=null!==(o=null==s?void 0:s.renderBefore)&&void 0!==o?o:null;n._$litPart$=l=new M(i.insertBefore(d(),t),t,void 0,null!=s?s:{});}return l._$AI(t),l};
-
-/**
- * @license
- * Copyright 2017 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */var l$1,o$1;let s$1 = class s extends u$3{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0;}createRenderRoot(){var t,e;const i=super.createRenderRoot();return null!==(t=(e=this.renderOptions).renderBefore)&&void 0!==t||(e.renderBefore=i.firstChild),i}update(t){const i=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=B(i,this.renderRoot,this.renderOptions);}connectedCallback(){var t;super.connectedCallback(),null===(t=this._$Do)||void 0===t||t.setConnected(!0);}disconnectedCallback(){var t;super.disconnectedCallback(),null===(t=this._$Do)||void 0===t||t.setConnected(!1);}render(){return T}};s$1.finalized=!0,s$1._$litElement$=!0,null===(l$1=globalThis.litElementHydrateSupport)||void 0===l$1||l$1.call(globalThis,{LitElement:s$1});const n$2=globalThis.litElementPolyfillSupport;null==n$2||n$2({LitElement:s$1});(null!==(o$1=globalThis.litElementVersions)&&void 0!==o$1?o$1:globalThis.litElementVersions=[]).push("3.3.2");
-
-/**
- * @license
- * Copyright 2017 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */
-const i$1=(i,e)=>"method"===e.kind&&e.descriptor&&!("value"in e.descriptor)?{...e,finisher(n){n.createProperty(e.key,i);}}:{kind:"field",key:Symbol(),placement:"own",descriptor:{},originalKey:e.key,initializer(){"function"==typeof e.initializer&&(this[e.key]=e.initializer.call(this));},finisher(n){n.createProperty(e.key,i);}},e$1=(i,e,n)=>{e.constructor.createProperty(n,i);};function n$1(n){return (t,o)=>void 0!==o?e$1(n,t,o):i$1(n,t)}
-
-/**
- * @license
- * Copyright 2021 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */var n;null!=(null===(n=window.HTMLSlotElement)||void 0===n?void 0:n.prototype.assignedElements)?(o,n)=>o.assignedElements(n):(o,n)=>o.assignedNodes(n).filter((o=>o.nodeType===Node.ELEMENT_NODE));
-
-/**
- * @license
- * Copyright 2021 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */
-const o=(o,r,n)=>{for(const n of r)if(n[0]===o)return (0, n[1])();return null==n?void 0:n()};
-
-/**
- * @license
- * Copyright 2017 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */
-const t={ATTRIBUTE:1,CHILD:2,PROPERTY:3,BOOLEAN_ATTRIBUTE:4,EVENT:5,ELEMENT:6},e=t=>(...e)=>({_$litDirective$:t,values:e});class i{constructor(t){}get _$AU(){return this._$AM._$AU}_$AT(t,e,i){this._$Ct=t,this._$AM=e,this._$Ci=i;}_$AS(t,e){return this.update(t,e)}update(t,e){return this.render(...e)}}
-
-/**
- * @license
- * Copyright 2020 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */const {I:l}=Z,c$1=()=>document.createComment(""),r=(o,t,i)=>{var n;const d=o._$AA.parentNode,v=void 0===t?o._$AB:t._$AA;if(void 0===i){const t=d.insertBefore(c$1(),v),n=d.insertBefore(c$1(),v);i=new l(t,n,o,o.options);}else {const l=i._$AB.nextSibling,t=i._$AM,e=t!==o;if(e){let l;null===(n=i._$AQ)||void 0===n||n.call(i,o),i._$AM=o,void 0!==i._$AP&&(l=o._$AU)!==t._$AU&&i._$AP(l);}if(l!==v||e){let o=i._$AA;for(;o!==l;){const l=o.nextSibling;d.insertBefore(o,v),o=l;}}}return i},u$1=(o,l,t=o)=>(o._$AI(l,t),o),f={},s=(o,l=f)=>o._$AH=l,m=o=>o._$AH,p=o=>{var l;null===(l=o._$AP)||void 0===l||l.call(o,!1,!0);let t=o._$AA;const i=o._$AB.nextSibling;for(;t!==i;){const o=t.nextSibling;t.remove(),t=o;}};
-
-/**
- * @license
- * Copyright 2017 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */
-const u=(e,s,t)=>{const r=new Map;for(let l=s;l<=t;l++)r.set(e[l],l);return r},c=e(class extends i{constructor(e){if(super(e),e.type!==t.CHILD)throw Error("repeat() can only be used in text expressions")}dt(e,s,t){let r;void 0===t?t=s:void 0!==s&&(r=s);const l=[],o=[];let i=0;for(const s of e)l[i]=r?r(s,i):i,o[i]=t(s,i),i++;return {values:o,keys:l}}render(e,s,t){return this.dt(e,s,t).values}update(s$1,[t,r$1,c]){var d;const a=m(s$1),{values:p$1,keys:v}=this.dt(t,r$1,c);if(!Array.isArray(a))return this.ht=v,p$1;const h=null!==(d=this.ht)&&void 0!==d?d:this.ht=[],m$1=[];let y,x,j=0,k=a.length-1,w=0,A=p$1.length-1;for(;j<=k&&w<=A;)if(null===a[j])j++;else if(null===a[k])k--;else if(h[j]===v[w])m$1[w]=u$1(a[j],p$1[w]),j++,w++;else if(h[k]===v[A])m$1[A]=u$1(a[k],p$1[A]),k--,A--;else if(h[j]===v[A])m$1[A]=u$1(a[j],p$1[A]),r(s$1,m$1[A+1],a[j]),j++,A--;else if(h[k]===v[w])m$1[w]=u$1(a[k],p$1[w]),r(s$1,a[j],a[k]),k--,w++;else if(void 0===y&&(y=u(v,w,A),x=u(h,j,k)),y.has(h[j]))if(y.has(h[k])){const e=x.get(v[w]),t=void 0!==e?a[e]:null;if(null===t){const e=r(s$1,a[j]);u$1(e,p$1[w]),m$1[w]=e;}else m$1[w]=u$1(t,p$1[w]),r(s$1,a[j],t),a[e]=null;w++;}else p(a[k]),k--;else p(a[j]),j++;for(;w<=A;){const e=r(s$1,m$1[A+1]);u$1(e,p$1[w]),m$1[w++]=e;}for(;j<=k;){const e=a[j++];null!==e&&p(e);}return this.ht=v,s(s$1,m$1),T}});
-
-class PoLRATVRemoteCard extends s$1 {
-    constructor() {
-        super(...arguments);
-        this.active = false;
-        this.currentX = 0;
-        this.currentY = 0;
-        this.initialX = 0;
-        this.initialY = 0;
-    }
-    static getConfigElement() {
-        return document.createElement("polr-atv-remote-card-editor");
-    }
-    static getStubConfig() {
-        return {
-            "entity_id": "remote.atvremote",
-            "apps": [
-                "disneyplus"
-            ],
-            "remote": "touch"
-        };
-    }
-    static get properties() {
-        return {
-            _hass: {},
-            _config: {},
-        };
-    }
-    setConfig(config) {
-        if (!config.entity_id) {
-            throw new Error("entity_id must be specified");
-        }
-        this._config = config;
-    }
-    set hass(hass) {
-        this._hass = hass;
-    }
-    firstUpdated() {
-        this._touchpad = this.renderRoot.querySelector("#touchpad");
-        this._dragItem = this.renderRoot.querySelector("#nub");
-    }
-    render() {
-        return x `
+function t(t,e,i,s){var r,n=arguments.length,o=n<3?e:null===s?s=Object.getOwnPropertyDescriptor(e,i):s;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)o=Reflect.decorate(t,e,i,s);else for(var a=t.length-1;a>=0;a--)(r=t[a])&&(o=(n<3?r(o):n>3?r(e,i,o):r(e,i))||o);return n>3&&o&&Object.defineProperty(e,i,o),o}const e=window,i=e.ShadowRoot&&(void 0===e.ShadyCSS||e.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,s=Symbol(),r=new WeakMap;let n=class{constructor(t,e,i){if(this._$cssResult$=!0,i!==s)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e}get styleSheet(){let t=this.o;const e=this.t;if(i&&void 0===t){const i=void 0!==e&&1===e.length;i&&(t=r.get(e)),void 0===t&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),i&&r.set(e,t))}return t}toString(){return this.cssText}};const o=i?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const i of t.cssRules)e+=i.cssText;return(t=>new n("string"==typeof t?t:t+"",void 0,s))(e)})(t):t;var a;const l=window,d=l.trustedTypes,h=d?d.emptyScript:"",c=l.reactiveElementPolyfillSupport,v={toAttribute(t,e){switch(e){case Boolean:t=t?h:null;break;case Object:case Array:t=null==t?t:JSON.stringify(t)}return t},fromAttribute(t,e){let i=t;switch(e){case Boolean:i=null!==t;break;case Number:i=null===t?null:Number(t);break;case Object:case Array:try{i=JSON.parse(t)}catch(t){i=null}}return i}},u=(t,e)=>e!==t&&(e==e||t==t),p={attribute:!0,type:String,converter:v,reflect:!1,hasChanged:u},_="finalized";let m=class extends HTMLElement{constructor(){super(),this._$Ei=new Map,this.isUpdatePending=!1,this.hasUpdated=!1,this._$El=null,this.u()}static addInitializer(t){var e;this.finalize(),(null!==(e=this.h)&&void 0!==e?e:this.h=[]).push(t)}static get observedAttributes(){this.finalize();const t=[];return this.elementProperties.forEach(((e,i)=>{const s=this._$Ep(i,e);void 0!==s&&(this._$Ev.set(s,i),t.push(s))})),t}static createProperty(t,e=p){if(e.state&&(e.attribute=!1),this.finalize(),this.elementProperties.set(t,e),!e.noAccessor&&!this.prototype.hasOwnProperty(t)){const i="symbol"==typeof t?Symbol():"__"+t,s=this.getPropertyDescriptor(t,i,e);void 0!==s&&Object.defineProperty(this.prototype,t,s)}}static getPropertyDescriptor(t,e,i){return{get(){return this[e]},set(s){const r=this[t];this[e]=s,this.requestUpdate(t,r,i)},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)||p}static finalize(){if(this.hasOwnProperty(_))return!1;this[_]=!0;const t=Object.getPrototypeOf(this);if(t.finalize(),void 0!==t.h&&(this.h=[...t.h]),this.elementProperties=new Map(t.elementProperties),this._$Ev=new Map,this.hasOwnProperty("properties")){const t=this.properties,e=[...Object.getOwnPropertyNames(t),...Object.getOwnPropertySymbols(t)];for(const i of e)this.createProperty(i,t[i])}return this.elementStyles=this.finalizeStyles(this.styles),!0}static finalizeStyles(t){const e=[];if(Array.isArray(t)){const i=new Set(t.flat(1/0).reverse());for(const t of i)e.unshift(o(t))}else void 0!==t&&e.push(o(t));return e}static _$Ep(t,e){const i=e.attribute;return!1===i?void 0:"string"==typeof i?i:"string"==typeof t?t.toLowerCase():void 0}u(){var t;this._$E_=new Promise((t=>this.enableUpdating=t)),this._$AL=new Map,this._$Eg(),this.requestUpdate(),null===(t=this.constructor.h)||void 0===t||t.forEach((t=>t(this)))}addController(t){var e,i;(null!==(e=this._$ES)&&void 0!==e?e:this._$ES=[]).push(t),void 0!==this.renderRoot&&this.isConnected&&(null===(i=t.hostConnected)||void 0===i||i.call(t))}removeController(t){var e;null===(e=this._$ES)||void 0===e||e.splice(this._$ES.indexOf(t)>>>0,1)}_$Eg(){this.constructor.elementProperties.forEach(((t,e)=>{this.hasOwnProperty(e)&&(this._$Ei.set(e,this[e]),delete this[e])}))}createRenderRoot(){var t;const s=null!==(t=this.shadowRoot)&&void 0!==t?t:this.attachShadow(this.constructor.shadowRootOptions);return((t,s)=>{i?t.adoptedStyleSheets=s.map((t=>t instanceof CSSStyleSheet?t:t.styleSheet)):s.forEach((i=>{const s=document.createElement("style"),r=e.litNonce;void 0!==r&&s.setAttribute("nonce",r),s.textContent=i.cssText,t.appendChild(s)}))})(s,this.constructor.elementStyles),s}connectedCallback(){var t;void 0===this.renderRoot&&(this.renderRoot=this.createRenderRoot()),this.enableUpdating(!0),null===(t=this._$ES)||void 0===t||t.forEach((t=>{var e;return null===(e=t.hostConnected)||void 0===e?void 0:e.call(t)}))}enableUpdating(t){}disconnectedCallback(){var t;null===(t=this._$ES)||void 0===t||t.forEach((t=>{var e;return null===(e=t.hostDisconnected)||void 0===e?void 0:e.call(t)}))}attributeChangedCallback(t,e,i){this._$AK(t,i)}_$EO(t,e,i=p){var s;const r=this.constructor._$Ep(t,i);if(void 0!==r&&!0===i.reflect){const n=(void 0!==(null===(s=i.converter)||void 0===s?void 0:s.toAttribute)?i.converter:v).toAttribute(e,i.type);this._$El=t,null==n?this.removeAttribute(r):this.setAttribute(r,n),this._$El=null}}_$AK(t,e){var i;const s=this.constructor,r=s._$Ev.get(t);if(void 0!==r&&this._$El!==r){const t=s.getPropertyOptions(r),n="function"==typeof t.converter?{fromAttribute:t.converter}:void 0!==(null===(i=t.converter)||void 0===i?void 0:i.fromAttribute)?t.converter:v;this._$El=r,this[r]=n.fromAttribute(e,t.type),this._$El=null}}requestUpdate(t,e,i){let s=!0;void 0!==t&&(((i=i||this.constructor.getPropertyOptions(t)).hasChanged||u)(this[t],e)?(this._$AL.has(t)||this._$AL.set(t,e),!0===i.reflect&&this._$El!==t&&(void 0===this._$EC&&(this._$EC=new Map),this._$EC.set(t,i))):s=!1),!this.isUpdatePending&&s&&(this._$E_=this._$Ej())}async _$Ej(){this.isUpdatePending=!0;try{await this._$E_}catch(t){Promise.reject(t)}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){var t;if(!this.isUpdatePending)return;this.hasUpdated,this._$Ei&&(this._$Ei.forEach(((t,e)=>this[e]=t)),this._$Ei=void 0);let e=!1;const i=this._$AL;try{e=this.shouldUpdate(i),e?(this.willUpdate(i),null===(t=this._$ES)||void 0===t||t.forEach((t=>{var e;return null===(e=t.hostUpdate)||void 0===e?void 0:e.call(t)})),this.update(i)):this._$Ek()}catch(t){throw e=!1,this._$Ek(),t}e&&this._$AE(i)}willUpdate(t){}_$AE(t){var e;null===(e=this._$ES)||void 0===e||e.forEach((t=>{var e;return null===(e=t.hostUpdated)||void 0===e?void 0:e.call(t)})),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t)}_$Ek(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$E_}shouldUpdate(t){return!0}update(t){void 0!==this._$EC&&(this._$EC.forEach(((t,e)=>this._$EO(e,this[e],t))),this._$EC=void 0),this._$Ek()}updated(t){}firstUpdated(t){}};var g;m[_]=!0,m.elementProperties=new Map,m.elementStyles=[],m.shadowRootOptions={mode:"open"},null==c||c({ReactiveElement:m}),(null!==(a=l.reactiveElementVersions)&&void 0!==a?a:l.reactiveElementVersions=[]).push("1.6.2");const $=window,w=$.trustedTypes,f=w?w.createPolicy("lit-html",{createHTML:t=>t}):void 0,A="$lit$",b=`lit$${(Math.random()+"").slice(9)}$`,y="?"+b,E=`<${y}>`,x=document,H=()=>x.createComment(""),S=t=>null===t||"object"!=typeof t&&"function"!=typeof t,C=Array.isArray,k=t=>C(t)||"function"==typeof(null==t?void 0:t[Symbol.iterator]),L="[ \t\n\f\r]",M=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,P=/-->/g,V=/>/g,U=RegExp(`>|${L}(?:([^\\s"'>=/]+)(${L}*=${L}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),D=/'/g,z=/"/g,T=/^(?:script|style|textarea|title)$/i,O=(t=>(e,...i)=>({_$litType$:t,strings:e,values:i}))(1),R=Symbol.for("lit-noChange"),B=Symbol.for("lit-nothing"),N=new WeakMap,j=x.createTreeWalker(x,129,null,!1),I=(t,e)=>{const i=t.length-1,s=[];let r,n=2===e?"<svg>":"",o=M;for(let e=0;e<i;e++){const i=t[e];let a,l,d=-1,h=0;for(;h<i.length&&(o.lastIndex=h,l=o.exec(i),null!==l);)h=o.lastIndex,o===M?"!--"===l[1]?o=P:void 0!==l[1]?o=V:void 0!==l[2]?(T.test(l[2])&&(r=RegExp("</"+l[2],"g")),o=U):void 0!==l[3]&&(o=U):o===U?">"===l[0]?(o=null!=r?r:M,d=-1):void 0===l[1]?d=-2:(d=o.lastIndex-l[2].length,a=l[1],o=void 0===l[3]?U:'"'===l[3]?z:D):o===z||o===D?o=U:o===P||o===V?o=M:(o=U,r=void 0);const c=o===U&&t[e+1].startsWith("/>")?" ":"";n+=o===M?i+E:d>=0?(s.push(a),i.slice(0,d)+A+i.slice(d)+b+c):i+b+(-2===d?(s.push(void 0),e):c)}const a=n+(t[i]||"<?>")+(2===e?"</svg>":"");if(!Array.isArray(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return[void 0!==f?f.createHTML(a):a,s]};class Z{constructor({strings:t,_$litType$:e},i){let s;this.parts=[];let r=0,n=0;const o=t.length-1,a=this.parts,[l,d]=I(t,e);if(this.el=Z.createElement(l,i),j.currentNode=this.el.content,2===e){const t=this.el.content,e=t.firstChild;e.remove(),t.append(...e.childNodes)}for(;null!==(s=j.nextNode())&&a.length<o;){if(1===s.nodeType){if(s.hasAttributes()){const t=[];for(const e of s.getAttributeNames())if(e.endsWith(A)||e.startsWith(b)){const i=d[n++];if(t.push(e),void 0!==i){const t=s.getAttribute(i.toLowerCase()+A).split(b),e=/([.?@])?(.*)/.exec(i);a.push({type:1,index:r,name:e[2],strings:t,ctor:"."===e[1]?K:"?"===e[1]?G:"@"===e[1]?J:q})}else a.push({type:6,index:r})}for(const e of t)s.removeAttribute(e)}if(T.test(s.tagName)){const t=s.textContent.split(b),e=t.length-1;if(e>0){s.textContent=w?w.emptyScript:"";for(let i=0;i<e;i++)s.append(t[i],H()),j.nextNode(),a.push({type:2,index:++r});s.append(t[e],H())}}}else if(8===s.nodeType)if(s.data===y)a.push({type:2,index:r});else{let t=-1;for(;-1!==(t=s.data.indexOf(b,t+1));)a.push({type:7,index:r}),t+=b.length-1}r++}}static createElement(t,e){const i=x.createElement("template");return i.innerHTML=t,i}}function Y(t,e,i=t,s){var r,n,o,a;if(e===R)return e;let l=void 0!==s?null===(r=i._$Co)||void 0===r?void 0:r[s]:i._$Cl;const d=S(e)?void 0:e._$litDirective$;return(null==l?void 0:l.constructor)!==d&&(null===(n=null==l?void 0:l._$AO)||void 0===n||n.call(l,!1),void 0===d?l=void 0:(l=new d(t),l._$AT(t,i,s)),void 0!==s?(null!==(o=(a=i)._$Co)&&void 0!==o?o:a._$Co=[])[s]=l:i._$Cl=l),void 0!==l&&(e=Y(t,l._$AS(t,e.values),l,s)),e}class X{constructor(t,e){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=e}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){var e;const{el:{content:i},parts:s}=this._$AD,r=(null!==(e=null==t?void 0:t.creationScope)&&void 0!==e?e:x).importNode(i,!0);j.currentNode=r;let n=j.nextNode(),o=0,a=0,l=s[0];for(;void 0!==l;){if(o===l.index){let e;2===l.type?e=new W(n,n.nextSibling,this,t):1===l.type?e=new l.ctor(n,l.name,l.strings,this,t):6===l.type&&(e=new Q(n,this,t)),this._$AV.push(e),l=s[++a]}o!==(null==l?void 0:l.index)&&(n=j.nextNode(),o++)}return j.currentNode=x,r}v(t){let e=0;for(const i of this._$AV)void 0!==i&&(void 0!==i.strings?(i._$AI(t,i,e),e+=i.strings.length-2):i._$AI(t[e])),e++}}class W{constructor(t,e,i,s){var r;this.type=2,this._$AH=B,this._$AN=void 0,this._$AA=t,this._$AB=e,this._$AM=i,this.options=s,this._$Cp=null===(r=null==s?void 0:s.isConnected)||void 0===r||r}get _$AU(){var t,e;return null!==(e=null===(t=this._$AM)||void 0===t?void 0:t._$AU)&&void 0!==e?e:this._$Cp}get parentNode(){let t=this._$AA.parentNode;const e=this._$AM;return void 0!==e&&11===(null==t?void 0:t.nodeType)&&(t=e.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,e=this){t=Y(this,t,e),S(t)?t===B||null==t||""===t?(this._$AH!==B&&this._$AR(),this._$AH=B):t!==this._$AH&&t!==R&&this._(t):void 0!==t._$litType$?this.g(t):void 0!==t.nodeType?this.$(t):k(t)?this.T(t):this._(t)}k(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}$(t){this._$AH!==t&&(this._$AR(),this._$AH=this.k(t))}_(t){this._$AH!==B&&S(this._$AH)?this._$AA.nextSibling.data=t:this.$(x.createTextNode(t)),this._$AH=t}g(t){var e;const{values:i,_$litType$:s}=t,r="number"==typeof s?this._$AC(t):(void 0===s.el&&(s.el=Z.createElement(s.h,this.options)),s);if((null===(e=this._$AH)||void 0===e?void 0:e._$AD)===r)this._$AH.v(i);else{const t=new X(r,this),e=t.u(this.options);t.v(i),this.$(e),this._$AH=t}}_$AC(t){let e=N.get(t.strings);return void 0===e&&N.set(t.strings,e=new Z(t)),e}T(t){C(this._$AH)||(this._$AH=[],this._$AR());const e=this._$AH;let i,s=0;for(const r of t)s===e.length?e.push(i=new W(this.k(H()),this.k(H()),this,this.options)):i=e[s],i._$AI(r),s++;s<e.length&&(this._$AR(i&&i._$AB.nextSibling,s),e.length=s)}_$AR(t=this._$AA.nextSibling,e){var i;for(null===(i=this._$AP)||void 0===i||i.call(this,!1,!0,e);t&&t!==this._$AB;){const e=t.nextSibling;t.remove(),t=e}}setConnected(t){var e;void 0===this._$AM&&(this._$Cp=t,null===(e=this._$AP)||void 0===e||e.call(this,t))}}class q{constructor(t,e,i,s,r){this.type=1,this._$AH=B,this._$AN=void 0,this.element=t,this.name=e,this._$AM=s,this.options=r,i.length>2||""!==i[0]||""!==i[1]?(this._$AH=Array(i.length-1).fill(new String),this.strings=i):this._$AH=B}get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}_$AI(t,e=this,i,s){const r=this.strings;let n=!1;if(void 0===r)t=Y(this,t,e,0),n=!S(t)||t!==this._$AH&&t!==R,n&&(this._$AH=t);else{const s=t;let o,a;for(t=r[0],o=0;o<r.length-1;o++)a=Y(this,s[i+o],e,o),a===R&&(a=this._$AH[o]),n||(n=!S(a)||a!==this._$AH[o]),a===B?t=B:t!==B&&(t+=(null!=a?a:"")+r[o+1]),this._$AH[o]=a}n&&!s&&this.j(t)}j(t){t===B?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,null!=t?t:"")}}class K extends q{constructor(){super(...arguments),this.type=3}j(t){this.element[this.name]=t===B?void 0:t}}const F=w?w.emptyScript:"";class G extends q{constructor(){super(...arguments),this.type=4}j(t){t&&t!==B?this.element.setAttribute(this.name,F):this.element.removeAttribute(this.name)}}class J extends q{constructor(t,e,i,s,r){super(t,e,i,s,r),this.type=5}_$AI(t,e=this){var i;if((t=null!==(i=Y(this,t,e,0))&&void 0!==i?i:B)===R)return;const s=this._$AH,r=t===B&&s!==B||t.capture!==s.capture||t.once!==s.once||t.passive!==s.passive,n=t!==B&&(s===B||r);r&&this.element.removeEventListener(this.name,this,s),n&&this.element.addEventListener(this.name,this,t),this._$AH=t}handleEvent(t){var e,i;"function"==typeof this._$AH?this._$AH.call(null!==(i=null===(e=this.options)||void 0===e?void 0:e.host)&&void 0!==i?i:this.element,t):this._$AH.handleEvent(t)}}class Q{constructor(t,e,i){this.element=t,this.type=6,this._$AN=void 0,this._$AM=e,this.options=i}get _$AU(){return this._$AM._$AU}_$AI(t){Y(this,t)}}const tt={O:A,P:b,A:y,C:1,M:I,L:X,D:k,R:Y,I:W,V:q,H:G,N:J,U:K,F:Q},et=$.litHtmlPolyfillSupport;null==et||et(Z,W),(null!==(g=$.litHtmlVersions)&&void 0!==g?g:$.litHtmlVersions=[]).push("2.7.4");var it,st;let rt=class extends m{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){var t,e;const i=super.createRenderRoot();return null!==(t=(e=this.renderOptions).renderBefore)&&void 0!==t||(e.renderBefore=i.firstChild),i}update(t){const e=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=((t,e,i)=>{var s,r;const n=null!==(s=null==i?void 0:i.renderBefore)&&void 0!==s?s:e;let o=n._$litPart$;if(void 0===o){const t=null!==(r=null==i?void 0:i.renderBefore)&&void 0!==r?r:null;n._$litPart$=o=new W(e.insertBefore(H(),t),t,void 0,null!=i?i:{})}return o._$AI(t),o})(e,this.renderRoot,this.renderOptions)}connectedCallback(){var t;super.connectedCallback(),null===(t=this._$Do)||void 0===t||t.setConnected(!0)}disconnectedCallback(){var t;super.disconnectedCallback(),null===(t=this._$Do)||void 0===t||t.setConnected(!1)}render(){return R}};rt.finalized=!0,rt._$litElement$=!0,null===(it=globalThis.litElementHydrateSupport)||void 0===it||it.call(globalThis,{LitElement:rt});const nt=globalThis.litElementPolyfillSupport;null==nt||nt({LitElement:rt}),(null!==(st=globalThis.litElementVersions)&&void 0!==st?st:globalThis.litElementVersions=[]).push("3.3.2");const ot=(t,e)=>"method"===e.kind&&e.descriptor&&!("value"in e.descriptor)?{...e,finisher(i){i.createProperty(e.key,t)}}:{kind:"field",key:Symbol(),placement:"own",descriptor:{},originalKey:e.key,initializer(){"function"==typeof e.initializer&&(this[e.key]=e.initializer.call(this))},finisher(i){i.createProperty(e.key,t)}};function at(t){return(e,i)=>void 0!==i?((t,e,i)=>{e.constructor.createProperty(i,t)})(t,e,i):ot(t,e)}var lt;null===(lt=window.HTMLSlotElement)||void 0===lt||lt.prototype.assignedElements;const dt=(t,e,i)=>{for(const i of e)if(i[0]===t)return(0,i[1])();return null==i?void 0:i()},ht=2;class ct{constructor(t){}get _$AU(){return this._$AM._$AU}_$AT(t,e,i){this._$Ct=t,this._$AM=e,this._$Ci=i}_$AS(t,e){return this.update(t,e)}update(t,e){return this.render(...e)}}const{I:vt}=tt,ut=()=>document.createComment(""),pt=(t,e,i)=>{var s;const r=t._$AA.parentNode,n=void 0===e?t._$AB:e._$AA;if(void 0===i){const e=r.insertBefore(ut(),n),s=r.insertBefore(ut(),n);i=new vt(e,s,t,t.options)}else{const e=i._$AB.nextSibling,o=i._$AM,a=o!==t;if(a){let e;null===(s=i._$AQ)||void 0===s||s.call(i,t),i._$AM=t,void 0!==i._$AP&&(e=t._$AU)!==o._$AU&&i._$AP(e)}if(e!==n||a){let t=i._$AA;for(;t!==e;){const e=t.nextSibling;r.insertBefore(t,n),t=e}}}return i},_t=(t,e,i=t)=>(t._$AI(e,i),t),mt={},gt=t=>{var e;null===(e=t._$AP)||void 0===e||e.call(t,!1,!0);let i=t._$AA;const s=t._$AB.nextSibling;for(;i!==s;){const t=i.nextSibling;i.remove(),i=t}},$t=(t,e,i)=>{const s=new Map;for(let r=e;r<=i;r++)s.set(t[r],r);return s},wt=(t=>(...e)=>({_$litDirective$:t,values:e}))(class extends ct{constructor(t){if(super(t),t.type!==ht)throw Error("repeat() can only be used in text expressions")}dt(t,e,i){let s;void 0===i?i=e:void 0!==e&&(s=e);const r=[],n=[];let o=0;for(const e of t)r[o]=s?s(e,o):o,n[o]=i(e,o),o++;return{values:n,keys:r}}render(t,e,i){return this.dt(t,e,i).values}update(t,[e,i,s]){var r;const n=(t=>t._$AH)(t),{values:o,keys:a}=this.dt(e,i,s);if(!Array.isArray(n))return this.ht=a,o;const l=null!==(r=this.ht)&&void 0!==r?r:this.ht=[],d=[];let h,c,v=0,u=n.length-1,p=0,_=o.length-1;for(;v<=u&&p<=_;)if(null===n[v])v++;else if(null===n[u])u--;else if(l[v]===a[p])d[p]=_t(n[v],o[p]),v++,p++;else if(l[u]===a[_])d[_]=_t(n[u],o[_]),u--,_--;else if(l[v]===a[_])d[_]=_t(n[v],o[_]),pt(t,d[_+1],n[v]),v++,_--;else if(l[u]===a[p])d[p]=_t(n[u],o[p]),pt(t,n[v],n[u]),u--,p++;else if(void 0===h&&(h=$t(a,p,_),c=$t(l,v,u)),h.has(l[v]))if(h.has(l[u])){const e=c.get(a[p]),i=void 0!==e?n[e]:null;if(null===i){const e=pt(t,n[v]);_t(e,o[p]),d[p]=e}else d[p]=_t(i,o[p]),pt(t,n[v],i),n[e]=null;p++}else gt(n[u]),u--;else gt(n[v]),v++;for(;p<=_;){const e=pt(t,d[_+1]);_t(e,o[p]),d[p++]=e}for(;v<=u;){const t=n[v++];null!==t&&gt(t)}return this.ht=a,((t,e=mt)=>{t._$AH=e})(t,d),R}});class ft extends rt{constructor(){super(...arguments),this.active=!1,this.currentX=0,this.currentY=0,this.initialX=0,this.initialY=0}static getConfigElement(){return document.createElement("polr-android-tv-remote-card-editor")}static getStubConfig(){return{entity_id:"remote.atvremote",apps:["disneyplus"],remote:"touch"}}static get properties(){return{_hass:{},_config:{}}}setConfig(t){if(!t.entity_id)throw new Error("entity_id must be specified");this._config=t}set hass(t){this._hass=t}firstUpdated(){this._touchpad=this.renderRoot.querySelector("#touchpad"),this._dragItem=this.renderRoot.querySelector("#nub")}render(){return O`
       <ha-card>
         <div class="card-content">
           <div class="grid card-grid">
-            ${o(this._config.remote, [
-            ['default', () => this._render_defaultpad()],
-            ['touch', () => this._render_touchpad()],
-            ['dpad', () => this._render_dpad()],
-        ])}
+            ${dt(this._config.remote,[["default",()=>this._render_defaultpad()],["touch",()=>this._render_touchpad()],["dpad",()=>this._render_dpad()]])}
             ${this._render_apps()}
             ${this._render_volume()}
           </div>
         </div>
       </ha-card>
-    `;
-    }
-    _render_volume() {
-        return x `
+    `}_render_volume(){return O`
       <div class="grid volume-grid">
-        <div @click=${{ handleEvent: () => this._send_command("VOLUME_DOWN") }} class="remote-button">
+        <div @click=${{handleEvent:()=>this._send_command("VOLUME_DOWN")}} class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -159,7 +21,7 @@ class PoLRATVRemoteCard extends s$1 {
             <path d="M3,9H7L12,4V20L7,15H3V9M14,11H22V13H14V11Z" />
           </svg>
         </div>
-        <div @click=${{ handleEvent: () => this._send_command("MUTE") }} class="remote-button">
+        <div @click=${{handleEvent:()=>this._send_command("MUTE")}} class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -172,7 +34,7 @@ class PoLRATVRemoteCard extends s$1 {
             />
           </svg>
         </div>
-        <div @click=${{ handleEvent: () => this._send_command("VOLUME_UP") }} class="remote-button">
+        <div @click=${{handleEvent:()=>this._send_command("VOLUME_UP")}} class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -186,40 +48,33 @@ class PoLRATVRemoteCard extends s$1 {
           </svg>
         </div>
       </div>
-    `;
-    }
-    /** REMOTE LAYOUTS **/
-    _render_dpad() {
-        return x `
+    `}_render_dpad(){return O`
       ${this._render_power()}
       <div class="pie">
         <div class="slice">
-          <div id="top" class="slice-contents" @click=${{ handleEvent: () => this._send_command("DPAD_UP") }}>
+          <div id="top" class="slice-contents" @click=${{handleEvent:()=>this._send_command("DPAD_UP")}}>
             top button
           </div>
         </div>
         <div class="slice">
-          <div id="right" class="slice-contents" @click=${{ handleEvent: () => this._send_command("DPAD_RIGHT") }}>
+          <div id="right" class="slice-contents" @click=${{handleEvent:()=>this._send_command("DPAD_RIGHT")}}>
             click 2
           </div>
         </div>
         <div class="slice">
-          <div id="down" class="slice-contents" @click=${{ handleEvent: () => this._send_command("DPAD_DOWN") }}>
+          <div id="down" class="slice-contents" @click=${{handleEvent:()=>this._send_command("DPAD_DOWN")}}>
             click 3
           </div>
         </div>
         <div class="slice">
-          <div id="left" class="slice-contents" @click=${{ handleEvent: () => this._send_command("DPAD_LEFT") }}>
+          <div id="left" class="slice-contents" @click=${{handleEvent:()=>this._send_command("DPAD_LEFT")}}>
             click 4
           </div>
         </div>
-        <div id="center" class="inner-pie" @click=${{ handleEvent: () => this._send_command("DPAD_CENTER") }}></div>
+        <div id="center" class="inner-pie" @click=${{handleEvent:()=>this._send_command("DPAD_CENTER")}}></div>
       </div>
       ${this._render_basic_buttons()}
-    `;
-    }
-    _render_touchpad() {
-        return x `
+    `}_render_touchpad(){return O`
       ${this._render_power()}
       <div id="touchpad">
         <div
@@ -233,12 +88,9 @@ class PoLRATVRemoteCard extends s$1 {
         ></div>
       </div>
       ${this._render_basic_buttons()}
-    `;
-    }
-    _render_defaultpad() {
-        return x `
+    `}_render_defaultpad(){return O`
       <div class="grid remote-grid">
-        <div @click=${{ handleEvent: () => this._press_power() }} class="remote-button">
+        <div @click=${{handleEvent:()=>this._press_power()}} class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -250,7 +102,7 @@ class PoLRATVRemoteCard extends s$1 {
             />
           </svg>
         </div>
-        <div @click=${{ handleEvent: () => this._send_command("DPAD_UP") }} class="remote-button">
+        <div @click=${{handleEvent:()=>this._send_command("DPAD_UP")}} class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -260,7 +112,7 @@ class PoLRATVRemoteCard extends s$1 {
             <path d="M7,15L12,10L17,15H7Z" />
           </svg>
         </div>
-        <div @click=${{ handleEvent: () => this._send_command("HOME") }} class="remote-button">
+        <div @click=${{handleEvent:()=>this._send_command("HOME")}} class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -270,7 +122,7 @@ class PoLRATVRemoteCard extends s$1 {
             <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" />
           </svg>
         </div>
-        <div @click=${{ handleEvent: () => this._send_command("DPAD_LEFT") }} class="remote-button">
+        <div @click=${{handleEvent:()=>this._send_command("DPAD_LEFT")}} class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -280,8 +132,8 @@ class PoLRATVRemoteCard extends s$1 {
             <path d="M14,7L9,12L14,17V7Z" />
           </svg>
         </div>
-        <div @click=${{ handleEvent: () => this._send_command("DPAD_CENTER") }} class="center remote-button"></div>
-        <div @click=${{ handleEvent: () => this._send_command("DPAD_RIGHT") }} class="remote-button">
+        <div @click=${{handleEvent:()=>this._send_command("DPAD_CENTER")}} class="center remote-button"></div>
+        <div @click=${{handleEvent:()=>this._send_command("DPAD_RIGHT")}} class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -291,7 +143,7 @@ class PoLRATVRemoteCard extends s$1 {
             <path d="M10,17L15,12L10,7V17Z" />
           </svg>
         </div>
-        <div @click=${{ handleEvent: () => this._send_command("BACK") }} class="remote-button">
+        <div @click=${{handleEvent:()=>this._send_command("BACK")}} class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -303,7 +155,7 @@ class PoLRATVRemoteCard extends s$1 {
             />
           </svg>
         </div>
-        <div @click=${{ handleEvent: () => this._send_command("DPAD_DOWN") }} class="remote-button">
+        <div @click=${{handleEvent:()=>this._send_command("DPAD_DOWN")}} class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -313,7 +165,7 @@ class PoLRATVRemoteCard extends s$1 {
             <path d="M7,10L12,15L17,10H7Z" />
           </svg>
         </div>
-        <div @click=${{ handleEvent: () => this._press_favorite_2() }} class="remote-button">
+        <div @click=${{handleEvent:()=>this._press_favorite_2()}} class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -326,12 +178,9 @@ class PoLRATVRemoteCard extends s$1 {
           </svg>
         </div>
       </div>
-    `;
-    }
-    _render_power() {
-        return x `
+    `}_render_power(){return O`
       <div class="power-grid">
-        <div @click=${{ handleEvent: () => this._press_power() }} class="remote-button">
+        <div @click=${{handleEvent:()=>this._press_power()}} class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -344,12 +193,9 @@ class PoLRATVRemoteCard extends s$1 {
           </svg>
         </div>
       </div>
-    `;
-    }
-    _render_basic_buttons() {
-        return x `
+    `}_render_basic_buttons(){return O`
       <div class="grid basic-grid">
-        <div @click=${{ handleEvent: () => this._send_command("HOME") }} class="remote-button">
+        <div @click=${{handleEvent:()=>this._send_command("HOME")}} class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -359,7 +205,7 @@ class PoLRATVRemoteCard extends s$1 {
             <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" />
           </svg>
         </div>
-        <div @click=${{ handleEvent: () => this._send_command("BACK") }} class="remote-button">
+        <div @click=${{handleEvent:()=>this._send_command("BACK")}} class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -372,31 +218,14 @@ class PoLRATVRemoteCard extends s$1 {
           </svg>
         </div>
       </div>
-    `;
-    }
-    /** APP LAYOUTS **/
-    _render_apps() {
-        if (!this._config.apps) {
-            return x ``;
-        }
-        return x `
+    `}_render_apps(){return this._config.apps?O`
       <div class="grid app-grid">
-      ${c(this._config.apps, (app) => app, (app, index) => x `
-        ${o(app, [
-            ['disneyplus', () => this._render_disneyplus()],
-            ['hbomax', () => this._render_hbomax()],
-            ['hulu', () => this._render_hulu()],
-            ['netflix', () => this._render_netflix()],
-            ['prime', () => this._render_prime()],
-            ['youtube', () => this._render_youtube()],
-        ], () => this._render_custom(app))}
-      `)}
+      ${wt(this._config.apps,(t=>t),((t,e)=>O`
+        ${dt(t,[["disneyplus",()=>this._render_disneyplus()],["hbomax",()=>this._render_hbomax()],["hulu",()=>this._render_hulu()],["netflix",()=>this._render_netflix()],["prime",()=>this._render_prime()],["youtube",()=>this._render_youtube()]],(()=>this._render_custom(t)))}
+      `))}
     </div>
-    `;
-    }
-    _render_disneyplus() {
-        return x `
-      <div @click=${{ handleEvent: () => this._turn_on("https://www.disneyplus.com") }} class="remote-button">
+    `:O``}_render_disneyplus(){return O`
+      <div @click=${{handleEvent:()=>this._turn_on("https://www.disneyplus.com")}} class="remote-button">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="48"
@@ -408,11 +237,8 @@ class PoLRATVRemoteCard extends s$1 {
           />
         </svg>
       </div>
-    `;
-    }
-    _render_hbomax() {
-        return x `
-      <div @click=${{ handleEvent: () => this._turn_on("https://play.hbomax.com") }} class="remote-button">
+    `}_render_hbomax(){return O`
+      <div @click=${{handleEvent:()=>this._turn_on("https://play.hbomax.com")}} class="remote-button">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="48"
@@ -424,11 +250,8 @@ class PoLRATVRemoteCard extends s$1 {
           />
         </svg>
       </div>
-    `;
-    }
-    _render_hulu() {
-        return x `
-      <div @click=${{ handleEvent: () => this._turn_on("HULU") }} class="remote-button">
+    `}_render_hulu(){return O`
+      <div @click=${{handleEvent:()=>this._turn_on("HULU")}} class="remote-button">
         <svg
           width="48px"
           height="48px"
@@ -442,11 +265,8 @@ class PoLRATVRemoteCard extends s$1 {
           />
         </svg>
       </div>
-    `;
-    }
-    _render_netflix() {
-        return x `
-      <div @click=${{ handleEvent: () => this._turn_on("https://www.netflix.com/title") }} class="remote-button">
+    `}_render_netflix(){return O`
+      <div @click=${{handleEvent:()=>this._turn_on("https://www.netflix.com/title")}} class="remote-button">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           xml:space="preserve"
@@ -460,11 +280,8 @@ class PoLRATVRemoteCard extends s$1 {
           />
         </svg>
       </div>
-    `;
-    }
-    _render_prime() {
-        return x `
-      <div @click=${{ handleEvent: () => this._turn_on("https://app.primevideo.com") }} class="remote-button">
+    `}_render_prime(){return O`
+      <div @click=${{handleEvent:()=>this._turn_on("https://app.primevideo.com")}} class="remote-button">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="48"
@@ -476,11 +293,8 @@ class PoLRATVRemoteCard extends s$1 {
           />
         </svg>
       </div>
-    `;
-    }
-    _render_youtube() {
-        return x `
-      <div @click=${{ handleEvent: () => this._turn_on("https://www.youtube.com") }} class="remote-button">
+    `}_render_youtube(){return O`
+      <div @click=${{handleEvent:()=>this._turn_on("https://www.youtube.com")}} class="remote-button">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           xml:space="preserve"
@@ -494,89 +308,11 @@ class PoLRATVRemoteCard extends s$1 {
           />
         </svg>
       </div>
-    `;
-    }
-    _render_custom(app) {
-        return x `
-      <div @click=${{ handleEvent: () => this._turn_on(app.url) }} class="remote-button">
-        <ha-icon icon="${app.icon}"></ha-icon>
+    `}_render_custom(t){return O`
+      <div @click=${{handleEvent:()=>this._turn_on(t.url)}} class="remote-button">
+        <ha-icon icon="${t.icon}"></ha-icon>
       </div>
-    `;
-    }
-    _send_command(action) {
-        this._hass.callService("remote", "send_command", {
-            entity_id: this._config.entity_id,
-            command: action,
-        });
-        console.log(`${action} was called`);
-    }
-    _turn_on(action) {
-        this._hass.callService("remote", "turn_on", {
-            entity_id: this._config.entity_id,
-            activity: action,
-        });
-        console.log(`${action} was called`);
-    }
-    _press_power() {
-        this._hass.callService("remote", "toggle", {
-            entity_id: this._config.entity_id,
-        });
-    }
-    _press_favorite_2() {
-    }
-    _dragStart(e) {
-        e.preventDefault();
-        if (e.type === "touchstart") {
-            this.initialX = e.touches[0].clientX;
-            this.initialY = e.touches[0].clientY;
-        }
-        else {
-            this.initialX = e.clientX;
-            this.initialY = e.clientY;
-        }
-        if (e.target === this._dragItem) {
-            this.active = true;
-        }
-    }
-    _dragEnd(e) {
-        let x = this.currentX / this._touchpad.offsetWidth;
-        let y = this.currentY / this._touchpad.offsetHeight;
-        if (Math.abs(x) < 0.01 && Math.abs(y) < 0.01) {
-            this._send_command("DPAD_CENTER");
-        }
-        else {
-            if (Math.abs(x) >= Math.abs(y)) {
-                x < 0 ? this._send_command("DPAD_LEFT") : this._send_command("DPAD_RIGHT");
-            }
-            else {
-                y < 0 ? this._send_command("DPAD_UP") : this._send_command("DPAD_DOWN");
-            }
-        }
-        this._setTranslate(0, 0, this._dragItem, "0.5s");
-        this.active = false;
-        this.currentX = 0;
-        this.currentY = 0;
-    }
-    _drag(e) {
-        if (this.active) {
-            e.preventDefault();
-            if (e.type === "touchmove") {
-                this.currentX = e.touches[0].clientX - this.initialX;
-                this.currentY = e.touches[0].clientY - this.initialY;
-            }
-            else {
-                this.currentX = e.clientX - this.initialX;
-                this.currentY = e.clientY - this.initialY;
-            }
-            this._setTranslate(this.currentX, this.currentY, this._dragItem, "0s");
-        }
-    }
-    _setTranslate(xPos, yPos, el, duration) {
-        el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
-        el.style.transitionDuration = duration;
-    }
-}
-PoLRATVRemoteCard.styles = i$3 `
+    `}_send_command(t){this._hass.callService("remote","send_command",{entity_id:this._config.entity_id,command:t}),console.log(`${t} was called`)}_turn_on(t){this._hass.callService("remote","turn_on",{entity_id:this._config.entity_id,activity:t}),console.log(`${t} was called`)}_press_power(){this._hass.callService("remote","toggle",{entity_id:this._config.entity_id})}_press_favorite_2(){}_dragStart(t){t.preventDefault(),"touchstart"===t.type?(this.initialX=t.touches[0].clientX,this.initialY=t.touches[0].clientY):(this.initialX=t.clientX,this.initialY=t.clientY),t.target===this._dragItem&&(this.active=!0)}_dragEnd(t){let e=this.currentX/this._touchpad.offsetWidth,i=this.currentY/this._touchpad.offsetHeight;Math.abs(e)<.01&&Math.abs(i)<.01?this._send_command("DPAD_CENTER"):Math.abs(e)>=Math.abs(i)?e<0?this._send_command("DPAD_LEFT"):this._send_command("DPAD_RIGHT"):i<0?this._send_command("DPAD_UP"):this._send_command("DPAD_DOWN"),this._setTranslate(0,0,this._dragItem,"0.5s"),this.active=!1,this.currentX=0,this.currentY=0}_drag(t){this.active&&(t.preventDefault(),"touchmove"===t.type?(this.currentX=t.touches[0].clientX-this.initialX,this.currentY=t.touches[0].clientY-this.initialY):(this.currentX=t.clientX-this.initialX,this.currentY=t.clientY-this.initialY),this._setTranslate(this.currentX,this.currentY,this._dragItem,"0s"))}_setTranslate(t,e,i,s){i.style.transform="translate3d("+t+"px, "+e+"px, 0)",i.style.transitionDuration=s}}ft.styles=((t,...e)=>{const i=1===t.length?t[0]:e.reduce(((e,i,s)=>e+(t=>{if(!0===t._$cssResult$)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(i)+t[s+1]),t[0]);return new n(i,t,s)})`
     .card-content {
       margin: auto;
     }
@@ -752,7 +488,7 @@ PoLRATVRemoteCard.styles = i$3 `
 
     .slice:nth-child(1) .slice-contents,
     .slice:nth-child(2) .slice-contents,
-    .slice:nth-child(3) .slice-contents,
+    .slice:nth-child(3) .slice-contents {
       transform: skewY(-30deg);
       // background-color: #222222;
     }
@@ -773,17 +509,4 @@ PoLRATVRemoteCard.styles = i$3 `
       border: 4px var(--ha-card-border-color, var(--divider-color, #e0e0e0)) solid;
       background-color: #222222;
     }
-  `;
-__decorate([
-    n$1()
-], PoLRATVRemoteCard.prototype, "_config", void 0);
-__decorate([
-    n$1()
-], PoLRATVRemoteCard.prototype, "_hass", void 0);
-customElements.define("polr-android-tv-remote-card", PoLRATVRemoteCard);
-window.customCards = window.customCards || [];
-window.customCards.push({
-    type: 'polr-android-tv-remote-card',
-    name: 'PoLR Android TV Remote Card',
-    description: 'Control your Android TV',
-});
+  `,t([at()],ft.prototype,"_config",void 0),t([at()],ft.prototype,"_hass",void 0),customElements.define("polr-android-tv-remote-card",ft),window.customCards=window.customCards||[],window.customCards.push({type:"polr-android-tv-remote-card",name:"PoLR Android TV Remote Card",description:"Control your Android TV"});

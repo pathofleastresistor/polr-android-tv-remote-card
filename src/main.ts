@@ -17,7 +17,7 @@ class PoLRATVRemoteCard extends LitElement {
   
 
   static getConfigElement() {
-    return document.createElement("polr-atv-remote-card-editor");
+    return document.createElement("polr-android-tv-remote-card-editor");
   }
 
   static getStubConfig() {
@@ -703,7 +703,7 @@ class PoLRATVRemoteCard extends LitElement {
 
     .slice:nth-child(1) .slice-contents,
     .slice:nth-child(2) .slice-contents,
-    .slice:nth-child(3) .slice-contents,
+    .slice:nth-child(3) .slice-contents {
       transform: skewY(-30deg);
       // background-color: #222222;
     }
