@@ -727,10 +727,10 @@ class PoLRATVRemoteCard extends LitElement {
   `;
 }
 
-customElements.define("polr-atv-remote-card", PoLRATVRemoteCard);
+customElements.define("polr-android-tv-remote-card", PoLRATVRemoteCard);
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({
-  type: 'polr-atv-remote-card',
+  type: 'polr-android-tv-remote-card',
   name: 'PoLR Android TV Remote Card',
   description: 'Control your Android TV',
 });

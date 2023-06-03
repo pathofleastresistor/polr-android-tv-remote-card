@@ -780,10 +780,10 @@ __decorate([
 __decorate([
     n$1()
 ], PoLRATVRemoteCard.prototype, "_hass", void 0);
-customElements.define("polr-atv-remote-card", PoLRATVRemoteCard);
+customElements.define("polr-android-tv-remote-card", PoLRATVRemoteCard);
 window.customCards = window.customCards || [];
 window.customCards.push({
-    type: 'polr-atv-remote-card',
+    type: 'polr-android-tv-remote-card',
     name: 'PoLR Android TV Remote Card',
     description: 'Control your Android TV',
 });
