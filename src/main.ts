@@ -623,8 +623,8 @@ class PoLRATVRemoteCard extends LitElement {
       width: 80%;
       height: 300px;
       background-color: var(
-        --ha-card-background,
-        var(--card-background-color, #fff)
+        --ha-card-border-color,
+        var(--divider-color, #e0e0e0)
       );
       border: 1px var(--ha-card-border-color,var(--divider-color,#e0e0e0)) solid;
       display: flex;
