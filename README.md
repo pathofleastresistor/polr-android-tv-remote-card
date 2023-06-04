@@ -93,6 +93,7 @@ If the app you want isn't supported, you can still add it by including a `icon` 
 ```
 type: custom:polr-android-tv-remote-card
 entity_id: remote.android_tv_remote
+remote: touch
 apps:
     - disneyplus
     - hbomax
