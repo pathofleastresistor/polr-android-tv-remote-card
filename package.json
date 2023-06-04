@@ -3,24 +3,40 @@
   "version": "1.0.0",
   "description": "This was designed to solve a personal need and I'm now trying to prepare it for others to use. That means several things can break between releases.",
   "main": "polr-android-tv-remote-card.js",
-  "scripts": {
-    "build-lit": "npx watchify ./src/polr-android-tv-remote-card.js -o \"npx browserify -p esmify ./src/polr-android-tv-remote-card.js > polr-android-tv-remote-card.js\""
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pathofleastresistor/polr-android-tv-remote-card.git"
   },
   "author": "",
   "license": "MIT",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/pathofleastresistor/polr-android-tv-remote-card/issues"
   },
   "homepage": "https://github.com/pathofleastresistor/polr-android-tv-remote-card#readme",
+  "scripts": {
+    "build": "npx rollup -c",
+    "watch": "npx rollup -c --watch"
+  },
   "devDependencies": {
-    "browser-resolve": "^2.0.0",
-    "browserify": "^17.0.0",
-    "esmify": "^2.1.1",
+    "@babel/core": "^7.22.1",
+    "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.1.0",
+    "@rollup/plugin-terser": "^0.4.3",
+    "rollup-plugin-typescript2": "^0.34.1",
+    "tslib": "^2.5.3",
+    "typescript": "^5.1.3"
+  },
+  "dependencies": {
     "lit": "^2.7.5",
-    "watchify": "^4.0.0"
+    "@material/mwc-formfield": "^0.25.3",
+    "@material/mwc-list": "^0.25.3",
+    "@material/mwc-menu": "^0.25.3",
+    "@material/mwc-notched-outline": "^0.25.3",
+    "@material/mwc-ripple": "^0.25.3",
+    "@material/mwc-select": "^0.25.3",
+    "@material/mwc-switch": "^0.25.3",
+    "@material/mwc-textfield": "^0.25.3"
   }
 }
