@@ -34,9 +34,9 @@ A Lovelace card designed as a companion to the [Android TV Remote](https://www.h
         <td>entity__id</td>
         <td>yes</td>
         <td>
-            <pre>
+<pre>
 entity_id: remote.atvremote
-            </pre>
+</pre>
         </td>
         <td>Must be a remote entity created by the new Android TV integration</td>
     </tr>
@@ -54,12 +54,22 @@ apps:
         <td>Must be a remote entity created by the new Android TV integration</td>
     </tr>
     <tr>
+        <td>remote</td>
+        <td>no</td>
+        <td>
+<pre>
+remote: default
+</pre>
+        </td>
+        <td><code>default</code>, <code>dpad</code>, <code>touch</code></td>
+    </tr>
+    <tr>
         <td>volume</td>
         <td>no</td>
         <td>
-            <pre>
+<pre>
 volume: false
-            </pre>
+</pre>
         </td>
         <td>Must be a remote entity created by the new Android TV integration</td>
     </tr>

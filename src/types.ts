@@ -2,7 +2,6 @@ export interface ATVRemoteCardConfig {
     entity_id: string;
     remote: string;
     apps: Array<App> | [];
-    power_action: [] | string;
     volume: boolean;
 }
 
