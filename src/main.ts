@@ -41,12 +41,17 @@ class PoLRATVRemoteCard extends LitElement {
     if (!config.entity_id) {
       throw new Error("entity_id must be specified");
     }
+
     this._config = JSON.parse(JSON.stringify(config));
     
     if (!this._config.hasOwnProperty("volume")) {
       this._config.volume = true;
     }
-    
+
+    if (!this._config.hasOwnProperty("remote")) {
+      this._config.remote = "default";
+    }
+
   }
 
   set hass(hass) {
