@@ -106,7 +106,7 @@ apps:
 ### Screenshot
 
 <p align="center">
-  <img width="300" src="images/touchpad-dark.png">
+  <img width="600" src="images/card-config.png">
 </p>
 
 ### Customization
