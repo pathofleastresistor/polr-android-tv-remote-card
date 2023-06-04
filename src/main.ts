@@ -2,7 +2,7 @@ import { LitElement, html, css } from 'lit';
 import { property } from "lit/decorators.js";
 import { choose } from 'lit/directives/choose.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { ATVRemoteCardConfig, CustomApp } from "./types";
+import { ATVRemoteCardConfig, CustomApp, App, ServiceApp } from "./types";
 
 class PoLRATVRemoteCard extends LitElement {
   @property() _config : any;
@@ -79,7 +79,7 @@ class PoLRATVRemoteCard extends LitElement {
   _render_volume() {
     return html`
       <div class="grid volume-grid">
-        <div @click=${{ handleEvent: () => this._send_command("VOLUME_DOWN") }} class="remote-button">
+        <div @click=${ this._press_volume_down } class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -90,7 +90,7 @@ class PoLRATVRemoteCard extends LitElement {
             <path d="M3,9H7L12,4V20L7,15H3V9M14,11H22V13H14V11Z" />
           </svg>
         </div>
-        <div @click=${{ handleEvent: () => this._send_command("MUTE") }} class="remote-button">
+        <div @click=${ this._press_volume_mute } class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -103,7 +103,7 @@ class PoLRATVRemoteCard extends LitElement {
             />
           </svg>
         </div>
-        <div @click=${{ handleEvent: () => this._send_command("VOLUME_UP") }} class="remote-button">
+        <div @click=${ this._press_volume_up } class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -120,32 +120,32 @@ class PoLRATVRemoteCard extends LitElement {
     `;
   }
 
-/** REMOTE LAYOUTS **/
+  /** REMOTE LAYOUTS **/
   _render_dpad() {
     return html`
       ${ this._render_power() }
       <div class="dpad">
         <div class="slice">
-          <div id="top" class="slice-contents" @click=${{ handleEvent: () => this._send_command("DPAD_UP") }}>
+          <div id="top" class="slice-contents" @click=${ this._press_up }>
             top button
           </div>
         </div>
         <div class="slice">
-          <div id="right" class="slice-contents" @click=${{ handleEvent: () => this._send_command("DPAD_RIGHT") }}>
+          <div id="right" class="slice-contents" @click=${ this._press_right }>
             click 2
           </div>
         </div>
         <div class="slice">
-          <div id="down" class="slice-contents" @click=${{ handleEvent: () =>  this._send_command("DPAD_DOWN") }}>
+          <div id="down" class="slice-contents" @click=${ this._press_down }>
             click 3
           </div>
         </div>
         <div class="slice">
-          <div id="left" class="slice-contents" @click=${{ handleEvent: () =>  this._send_command("DPAD_LEFT") }}>
+          <div id="left" class="slice-contents" @click=${ this._press_left }>
             click 4
           </div>
         </div>
-        <div id="center" class="inner-dpad" @click=${{ handleEvent: () => this._send_command("DPAD_CENTER") }}></div>
+        <div id="center" class="inner-dpad" @click=${ this._press_center }></div>
       </div>
       ${ this._render_basic_buttons() }
     `;
@@ -172,7 +172,7 @@ class PoLRATVRemoteCard extends LitElement {
   _render_defaultpad() {
     return html`
       <div class="grid remote-grid">
-        <div @click=${{ handleEvent: () => this._press_power() }} class="remote-button">
+        <div @click=${ this._press_power } class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -184,7 +184,7 @@ class PoLRATVRemoteCard extends LitElement {
             />
           </svg>
         </div>
-        <div @click=${{ handleEvent: () => this._send_command("DPAD_UP") }} class="remote-button">
+        <div @click=${ this._press_up } class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -194,7 +194,7 @@ class PoLRATVRemoteCard extends LitElement {
             <path d="M7,15L12,10L17,15H7Z" />
           </svg>
         </div>
-        <div @click=${{ handleEvent: () => this._send_command("HOME") }} class="remote-button">
+        <div @click=${ this._press_home } class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -204,7 +204,7 @@ class PoLRATVRemoteCard extends LitElement {
             <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" />
           </svg>
         </div>
-        <div @click=${{ handleEvent: () => this._send_command("DPAD_LEFT") }} class="remote-button">
+        <div @click=${ this._press_left } class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -214,8 +214,8 @@ class PoLRATVRemoteCard extends LitElement {
             <path d="M14,7L9,12L14,17V7Z" />
           </svg>
         </div>
-        <div @click=${{ handleEvent: () => this._send_command("DPAD_CENTER") }} class="center remote-button"></div>
-        <div @click=${{ handleEvent: () => this._send_command("DPAD_RIGHT") }} class="remote-button">
+        <div @click=${ this._press_center } class="center remote-button"></div>
+        <div @click=${ this._press_right } class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -225,7 +225,7 @@ class PoLRATVRemoteCard extends LitElement {
             <path d="M10,17L15,12L10,7V17Z" />
           </svg>
         </div>
-        <div @click=${{ handleEvent: () =>  this._send_command("BACK") }} class="remote-button">
+        <div @click=${ this._press_back } class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -237,7 +237,7 @@ class PoLRATVRemoteCard extends LitElement {
             />
           </svg>
         </div>
-        <div @click=${{ handleEvent: () =>  this._send_command("DPAD_DOWN") }} class="remote-button">
+        <div @click=${ this._press_down } class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -247,7 +247,7 @@ class PoLRATVRemoteCard extends LitElement {
             <path d="M7,10L12,15L17,10H7Z" />
           </svg>
         </div>
-        <div @click=${{ handleEvent: () =>  this._press_favorite_2() }} class="remote-button">
+        <div @click=${ this._press_favorite_2 } class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -266,7 +266,7 @@ class PoLRATVRemoteCard extends LitElement {
   _render_power() {
     return html`
       <div class="power-grid">
-        <div @click=${{ handleEvent: () =>  this._press_power() }} class="remote-button">
+        <div @click=${ this._press_power } class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -285,7 +285,7 @@ class PoLRATVRemoteCard extends LitElement {
   _render_basic_buttons() {
     return html`
       <div class="grid basic-grid">
-        <div @click=${{ handleEvent: () => this._send_command("HOME") }} class="remote-button">
+        <div @click=${ this._press_home } class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -295,7 +295,7 @@ class PoLRATVRemoteCard extends LitElement {
             <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" />
           </svg>
         </div>
-        <div @click=${{ handleEvent: () => this._send_command("BACK") }} class="remote-button">
+        <div @click=${ this._press_back } class="remote-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="48"
@@ -311,7 +311,7 @@ class PoLRATVRemoteCard extends LitElement {
     `;
   }
 
-/** APP LAYOUTS **/
+  /** APP LAYOUTS **/
   _render_apps() {
     let app_buttons = "";
     if(!this._config.apps) {
@@ -444,7 +444,7 @@ class PoLRATVRemoteCard extends LitElement {
 
   _render_custom(app : CustomApp) {
     return html`
-      <div @click=${{ handleEvent: () => this._turn_on(app.url) }} class="remote-button">
+      <div @click=${{ handleEvent: () => this._press_custom(app) }} id=1 class="remote-button">
         <ha-icon icon="${ app.icon }"></ha-icon>
       </div>
     `;
@@ -467,13 +467,123 @@ class PoLRATVRemoteCard extends LitElement {
   }
 
   _press_power() {
-    this._hass.callService("remote", "toggle", {
-      entity_id: this._config.entity_id,
-    });
+    if(this._config["power"]) {
+      this._callService(this._config["power"]);
+    }
+  }
+
+  _press_up() {
+    if(this._config["up"]) {
+      this._callService(this._config["up"]);
+    } else {
+      this._send_command("DPAD_UP");
+    }
+  }
+
+  _press_left() {
+    if(this._config["left"]) {
+      this._callService(this._config["left"]);
+    } else {
+      this._send_command("DPAD_LEFT");
+    }
+  }
+
+  _press_right() {
+    if(this._config["right"]) {
+      this._callService(this._config["right"]);
+    } else {
+      this._send_command("DPAD_RIGHT");
+    }
+  }
+
+  _press_down() {
+    if(this._config["down"]) {
+      this._callService(this._config["down"]);
+    } else {
+      this._send_command("DPAD_DOWN");
+    }
+  }
+
+  _press_center() {
+    if(this._config["center"]) {
+      this._callService(this._config["center"]);
+    } else {
+      this._send_command("DPAD_CENTER");
+    }
+  }
+
+  _press_home() {
+    if(this._config["home"]) {
+      this._callService(this._config["home"]);
+    } else {
+      this._send_command("HOME");
+    }
+  }
+
+  _press_back() {
+    if(this._config["back"]) {
+      this._callService(this._config["back"]);
+    } else {
+      this._send_command("BACK");
+    }
+  }
+
+  _press_volume_up() {
+    if(this._config["volumeup"]) {
+      this._callService(this._config["volumeup"]);
+    } else {
+      this._send_command("VOLUME_UP");
+    }
+  }
+
+  _press_volume_mute() {
+    this._send_command("MUTE");
+  }
+
+  _press_volume_down() {
+    if(this._config["volumeup"]) {
+      this._callService(this._config["volumedown"]);
+    } else {
+      this._send_command("VOLUME_DOWN");
+    }
+  }
+
+  _press_disney_plus() {
+    this._turn_on("https://www.disneyplus.com");
+  }
+
+  _press_hbo_max() {
+    this._turn_on("https://play.hbomax.com");
+  }
+
+  _press_hulu() {
+    this._turn_on("HULU");
+  }
+
+  _press_netflix() {
+    this._turn_on("https://www.netflix.com/title");
+  }
+
+  _press_prime_video() {
+    this._turn_on("https://app.primevideo.com");
+  }
+
+  _press_youtube() {
+    this._turn_on("https://www.youtube.com");
   }
 
   _press_favorite_2() {
+    console.log("favorite was pressed");
+    this._callService(this._config["favorite"]);    
+  }
 
+  _press_custom(app) {
+    console.log(app);
+    if(app.hasOwnProperty("service")) {
+      this._callService(app)
+    } else {
+      this._turn_on(app.url)
+    }
   }
 
   _dragStart(e) {
@@ -492,23 +602,25 @@ class PoLRATVRemoteCard extends LitElement {
   }
 
   _dragEnd(e) {
-    let x = this.currentX / this._touchpad.offsetWidth;
-    let y = this.currentY / this._touchpad.offsetHeight;
+    if(this.active) {
+      let x = this.currentX / this._touchpad.offsetWidth;
+      let y = this.currentY / this._touchpad.offsetHeight;
 
-    if (Math.abs(x) < 0.01 && Math.abs(y) < 0.01) {
-      this._send_command("DPAD_CENTER");
-    } else {
-      if (Math.abs(x) >= Math.abs(y)) {
-        x < 0 ? this._send_command("DPAD_LEFT") : this._send_command("DPAD_RIGHT");
+      if (Math.abs(x) < 0.01 && Math.abs(y) < 0.01) {
+        this._press_center();
       } else {
-        y < 0 ? this._send_command("DPAD_UP") : this._send_command("DPAD_DOWN");
+        if (Math.abs(x) >= Math.abs(y)) {
+          x < 0 ? this._press_left() : this._press_right();
+        } else {
+          y < 0 ? this._press_up() : this._press_down();
+        }
       }
-    }
 
-    this._setTranslate(0, 0, this._dragItem, "0.5s");
+      this._setTranslate(0, 0, this._dragItem, "0.5s");
+      this.currentX = 0;
+      this.currentY = 0;
+    }
     this.active = false;
-    this.currentX = 0;
-    this.currentY = 0;
   }
 
   _drag(e) {
@@ -531,6 +643,12 @@ class PoLRATVRemoteCard extends LitElement {
     el.style.transitionDuration = duration;
   }
 
+  _callService(s : ServiceApp){
+    let vals: any;
+    vals = s.service.split(".");
+    console.log(s, vals);
+    this._hass.callService(vals[0], vals[1], s.data);
+  }
 
   static styles = css`
     .card-content {
@@ -570,7 +688,7 @@ class PoLRATVRemoteCard extends LitElement {
     .app-grid {
       grid-template-columns: repeat(4, 1fr);
     }
-    
+
     .remote-button {
       display: flex;
       align-items: center;
