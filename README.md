@@ -97,3 +97,99 @@ apps:
 <p align="center">
   <img width="300" src="images/touchpad-dark.png">
 </p>
+
+### Customization
+
+It's still possible that the card isn't perfect for you so you need to make some customizations. Every button can be overridden to call a service, including custom apps.
+
+| Button                     | YAML Key     |
+| -------------------------- | ------------ |
+| Up                         | `up`         |
+| Down                       | `down`       |
+| Left                       | `left`       |
+| Right                      | `right`      |
+| Center                     | `center`     |
+| Power                      | `power`      |
+| Home                       | `home`       |
+| Back                       | `back`       |
+| Favorite (only on default) | `favorite`   |
+| Volume Up                  | `volumeup`   |
+| Volume Down                | `volumedown` |
+| Volume Mute                | `volumemute` |
+
+Here's an example card config showing these overrides:
+
+```
+type: custom:polr-android-tv-remote-card
+entity_id: remote.atvremote_2
+remote: touch
+apps:
+  - service: remote.send_command
+    data:
+      command: volumedown
+      device: livingroomtv
+      entity_id: remote.living_room_ir_repeater
+    icon: mdi:volume-low
+power:
+  service: remote.send_command
+  data:
+    command: power
+    device: livingroomtv
+    entity_id: remote.living_room_ir_repeater
+up:
+  service: remote.send_command
+  data:
+    command: up
+    device: livingroomtv
+    entity_id: remote.living_room_ir_repeater
+down:
+  service: remote.send_command
+  data:
+    command: down
+    device: livingroomtv
+    entity_id: remote.living_room_ir_repeater
+left:
+  service: remote.send_command
+  data:
+    command: left
+    device: livingroomtv
+    entity_id: remote.living_room_ir_repeater
+right:
+  service: remote.send_command
+  data:
+    command: right
+    device: livingroomtv
+    entity_id: remote.living_room_ir_repeater
+back:
+  service: remote.send_command
+  data:
+    command: back
+    device: livingroomtv
+    entity_id: remote.living_room_ir_repeater
+center:
+  service: remote.send_command
+  data:
+    command: center
+    device: livingroomtv
+    entity_id: remote.living_room_ir_repeater
+favorite:
+  service: remote.send_command
+  data:
+    command: volumedown
+    device: livingroomtv
+    entity_id: remote.living_room_ir_repeater
+volumedown:
+  service: remote.send_command
+  data:
+    command: volumedown
+    device: livingroomtv
+    entity_id: remote.living_room_ir_repeater
+volumeup:
+  service: remote.send_command
+  data:
+    command: volumeup
+    device: livingroomtv
+    entity_id: remote.living_room_ir_repeater
+```
+
+Because you can also override custom apps, you could for example add a button to set the lights in room.
