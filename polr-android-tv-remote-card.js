@@ -596,7 +596,7 @@ class PoLRATVRemoteCard extends s$1 {
         this._send_command("MUTE");
     }
     _press_volume_down() {
-        if (this._config["volumeup"]) {
+        if (this._config["volumedown"]) {
             this._callService(this._config["volumedown"]);
         }
         else {
