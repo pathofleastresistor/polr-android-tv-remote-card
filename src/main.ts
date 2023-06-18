@@ -542,11 +542,12 @@ class PoLRATVRemoteCard extends LitElement {
   }
 
   _press_volume_mute() {
-    if(this._config["mute"]) {
-      this._callService(this._config["mute"]);
+    if(this._config["volumemute"]) {
+      this._callService(this._config["volumemute"]);
     } else {
       this._send_command("MUTE");
-    }  }
+    }
+  }
 
   _press_volume_down() {
     if(this._config["volumedown"]) {
