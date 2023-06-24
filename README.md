@@ -201,6 +201,12 @@ volumeup:
     command: volumeup
     device: livingroomtv
     entity_id: remote.living_room_ir_repeater
+volumemute:
+  service: remote.send_command
+  data:
+    command: volumemute
+    device: livingroomtv
+    entity_id: remote.living_room_ir_repeater
 ```
 
 Because you can also override custom apps, you could for example add a button to set the lights in room.
