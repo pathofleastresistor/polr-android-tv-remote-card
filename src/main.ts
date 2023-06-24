@@ -546,7 +546,7 @@ class PoLRATVRemoteCard extends LitElement {
   }
 
   _press_volume_down() {
-    if(this._config["volumeup"]) {
+    if(this._config["volumedown"]) {
       this._callService(this._config["volumedown"]);
     } else {
       this._send_command("VOLUME_DOWN");
