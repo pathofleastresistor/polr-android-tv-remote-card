@@ -21,22 +21,18 @@
   "devDependencies": {
     "@babel/core": "^7.22.1",
     "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-commonjs": "^25.0.2",
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.1.0",
     "@rollup/plugin-terser": "^0.4.3",
+    "@types/hammerjs": "^2.0.41",
+    "rollup": "^3.25.1",
     "rollup-plugin-typescript2": "^0.34.1",
     "tslib": "^2.5.3",
     "typescript": "^5.1.3"
   },
   "dependencies": {
-    "lit": "^2.7.5",
-    "@material/mwc-formfield": "^0.25.3",
-    "@material/mwc-list": "^0.25.3",
-    "@material/mwc-menu": "^0.25.3",
-    "@material/mwc-notched-outline": "^0.25.3",
-    "@material/mwc-ripple": "^0.25.3",
-    "@material/mwc-select": "^0.25.3",
-    "@material/mwc-switch": "^0.25.3",
-    "@material/mwc-textfield": "^0.25.3"
+    "hammerjs": "^2.0.8",
+    "lit": "^2.7.5"
   }
 }

@@ -3,6 +3,8 @@ import { property } from "lit/decorators.js";
 import { choose } from 'lit/directives/choose.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { ATVRemoteCardConfig, CustomApp, App, ServiceApp } from "./types";
+import { PowerIcon } from './utils/icons';
+import './touchpad';
 
 class PoLRATVRemoteCard extends LitElement {
   @property() _config : any;
@@ -66,16 +68,15 @@ class PoLRATVRemoteCard extends LitElement {
   render() {
     return html`
       <ha-card>
-        <div class="card-content">
-          <div class="grid card-grid">
-            ${choose(this._config.remote, [
-              ['default', () => this._render_defaultpad()],
-              ['touch', () => this._render_touchpad() ],
-              ['dpad', () => this._render_dpad() ],
-            ])}
-            ${ this._render_apps() }
-            ${ (this._config.volume) ? this._render_volume() : html`` }
-          </div>
+        ${ this._render_cardheader() }
+        <div class="grid card-grid">
+          ${choose(this._config.remote, [
+            ['default', () => this._render_defaultpad()],
+            ['touch', () => this._render_touchpad() ],
+            ['dpad', () => this._render_dpad() ],
+          ])}
+          ${ this._render_apps() }
+          ${ (this._config.volume) ? this._render_volume() : html`` }
         </div>
       </ha-card>
     `;
@@ -158,20 +159,34 @@ class PoLRATVRemoteCard extends LitElement {
 
   _render_touchpad() {
     return html`
-      ${ this._render_power() }
-      <div id="touchpad">
-        <div
-          @mousedown=${this._dragStart}
-          @mousemove=${this._drag}
-          @mouseup=${this._dragEnd}
-          @touchstart=${this._dragStart}
-          @touchmove=${this._drag}
-          @touchend=${this._dragEnd}
-          id="nub"
-        ></div>
-      </div>
+      <polr-touchpad
+        _hass=${this._hass}
+        @padaction=${this._handleAction}
+      />
       ${ this._render_basic_buttons() }
     `;
+  }
+
+  _handleAction(ev){
+    switch(ev.detail?.action) {
+      case "swipeup":
+        this._press_up();
+        break;
+      case "swipedown":
+        this._press_down();
+        break;
+      case "swipeleft":
+        this._press_left();
+        break;
+      case "swiperight":
+        this._press_right();
+        break;
+      case "tap":
+        this._press_center();
+        break;
+      default:
+        break;
+    }
   }
 
   _render_defaultpad() {
@@ -268,20 +283,34 @@ class PoLRATVRemoteCard extends LitElement {
     `;
   }
 
+  _render_cardheader() {
+    return html`
+      <div class="header-grid">
+        <div class="header-icon"></div>
+        <div class="header-content">
+          <div class="primary-info">
+            Living Room TV Remote
+          </div>
+          <div class="secondary-info">
+            Netflix
+          </div>
+          <div class="secondary-info">
+          </div>
+        </div>
+        <div class="header-additional">
+          <div @click=${ this._press_power }>
+            ${ PowerIcon }
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   _render_power() {
     return html`
       <div class="power-grid">
         <div @click=${ this._press_power } class="remote-button">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="48"
-            height="48"
-            viewBox="0 0 24 24"
-          >
-            <path
-              d="M16.56,5.44L15.11,6.89C16.84,7.94 18,9.83 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12C6,9.83 7.16,7.94 8.88,6.88L7.44,5.44C5.36,6.88 4,9.28 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12C20,9.28 18.64,6.88 16.56,5.44M13,3H11V13H13"
-            />
-          </svg>
+          ${ PowerIcon }
         </div>
       </div>
     `;
@@ -659,26 +688,70 @@ class PoLRATVRemoteCard extends LitElement {
     this._hass.callService(vals[0], vals[1], s.data);
   }
 
-  static styles = css`
-    .card-content {
-      margin: auto;
+  static styles = css`   
+    ha-card {
+      overflow: hidden;
     }
 
+    .header-grid {
+      background-color: grey;
+      display: grid;
+      grid-template-columns: 36px 1fr 36px;
+      align-items: center;
+      height: 56px;
+      padding: 20px 20px;
+      gap: 20px;
+    }
+    .header-icon {
+      background-color: blue;
+      border-radius: 5px;
+      width: 36px;
+      height: 36px;
+    }
+    .header-icon ha-icon {
+      --mdc-icon-size: 36px;
+      color: var(--polr-fox-primary-on-dark-color);
+    }
+    .header-content {
+      display: flex;
+      flex-direction: column;                
+    }
+    .header-content .primary-info {
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .header-content .secondary-info {
+      font-size: 12px;
+    }
+    .header-additional {
+      background-color: blue;
+      border-radius: 5px;
+      width: 36px;
+      height: 36px;
+      margin: auto;
+    }
+    .header-additional svg {
+      fill: white;
+      width: 26px;
+      height: 26px;
+      padding: 5px;
+    }
     .grid {
       display: grid;
       align-items: center;
       justify-content: center;
       justify-items: center;
-      width: 90%;
+      margin: auto;
       gap: 10px;
       padding: 15px;
+      margin: 20px 0px;
     }
 
     .card-grid {
       grid-template-columns: repeat(1, 1fr);
       border: none;
       background: none;
-      width: 100%;
+      
       padding: 0;
     }
 
@@ -690,9 +763,6 @@ class PoLRATVRemoteCard extends LitElement {
       grid-template-columns: repeat(2, 1fr);
     }
 
-    .basic-grid > .remote-button {
-      padding: 20px;
-    }
 
     .app-grid {
       grid-template-columns: repeat(4, 1fr);
@@ -704,14 +774,25 @@ class PoLRATVRemoteCard extends LitElement {
       justify-content: center;
       justify-items: center;
       fill: var(--primary-text-color);
-      border-radius: 25%;
+      border-radius: 5px;
       background-color: var(
         --ha-card-border-color,
         var(--divider-color, #e0e0e0)
       );
       cursor: pointer;
-      width: 30px;
       height: 30px;
+      pading: 20px;
+    }
+
+    .basic-grid > .remote-button {
+      padding: 20px;
+    }
+    .volume-grid > .remote-button {
+      padding: 15px;
+    }
+
+    .app-grid > .remote-button {
+      padding: 10px;
     }
 
     .remote-grid > .remote-button {
@@ -730,30 +811,9 @@ class PoLRATVRemoteCard extends LitElement {
       grid-template-columns: repeat(3, 1fr);
     }
 
-    .volume-grid > .remote-button {
-      padding: 15px;
-    }
-
-    .app-grid > .remote-button {
-      padding: 10px;
-    }
-
-    /** power **/
-    .power-grid {
-      display: flex;
-      justify-content: start;
-      padding: 10px 0 10px 0 ;
-      margin: auto;
-      width: 90%;
-    }
-
-    .power-grid > .remote-button {
-      padding: 5px;
-    }
 
     /** touchpad **/
     #touchpad {
-      width: 80%;
       height: 300px;
       background-color: var(
         --ha-card-border-color,
