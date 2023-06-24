@@ -4,6 +4,7 @@ import { choose } from "lit/directives/choose.js";
 import { repeat } from "lit/directives/repeat.js";
 import { ATVRemoteCardConfig, CustomApp, App, ServiceApp } from "./types";
 import { BackIcon, HomeIcon, PowerIcon } from "./utils/icons";
+import "./elements/header";
 import "./elements/touchpad";
 import "./elements/remote-button";
 
@@ -65,7 +66,7 @@ class PoLRATVRemoteCard extends LitElement {
     render() {
         return html`
             <ha-card>
-                ${this._render_cardheader()}
+                <polr-headercard icon=${PowerIcon}></polr-headercard>
                 <div class="grid card-grid">
                     ${choose(this._config.remote, [
                         ["default", () => this._render_defaultpad()],
