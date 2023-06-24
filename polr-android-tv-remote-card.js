@@ -593,10 +593,15 @@ class PoLRATVRemoteCard extends s$1 {
         }
     }
     _press_volume_mute() {
-        this._send_command("MUTE");
+        if (this._config["volumemute"]) {
+            this._callService(this._config["volumemute"]);
+        }
+        else {
+            this._send_command("MUTE");
+        }
     }
     _press_volume_down() {
-        if (this._config["volumeup"]) {
+        if (this._config["volumedown"]) {
             this._callService(this._config["volumedown"]);
         }
         else {
