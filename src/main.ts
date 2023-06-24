@@ -3,7 +3,14 @@ import { property } from "lit/decorators.js";
 import { choose } from "lit/directives/choose.js";
 import { repeat } from "lit/directives/repeat.js";
 import { ATVRemoteCardConfig, CustomApp, App, ServiceApp } from "./types";
-import { BackIcon, HomeIcon, PowerIcon } from "./utils/icons";
+import {
+    BackIcon,
+    HomeIcon,
+    PowerIcon,
+    VolumeDownIcon,
+    VolumeMuteIcon,
+    VolumeUpIcon,
+} from "./utils/icons";
 import "./elements/header";
 import "./elements/touchpad";
 import "./elements/remote-button";
@@ -83,38 +90,15 @@ class PoLRATVRemoteCard extends LitElement {
     _render_volume() {
         return html`
             <div class="grid volume-grid">
-                <div @click=${this._press_volume_down} class="remote-button">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="48"
-                        height="48"
-                        viewBox="0 0 24 24">
-                        <title>volume-minus</title>
-                        <path d="M3,9H7L12,4V20L7,15H3V9M14,11H22V13H14V11Z" />
-                    </svg>
-                </div>
-                <div @click=${this._press_volume_mute} class="remote-button">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="48"
-                        height="48"
-                        viewBox="0 0 24 24">
-                        <title>volume-mute</title>
-                        <path
-                            d="M3,9H7L12,4V20L7,15H3V9M16.59,12L14,9.41L15.41,8L18,10.59L20.59,8L22,9.41L19.41,12L22,14.59L20.59,16L18,13.41L15.41,16L14,14.59L16.59,12Z" />
-                    </svg>
-                </div>
-                <div @click=${this._press_volume_up} class="remote-button">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="48"
-                        height="48"
-                        viewBox="0 0 24 24">
-                        <title>volume-plus</title>
-                        <path
-                            d="M3,9H7L12,4V20L7,15H3V9M14,11H17V8H19V11H22V13H19V16H17V13H14V11Z" />
-                    </svg>
-                </div>
+                <polr-remotebutton
+                    @click=${this._press_volume_down}
+                    icon=${VolumeDownIcon}></polr-remotebutton>
+                <polr-remotebutton
+                    @click=${this._press_volume_mute}
+                    icon=${VolumeMuteIcon}></polr-remotebutton>
+                <polr-remotebutton
+                    @click=${this._press_volume_up}
+                    icon=${VolumeUpIcon}></polr-remotebutton>
             </div>
         `;
     }

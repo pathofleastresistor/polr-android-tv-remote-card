@@ -101,10 +101,11 @@ const t={ATTRIBUTE:1,CHILD:2,PROPERTY:3,BOOLEAN_ATTRIBUTE:4,EVENT:5,ELEMENT:6},e
  */
 const u=(e,s,t)=>{const r=new Map;for(let l=s;l<=t;l++)r.set(e[l],l);return r},c=e(class extends i{constructor(e){if(super(e),e.type!==t.CHILD)throw Error("repeat() can only be used in text expressions")}dt(e,s,t){let r;void 0===t?t=s:void 0!==s&&(r=s);const l=[],o=[];let i=0;for(const s of e)l[i]=r?r(s,i):i,o[i]=t(s,i),i++;return {values:o,keys:l}}render(e,s,t){return this.dt(e,s,t).values}update(s$1,[t,r$1,c]){var d;const a=m(s$1),{values:p$1,keys:v}=this.dt(t,r$1,c);if(!Array.isArray(a))return this.ht=v,p$1;const h=null!==(d=this.ht)&&void 0!==d?d:this.ht=[],m$1=[];let y,x,j=0,k=a.length-1,w=0,A=p$1.length-1;for(;j<=k&&w<=A;)if(null===a[j])j++;else if(null===a[k])k--;else if(h[j]===v[w])m$1[w]=u$1(a[j],p$1[w]),j++,w++;else if(h[k]===v[A])m$1[A]=u$1(a[k],p$1[A]),k--,A--;else if(h[j]===v[A])m$1[A]=u$1(a[j],p$1[A]),r(s$1,m$1[A+1],a[j]),j++,A--;else if(h[k]===v[w])m$1[w]=u$1(a[k],p$1[w]),r(s$1,a[j],a[k]),k--,w++;else if(void 0===y&&(y=u(v,w,A),x=u(h,j,k)),y.has(h[j]))if(y.has(h[k])){const e=x.get(v[w]),t=void 0!==e?a[e]:null;if(null===t){const e=r(s$1,a[j]);u$1(e,p$1[w]),m$1[w]=e;}else m$1[w]=u$1(t,p$1[w]),r(s$1,a[j],t),a[e]=null;w++;}else p(a[k]),k--;else p(a[j]),j++;for(;w<=A;){const e=r(s$1,m$1[A+1]);u$1(e,p$1[w]),m$1[w++]=e;}for(;j<=k;){const e=a[j++];null!==e&&p(e);}return this.ht=v,s(s$1,m$1),T}});
 
-const PowerIcon = x `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+const BackIcon = x `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M0 0h24v24H0V0z" fill="none" />
         <path
-            d="M479.825-438Q467-438 458.5-446.625T450-468v-346q0-12.75 8.675-21.375 8.676-8.625 21.5-8.625 12.825 0 21.325 8.625T510-814v346q0 12.75-8.675 21.375-8.676 8.625-21.5 8.625ZM480-118q-75 0-140.5-28.5t-114-77q-48.5-48.5-77-114T120-478q0-71 28-135.5T226-729q9-9 22.5-9.5T271-730q9 9 7.5 21.5T268-687q-42 42-65 95.5T180-478q0 125.357 87.321 212.679Q354.643-178 480-178t212.679-87.321Q780-352.643 780-478q0-60-22.644-113.804Q734.712-645.609 693-688q-9-9-10-21.5t8-20.5q10-10 23.5-8.5T738-727q49 51 75.5 114.969Q840-548.062 840-478q0 75-28.5 140.5t-77 114q-48.5 48.5-114 77T480-118Z" />
+            d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42-.39-.39-1.02-.39-1.41 0l-6.59 6.59c-.39.39-.39 1.02 0 1.41l6.59 6.59c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1z" />
     </svg>
 `;
 const HomeIcon = x `
@@ -113,11 +114,38 @@ const HomeIcon = x `
             d="M220-180h150v-250h220v250h150v-390L480-765 220-570v390Zm-60 60v-480l320-240 320 240v480H530v-250H430v250H160Zm320-353Z" />
     </svg>
 `;
-const BackIcon = x `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-        <path d="M0 0h24v24H0V0z" fill="none" />
+const PowerIcon = x `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
         <path
-            d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42-.39-.39-1.02-.39-1.41 0l-6.59 6.59c-.39.39-.39 1.02 0 1.41l6.59 6.59c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1z" />
+            d="M479.825-438Q467-438 458.5-446.625T450-468v-346q0-12.75 8.675-21.375 8.676-8.625 21.5-8.625 12.825 0 21.325 8.625T510-814v346q0 12.75-8.675 21.375-8.676 8.625-21.5 8.625ZM480-118q-75 0-140.5-28.5t-114-77q-48.5-48.5-77-114T120-478q0-71 28-135.5T226-729q9-9 22.5-9.5T271-730q9 9 7.5 21.5T268-687q-42 42-65 95.5T180-478q0 125.357 87.321 212.679Q354.643-178 480-178t212.679-87.321Q780-352.643 780-478q0-60-22.644-113.804Q734.712-645.609 693-688q-9-9-10-21.5t8-20.5q10-10 23.5-8.5T738-727q49 51 75.5 114.969Q840-548.062 840-478q0 75-28.5 140.5t-77 114q-48.5 48.5-114 77T480-118Z" />
+    </svg>
+`;
+const VolumeDownIcon = x `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <title>volume-minus</title>
+        <path d="M3,9H7L12,4V20L7,15H3V9M14,11H22V13H14V11Z" />
+    </svg>
+`;
+const VolumeMuteIcon = x `
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="48"
+        height="48"
+        viewBox="0 0 24 24">
+        <title>volume-mute</title>
+        <path
+            d="M3,9H7L12,4V20L7,15H3V9M16.59,12L14,9.41L15.41,8L18,10.59L20.59,8L22,9.41L19.41,12L22,14.59L20.59,16L18,13.41L15.41,16L14,14.59L16.59,12Z" />
+    </svg>
+`;
+const VolumeUpIcon = x `
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="48"
+        height="48"
+        viewBox="0 0 24 24">
+        <title>volume-plus</title>
+        <path
+            d="M3,9H7L12,4V20L7,15H3V9M14,11H17V8H19V11H22V13H19V16H17V13H14V11Z" />
     </svg>
 `;
 
@@ -2995,38 +3023,15 @@ class PoLRATVRemoteCard extends s$1 {
     _render_volume() {
         return x `
             <div class="grid volume-grid">
-                <div @click=${this._press_volume_down} class="remote-button">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="48"
-                        height="48"
-                        viewBox="0 0 24 24">
-                        <title>volume-minus</title>
-                        <path d="M3,9H7L12,4V20L7,15H3V9M14,11H22V13H14V11Z" />
-                    </svg>
-                </div>
-                <div @click=${this._press_volume_mute} class="remote-button">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="48"
-                        height="48"
-                        viewBox="0 0 24 24">
-                        <title>volume-mute</title>
-                        <path
-                            d="M3,9H7L12,4V20L7,15H3V9M16.59,12L14,9.41L15.41,8L18,10.59L20.59,8L22,9.41L19.41,12L22,14.59L20.59,16L18,13.41L15.41,16L14,14.59L16.59,12Z" />
-                    </svg>
-                </div>
-                <div @click=${this._press_volume_up} class="remote-button">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="48"
-                        height="48"
-                        viewBox="0 0 24 24">
-                        <title>volume-plus</title>
-                        <path
-                            d="M3,9H7L12,4V20L7,15H3V9M14,11H17V8H19V11H22V13H19V16H17V13H14V11Z" />
-                    </svg>
-                </div>
+                <polr-remotebutton
+                    @click=${this._press_volume_down}
+                    icon=${VolumeDownIcon}></polr-remotebutton>
+                <polr-remotebutton
+                    @click=${this._press_volume_mute}
+                    icon=${VolumeMuteIcon}></polr-remotebutton>
+                <polr-remotebutton
+                    @click=${this._press_volume_up}
+                    icon=${VolumeUpIcon}></polr-remotebutton>
             </div>
         `;
     }
