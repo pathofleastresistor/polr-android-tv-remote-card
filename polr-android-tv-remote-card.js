@@ -411,7 +411,7 @@ PoLRHeaderCard.styles = i$3 `
         .header-grid {
             background: #381e72;
             display: grid;
-            grid-template-columns: 36px 1fr 36px;
+            grid-template-columns: 36px 1fr min-content;
             align-items: center;
             height: 56px;
             padding: 20px 20px;
