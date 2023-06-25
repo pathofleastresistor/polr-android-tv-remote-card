@@ -1,22 +1,9 @@
 import { TemplateResult } from "lit";
 import {
-    BackIcon,
-    CenterIcon,
     DisneyPlusIcon,
-    DownIcon,
-    FavoriteIcon,
-    HBOMaxIcon,
-    HomeIcon,
     HuluIcon,
-    LeftIcon,
     NetflixIcon,
-    PowerIcon,
     PrimeVideoIcon,
-    RightIcon,
-    UpIcon,
-    VolumeDownIcon,
-    VolumeMuteIcon,
-    VolumeUpIcon,
     YouTubeIcon,
 } from "../../utils/icons";
 
