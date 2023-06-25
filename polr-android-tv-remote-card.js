@@ -165,6 +165,12 @@ const UpIcon = x `
         <path d="M7,15L12,10L17,15H7Z" />
     </svg>
 `;
+const TelevisionIcon = x `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+        <path
+            d="M140-200q-24 0-42-18t-18-42v-520q0-24 18-42t42-18h680q24 0 42 18t18 42v520q0 24-18 42t-42 18H630v50q0 12.75-8.625 21.375T600-120H360q-12.75 0-21.375-8.625T330-150v-50H140Zm0-60h680v-520H140v520Zm0 0v-520 520Z" />
+    </svg>
+`;
 const VolumeDownIcon = x `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
         <title>volume-minus</title>
@@ -379,24 +385,31 @@ class PoLRHeaderCard extends s {
         super();
     }
     render() {
+        var state = this._hass["states"][this.entity_id]["state"];
+        var primary_info = this._hass["states"][this.entity_id]["attributes"]["friendly_name"] || "TV Remote";
+        this._hass["states"][this.entity_id]["attributes"]["current_activity"] || "Info";
         return x `
             <div class="header-grid">
                 <div class="header-icon">${this.icon}</div>
                 <div class="header-content">
-                    <div class="primary-info">Living Room TV Remote</div>
-                    <div class="secondary-info">Netflix</div>
+                    <div class="primary-info">${primary_info}</div>
                     <div class="secondary-info"></div>
                 </div>
-                <div class="header-additional">
-                    <div>${this.additionalIcon}</div>
+                <div
+                    class="header-additional ${state === "on" ? "on" : "off"}"
+                    @click=${this._additionalClick}>
+                    ${this.additionalIcon}
                 </div>
             </div>
         `;
     }
+    _additionalClick(ev) {
+        this.dispatchEvent(new CustomEvent("additionalclick"));
+    }
 }
 PoLRHeaderCard.styles = i$3 `
         .header-grid {
-            background-color: grey;
+            background: #381e72;
             display: grid;
             grid-template-columns: 36px 1fr 36px;
             align-items: center;
@@ -405,14 +418,12 @@ PoLRHeaderCard.styles = i$3 `
             gap: 20px;
         }
         .header-icon {
-            background-color: blue;
             border-radius: 5px;
             width: 36px;
             height: 36px;
         }
-        .header-icon ha-icon {
-            --mdc-icon-size: 36px;
-            color: var(--polr-fox-primary-on-dark-color);
+        .header-icon svg {
+            fill: #ededed;
         }
         .header-content {
             display: flex;
@@ -426,11 +437,14 @@ PoLRHeaderCard.styles = i$3 `
             font-size: 12px;
         }
         .header-additional {
-            background-color: blue;
             border-radius: 5px;
             width: 36px;
             height: 36px;
             margin: auto;
+            padding: 4px;
+        }
+        .on {
+            background: #1e0d40;
         }
         .header-additional svg {
             fill: white;
@@ -448,6 +462,9 @@ __decorate([
 __decorate([
     n$1()
 ], PoLRHeaderCard.prototype, "additionalIcon", void 0);
+__decorate([
+    n$1()
+], PoLRHeaderCard.prototype, "entity_id", void 0);
 customElements.define("polr-headercard", PoLRHeaderCard);
 
 class PoLRRemoteButton extends s {
@@ -465,19 +482,18 @@ PoLRRemoteButton.styles = i$3 `
             justify-content: center;
             justify-items: center;
             fill: var(--primary-text-color);
-            border-radius: 5px;
-            background-color: var(
-                --ha-card-border-color,
-                var(--divider-color, #e0e0e0)
-            );
+            border-radius: 8px;
+            background-color: #373737;
             cursor: pointer;
-            height: 30px;
-            pading: 20px;
+            height: 100%;
+            min-height: 30px;
+            min-width: 30px;
+            padding: 5px;
         }
 
         svg {
-            height: 30px;
-            width: 30px;
+            height: 24px;
+            width: 24px;
         }
     `;
 __decorate([
@@ -3132,20 +3148,30 @@ if (typeof define === 'function' && define.amd) {
 })(window, document, 'Hammer');
 
 class PoLRTouchpad extends s {
-    constructor() {
-        super();
-    }
     connectedCallback() {
         super.connectedCallback();
         this._mc = new Hammer(this);
-        this._mc.get('swipe').set({ direction: Hammer.DIRECTION_ALL });
+        this._mc.get("swipe").set({ direction: Hammer.DIRECTION_ALL });
+        this._mc.get("pan").set({ direction: Hammer.DIRECTION_ALL });
         this._mc.on("swipeup swipedown swiperight swipeleft tap press", (ev) => {
-            console.log(ev.type);
             this.dispatchEvent(new CustomEvent("padaction", {
                 detail: {
-                    action: ev.type
-                }
+                    action: ev.type,
+                },
             }));
+        });
+        this._mc.on("panstart panmove", (event) => {
+            const rect = this.pad.getBoundingClientRect();
+            const size = 20;
+            this.circle.style.padding = `${size}px`;
+            const clientX = event.center.x;
+            const clientY = event.center.y;
+            this.circle.style.visibility = "visible";
+            this.circle.style.left = `${this.clamp(clientX - rect.left - size, 0 - size, rect.width - rect.left + size)}px`;
+            this.circle.style.top = `${this.clamp(clientY - rect.top - size, 0 - size, rect.height - size)}px`;
+        });
+        this._mc.on("panend", (event) => {
+            this.circle.style.visibility = "hidden";
         });
     }
     disconnectedCallback() {
@@ -3157,18 +3183,34 @@ class PoLRTouchpad extends s {
     }
     render() {
         return x `
-            <ha-card id="pad">
-            </ha-card>
+            <div id="pad">
+                <div id="circle"></div>
+            </div>
         `;
+    }
+    clamp(value, min, max) {
+        return Math.min(Math.max(value, min), max);
     }
 }
 PoLRTouchpad.styles = i$3 `
         #pad {
-            height: 300px;
+            position: relative;
+            height: 100%;
+            min-height: 100px;
+            max-height: 600px;
             width: 100%;
             min-width: 250px;
             background: #ededed;
             border-radius: 12px;
+            overflow: hidden;
+        }
+
+        #circle {
+            position: absolute;
+            padding: 20px;
+            background-color: #1e0d40;
+            border-radius: 50%;
+            visibility: hidden;
         }
     `;
 __decorate([
@@ -3181,8 +3223,11 @@ __decorate([
     n$1()
 ], PoLRTouchpad.prototype, "up", void 0);
 __decorate([
-    i("touchpad")
-], PoLRTouchpad.prototype, "touchpad", void 0);
+    i("#pad")
+], PoLRTouchpad.prototype, "pad", void 0);
+__decorate([
+    i("#circle")
+], PoLRTouchpad.prototype, "circle", void 0);
 customElements.define("polr-touchpad", PoLRTouchpad);
 
 class PoLRATVRemoteCard extends s {
@@ -3218,8 +3263,45 @@ class PoLRATVRemoteCard extends s {
         this._hass = hass;
     }
     render() {
-        var _a;
+        var _a, _b;
+        var entity_id = this._config["entity_id"];
+        var state = (_b = (_a = this._hass) === null || _a === void 0 ? void 0 : _a.states[entity_id]) === null || _b === void 0 ? void 0 : _b.state;
         var padlayout;
+        var applayout;
+        var volumelayout;
+        var layout = [];
+        layout.push(x `
+            <polr-headercard
+                icon=${TelevisionIcon}
+                _hass=${this._hass}
+                entity_id=${entity_id}
+                additionalIcon=${PowerIcon}
+                @additionalclick=${this._press_power}>
+            </polr-headercard>
+        `);
+        if (state === "on") {
+            padlayout = this._choosePad(padlayout);
+            applayout = this._chooseApps();
+            volumelayout = this._config.volume ? this._chooseVolume() : x ``;
+            layout.push(x `
+                <div id="main-grid">
+                    ${padlayout} ${applayout} ${volumelayout}
+                </div>
+            `);
+        }
+        else {
+            applayout = this._chooseApps();
+            layout.push(x `
+                <div id="main-grid">
+                    ${padlayout} ${applayout} ${volumelayout}
+                </div>
+            `);
+        }
+        var entity_id = this._config["entity_id"];
+        return x ` <ha-card> ${layout} </ha-card> `;
+    }
+    _choosePad(padlayout) {
+        var _a;
         switch ((_a = this._config) === null || _a === void 0 ? void 0 : _a.remote) {
             case "default":
                 padlayout = this._render_defaultpad();
@@ -3231,19 +3313,11 @@ class PoLRATVRemoteCard extends s {
                 padlayout = this._render_dpad();
                 break;
         }
-        return x `
-            <ha-card>
-                <polr-headercard icon=${PowerIcon}></polr-headercard>
-                <div class="grid card-grid">
-                    ${padlayout} ${this._renderApps()}
-                    ${this._config.volume ? this._render_volume() : x ``}
-                </div>
-            </ha-card>
-        `;
+        return padlayout;
     }
-    _render_volume() {
+    _chooseVolume() {
         return x `
-            <div class="grid volume-grid">
+            <div id="volume-grid">
                 <polr-remotebutton
                     @click=${() => this._press(buttonCommands.volumedown.config)}
                     icon=${VolumeDownIcon}></polr-remotebutton>
@@ -3257,13 +3331,27 @@ class PoLRATVRemoteCard extends s {
         `;
     }
     _render_dpad() {
-        return x ` <polr-dpad
-            @clickup=${() => this._press(buttonCommands.up.config)}
-            @clickdown=${() => this._press(buttonCommands.down.config)}
-            @clickleft=${() => this._press(buttonCommands.left.config)}
-            @clickright=${() => this._press(buttonCommands.right.config)}
-            @clickcenter=${() => this._press(buttonCommands.center.config)}>
-        </polr-dpad>`;
+        return x `
+            <div id="dpad-grid">
+                <polr-dpad
+                    id="dpad-grid"
+                    @clickup=${() => this._press(buttonCommands.up.config)}
+                    @clickdown=${() => this._press(buttonCommands.down.config)}
+                    @clickleft=${() => this._press(buttonCommands.left.config)}
+                    @clickright=${() => this._press(buttonCommands.right.config)}
+                    @clickcenter=${() => this._press(buttonCommands.center.config)}>
+                </polr-dpad>
+
+                <div id="basicbutton-grid">
+                    <polr-remotebutton
+                        @click=${() => this._press(buttonCommands.home.config)}
+                        icon=${HomeIcon}></polr-remotebutton>
+                    <polr-remotebutton
+                        @click=${() => this._press(buttonCommands.back.config)}
+                        icon=${BackIcon}></polr-remotebutton>
+                </div>
+            </div>
+        `;
     }
     _render_touchpad() {
         return x `
@@ -3272,15 +3360,19 @@ class PoLRATVRemoteCard extends s {
                     _hass=${this._hass}
                     @padaction=${this._handleTouchpadAction}></polr-touchpad>
                 <div id="basicbutton-grid">
-                    <polr-remotebutton icon=${HomeIcon}></polr-remotebutton>
-                    <polr-remotebutton icon=${BackIcon}></polr-remotebutton>
+                    <polr-remotebutton
+                        @click=${() => this._press(buttonCommands.home.config)}
+                        icon=${HomeIcon}></polr-remotebutton>
+                    <polr-remotebutton
+                        @click=${() => this._press(buttonCommands.back.config)}
+                        icon=${BackIcon}></polr-remotebutton>
                 </div>
             </div>
         `;
     }
     _render_defaultpad() {
         return x `
-            <div class="grid remote-grid">
+            <div id="defaultpad-grid">
                 <polr-remotebutton
                     @click=${this._press_power}
                     icon=${PowerIcon}></polr-remotebutton>
@@ -3331,7 +3423,7 @@ class PoLRATVRemoteCard extends s {
                 break;
         }
     }
-    _renderApps() {
+    _chooseApps() {
         var _a;
         if (!this._config.apps) {
             return x ``;
@@ -3355,7 +3447,7 @@ class PoLRATVRemoteCard extends s {
                     app_buttons.push(this._renderCustomApp(app));
             }
         }
-        return x ` <div class="grid app-grid">${app_buttons}</div> `;
+        return x `<div id="app-grid">${app_buttons}</div>`;
     }
     _renderApp(app) {
         return x `
@@ -3401,6 +3493,10 @@ class PoLRATVRemoteCard extends s {
         if (this._config["power"]) {
             this._callService(this._config["power"]);
         }
+        this._hass.callService("remote", "toggle", {
+            entity_id: this._config.entity_id,
+        });
+        console.log(`Power was called`);
     }
     _press_favorite_2() {
         console.log("favorite was pressed");
@@ -3426,50 +3522,37 @@ PoLRATVRemoteCard.styles = i$3 `
         ha-card {
             overflow: hidden;
         }
-        .grid {
-            display: grid;
-            align-items: center;
-            justify-content: center;
-            justify-items: center;
-            margin: auto;
-            gap: 10px;
-            padding: 15px;
-            margin: 20px 0px;
+        polr-remotebutton {
+            padding: 20px 5px;
+            height: 50px;
         }
-
+        polr-touchpad {
+            height: 250px;
+        }
+        #main-grid {
+            width: 90%;
+            margin: auto;
+            padding: 20px 0;
+        }
+        #touchpad-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
         #touchpad-grid > #basicbutton-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
-            padding: 20px;
         }
-
-        .card-grid {
-            grid-template-columns: repeat(1, 1fr);
-            border: none;
-            background: none;
-
-            padding: 0;
+        #app-grid {
+            display: grid;
+            grid-template-columns: auto auto auto auto;
+            gap: 5px;
         }
-
-        .remote-grid {
-            grid-template-columns: repeat(3, 1fr);
+        #volume-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
         }
-
-        .basic-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .app-grid {
-            grid-template-columns: repeat(4, 1fr);
-        }
-
-        /** VOLUME **/
-        .volume-grid {
-            grid-template-columns: repeat(3, 1fr);
-        }
-
-        /** dpad **/
     `;
 __decorate([
     n$1()

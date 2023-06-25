@@ -11,29 +11,47 @@ class PoLRHeaderCard extends LitElement {
     @property()
     public additionalIcon;
 
+    @property()
+    public entity_id;
+
     constructor() {
         super();
     }
 
     render() {
+        var state = this._hass["states"][this.entity_id]["state"];
+        var primary_info =
+            this._hass["states"][this.entity_id]["attributes"][
+                "friendly_name"
+            ] || "TV Remote";
+        var secondary_info =
+            this._hass["states"][this.entity_id]["attributes"][
+                "current_activity"
+            ] || "Info";
+
         return html`
             <div class="header-grid">
                 <div class="header-icon">${this.icon}</div>
                 <div class="header-content">
-                    <div class="primary-info">Living Room TV Remote</div>
-                    <div class="secondary-info">Netflix</div>
+                    <div class="primary-info">${primary_info}</div>
                     <div class="secondary-info"></div>
                 </div>
-                <div class="header-additional">
-                    <div>${this.additionalIcon}</div>
+                <div
+                    class="header-additional ${state === "on" ? "on" : "off"}"
+                    @click=${this._additionalClick}>
+                    ${this.additionalIcon}
                 </div>
             </div>
         `;
     }
 
+    _additionalClick(ev) {
+        this.dispatchEvent(new CustomEvent("additionalclick"));
+    }
+
     static styles = css`
         .header-grid {
-            background-color: grey;
+            background: #381e72;
             display: grid;
             grid-template-columns: 36px 1fr 36px;
             align-items: center;
@@ -42,14 +60,12 @@ class PoLRHeaderCard extends LitElement {
             gap: 20px;
         }
         .header-icon {
-            background-color: blue;
             border-radius: 5px;
             width: 36px;
             height: 36px;
         }
-        .header-icon ha-icon {
-            --mdc-icon-size: 36px;
-            color: var(--polr-fox-primary-on-dark-color);
+        .header-icon svg {
+            fill: #ededed;
         }
         .header-content {
             display: flex;
@@ -63,11 +79,14 @@ class PoLRHeaderCard extends LitElement {
             font-size: 12px;
         }
         .header-additional {
-            background-color: blue;
             border-radius: 5px;
             width: 36px;
             height: 36px;
             margin: auto;
+            padding: 4px;
+        }
+        .on {
+            background: #1e0d40;
         }
         .header-additional svg {
             fill: white;

@@ -20,19 +20,18 @@ class PoLRRemoteButton extends LitElement {
             justify-content: center;
             justify-items: center;
             fill: var(--primary-text-color);
-            border-radius: 5px;
-            background-color: var(
-                --ha-card-border-color,
-                var(--divider-color, #e0e0e0)
-            );
+            border-radius: 8px;
+            background-color: #373737;
             cursor: pointer;
-            height: 30px;
-            pading: 20px;
+            height: 100%;
+            min-height: 30px;
+            min-width: 30px;
+            padding: 5px;
         }
 
         svg {
-            height: 30px;
-            width: 30px;
+            height: 24px;
+            width: 24px;
         }
     `;
 }
