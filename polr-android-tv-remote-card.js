@@ -3224,6 +3224,7 @@ PoLRTouchpad.styles = i$3 `
             min-width: 250px;
             background: #ededed;
             border-radius: 12px;
+            cursor: pointer;
             overflow: hidden;
         }
 
