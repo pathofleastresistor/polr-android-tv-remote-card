@@ -18,7 +18,7 @@ import {
     VolumeMuteIcon,
     VolumeUpIcon,
     YouTubeIcon,
-} from "./icons";
+} from "../../utils/icons";
 
 export interface TvAppInterface {
     url: string;

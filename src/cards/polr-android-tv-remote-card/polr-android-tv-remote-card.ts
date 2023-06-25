@@ -7,8 +7,8 @@ import {
     PrimeVideoApp,
     TvAppInterface,
     YouTubeApp,
-} from "../../utils/apps";
-import { buttonCommands } from "../../utils/buttonCommands";
+} from "./apps";
+import { buttonCommands } from "./buttonCommands";
 import {
     BackIcon,
     CenterIcon,
