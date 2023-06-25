@@ -189,16 +189,6 @@ const VolumeUpIcon = x `
             d="M780-481q0-94-52.5-169T590-759q-12-5-17-16t0-22q5-12 17.5-16.5t25.5.5q101 41 162.5 131T840-481q0 111-61.5 201T616-149q-13 5-25.5.5T573-165q-5-11 0-22t17-16q85-34 137.5-109T780-481ZM280-360H150q-13 0-21.5-8.5T120-390v-180q0-13 8.5-21.5T150-600h130l149-149q14-14 32.5-6.5T480-728v496q0 20-18.5 27.5T429-211L280-360Zm380-120q0 52-26 94t-73 64q-8 4-14.5-1t-6.5-13v-289q0-8 6.5-13t14.5-1q47 22 73 65t26 94ZM420-648 307-540H180v120h127l113 109v-337ZM298-480Z" />
     </svg>
 `;
-const YouTubeIcon = x `
-    <svg
-        xmlns="http://www.w3.org/2000/svg"
-        xml:space="preserve"
-        version="1.0"
-        viewBox="0 0 24 24">
-        <path
-            d="M18.43 4.216H5.57A4.57 4.57 0 0 0 1 8.786v6.429a4.57 4.57 0 0 0 4.57 4.569h12.86a4.57 4.57 0 0 0 4.57-4.57V8.786a4.57 4.57 0 0 0-4.57-4.569zm-3.09 8.097-6.015 2.869a.241.241 0 0 1-.346-.218V9.046c0-.18.19-.297.351-.215l6.016 3.048a.242.242 0 0 1-.005.434z" />
-    </svg>
-`;
 
 const DisneyPlusApp = {
     url: "https://www.disneyplus.com",
@@ -211,10 +201,6 @@ const NetflixApp = {
 const PrimeVideoApp = {
     url: "https://app.primevideo.com",
     icon: PrimeVideoIcon,
-};
-const YouTubeApp = {
-    url: "https://www.youtube.com",
-    icon: YouTubeIcon,
 };
 
 const buttonCommands = {
@@ -3334,7 +3320,7 @@ class PoLRATVRemoteCard extends s {
             `);
         }
         var entity_id = this._config["entity_id"];
-        return x ` <ha-card> ${layout} </ha-card> `;
+        return x ` <ha-card>${layout} </ha-card> `;
     }
     _choosePad(padlayout) {
         var _a;
@@ -3475,9 +3461,6 @@ class PoLRATVRemoteCard extends s {
                     break;
                 case "prime":
                     app_buttons.push(this._renderApp(PrimeVideoApp));
-                    break;
-                case "youtube":
-                    app_buttons.push(this._renderApp(YouTubeApp));
                     break;
                 default:
                     app_buttons.push(this._renderCustomApp(app));

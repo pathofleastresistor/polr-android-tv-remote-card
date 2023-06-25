@@ -6,7 +6,6 @@ import {
     NetflixApp,
     PrimeVideoApp,
     TvAppInterface,
-    YouTubeApp,
 } from "./apps";
 import { buttonCommands } from "./buttonCommands";
 import {
@@ -116,7 +115,7 @@ export class PoLRATVRemoteCard extends LitElement {
         }
         var entity_id = this._config["entity_id"];
 
-        return html` <ha-card> ${layout} </ha-card> `;
+        return html` <ha-card>${layout} </ha-card> `;
     }
 
     private _choosePad(padlayout: any) {
@@ -270,9 +269,6 @@ export class PoLRATVRemoteCard extends LitElement {
                     break;
                 case "prime":
                     app_buttons.push(this._renderApp(PrimeVideoApp));
-                    break;
-                case "youtube":
-                    app_buttons.push(this._renderApp(YouTubeApp));
                     break;
                 default:
                     app_buttons.push(this._renderCustomApp(app));

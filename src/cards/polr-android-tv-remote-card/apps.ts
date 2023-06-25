@@ -17,11 +17,6 @@ export const DisneyPlusApp: TvAppInterface = {
     icon: DisneyPlusIcon,
 };
 
-export const HuluApp: TvAppInterface = {
-    url: "HULU",
-    icon: HuluIcon,
-};
-
 export const NetflixApp: TvAppInterface = {
     url: "https://www.netflix.com/title",
     icon: NetflixIcon,
@@ -30,9 +25,4 @@ export const NetflixApp: TvAppInterface = {
 export const PrimeVideoApp: TvAppInterface = {
     url: "https://app.primevideo.com",
     icon: PrimeVideoIcon,
-};
-
-export const YouTubeApp: TvAppInterface = {
-    url: "https://www.youtube.com",
-    icon: YouTubeIcon,
 };

@@ -15,7 +15,6 @@ export default {
     plugins: [
         nodeResolve(),
         json(),
-        //tailwindcss(),
         typescript2(),
         babel({
             babelHelpers: 'bundled',
