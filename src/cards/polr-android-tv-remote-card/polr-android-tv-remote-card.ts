@@ -1,6 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { property } from "lit/decorators.js";
-import { ATVRemoteCardConfig, ServiceApp } from "../../types";
+import { ATVRemoteCardConfig, ServiceApp } from "./types";
 import {
     DisneyPlusApp,
     NetflixApp,
