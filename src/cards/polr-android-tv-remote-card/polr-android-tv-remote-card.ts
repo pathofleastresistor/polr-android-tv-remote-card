@@ -1,14 +1,14 @@
 import { LitElement, html, css } from "lit";
 import { property } from "lit/decorators.js";
-import { ATVRemoteCardConfig, ServiceApp } from "./types";
+import { ATVRemoteCardConfig, ServiceApp } from "../../types";
 import {
     DisneyPlusApp,
     NetflixApp,
     PrimeVideoApp,
     TvAppInterface,
     YouTubeApp,
-} from "./utils/apps";
-import { buttonCommands } from "./utils/buttonCommands";
+} from "../../utils/apps";
+import { buttonCommands } from "../../utils/buttonCommands";
 import {
     BackIcon,
     CenterIcon,
@@ -23,13 +23,13 @@ import {
     VolumeDownIcon,
     VolumeMuteIcon,
     VolumeUpIcon,
-} from "./utils/icons";
-import "./elements/dpad";
-import "./elements/header";
-import "./elements/remote-button";
-import "./elements/touchpad";
+} from "../../utils/icons";
+import "../../elements/dpad";
+import "../../elements/header";
+import "../../elements/remote-button";
+import "../../elements/touchpad";
 
-class PoLRATVRemoteCard extends LitElement {
+export class PoLRATVRemoteCard extends LitElement {
     @property() _config: any;
     @property() _hass: any;
 

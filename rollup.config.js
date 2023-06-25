@@ -7,7 +7,7 @@ import babel from "@rollup/plugin-babel";
 const dev = process.env.ROLLUP_WATCH;
 
 export default {
-    input: "src/main.ts",
+    input: "src/polr-fox-card.ts",
     output: {
         file: "polr-android-tv-remote-card.js",
         format: "es"

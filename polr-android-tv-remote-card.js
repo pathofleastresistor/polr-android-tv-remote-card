@@ -3603,3 +3603,5 @@ window.customCards.push({
     name: "PoLR Android TV Remote Card",
     description: "Control your Android TV",
 });
+
+export { PoLRATVRemoteCard };
