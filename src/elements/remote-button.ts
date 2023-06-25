@@ -4,14 +4,15 @@ import { property, query } from "lit/decorators.js";
 class PoLRRemoteButton extends LitElement {
     @property() _hass: any;
     @property() icon: any;
-
-    constructor() {
-        super();
-    }
+    @query("#remotebutton") remotebutton;
 
     render() {
-        return html` <div id="remotebutton">${this.icon}</div> `;
+        return html`
+            <div @click=${this._click} id="remotebutton">${this.icon}</div>
+        `;
     }
+
+    _click(ev) {}
 
     static styles = css`
         #remotebutton {

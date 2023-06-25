@@ -29,18 +29,17 @@ class PoLRTouchpad extends LitElement {
         this._mc.on("panstart panmove", (event) => {
             const rect = this.pad.getBoundingClientRect();
             const size = 20;
-            this.circle.style.padding = `${size}px`;
-            this.circle.style.opacity = 1;
-            this.circle.style.transition = "opacity 0s";
             const clientX = event.center.x;
             const clientY = event.center.y;
 
+            this.circle.style.padding = `${size}px`;
+            this.circle.style.transition = "opacity 0s";
+            this.circle.style.opacity = 1;
             this.circle.style.visibility = "visible";
-
             this.circle.style.left = `${this.clamp(
                 clientX - rect.left - size,
                 0 - size,
-                rect.width - rect.left + size
+                rect.width + size - rect.left
             )}px`;
 
             this.circle.style.top = `${this.clamp(
@@ -50,10 +49,11 @@ class PoLRTouchpad extends LitElement {
             )}px`;
         });
         this._mc.on("panend", (event) => {
-            this.circle.style.transition = "all 1s";
             this.circle.style.opacity = 0;
+            this.circle.style.transition = "opacity 0.4s";
         });
     }
+
     disconnectedCallback(): void {
         super.disconnectedCallback();
         if (this._mc) {
@@ -64,12 +64,25 @@ class PoLRTouchpad extends LitElement {
 
     render() {
         return html`
-            <div id="pad">
+            <div id="pad" @click=${this._click}>
                 <div id="circle"></div>
             </div>
         `;
     }
 
+    _click(e) {
+        var d = document.createElement("div");
+        d.className = "clickEffect";
+        d.style.top = e.clientY + "px";
+        d.style.left = e.clientX + "px";
+        this.pad.appendChild(d);
+        d.addEventListener(
+            "animationend",
+            function () {
+                this.pad.removeChild(d);
+            }.bind(this)
+        );
+    }
     static styles = css`
         #pad {
             position: relative;
@@ -89,6 +102,27 @@ class PoLRTouchpad extends LitElement {
             background-color: #1e0d40;
             border-radius: 50%;
             opacity: 0%;
+        }
+
+        div.clickEffect {
+            position: fixed;
+            background-color: #1e0d40;
+            border-radius: 50%;
+            animation: clickEffect 0.4s ease-out;
+        }
+        @keyframes clickEffect {
+            0% {
+                opacity: 1;
+                width: 20px;
+                height: 20px;
+            }
+            100% {
+                opacity: 0.2;
+                width: 15em;
+                height: 15em;
+                margin: -7.5em;
+                border-width: 0.03em;
+            }
         }
     `;
 
