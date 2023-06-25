@@ -3164,6 +3164,8 @@ class PoLRTouchpad extends s {
             const rect = this.pad.getBoundingClientRect();
             const size = 20;
             this.circle.style.padding = `${size}px`;
+            this.circle.style.opacity = 1;
+            this.circle.style.transition = "opacity 0s";
             const clientX = event.center.x;
             const clientY = event.center.y;
             this.circle.style.visibility = "visible";
@@ -3171,7 +3173,8 @@ class PoLRTouchpad extends s {
             this.circle.style.top = `${this.clamp(clientY - rect.top - size, 0 - size, rect.height - size)}px`;
         });
         this._mc.on("panend", (event) => {
-            this.circle.style.visibility = "hidden";
+            this.circle.style.transition = "all 1s";
+            this.circle.style.opacity = 0;
         });
     }
     disconnectedCallback() {
@@ -3210,7 +3213,7 @@ PoLRTouchpad.styles = i$3 `
             padding: 20px;
             background-color: #1e0d40;
             border-radius: 50%;
-            visibility: hidden;
+            opacity: 0%;
         }
     `;
 __decorate([

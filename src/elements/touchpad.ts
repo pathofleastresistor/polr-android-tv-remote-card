@@ -30,6 +30,8 @@ class PoLRTouchpad extends LitElement {
             const rect = this.pad.getBoundingClientRect();
             const size = 20;
             this.circle.style.padding = `${size}px`;
+            this.circle.style.opacity = 1;
+            this.circle.style.transition = "opacity 0s";
             const clientX = event.center.x;
             const clientY = event.center.y;
 
@@ -48,7 +50,8 @@ class PoLRTouchpad extends LitElement {
             )}px`;
         });
         this._mc.on("panend", (event) => {
-            this.circle.style.visibility = "hidden";
+            this.circle.style.transition = "all 1s";
+            this.circle.style.opacity = 0;
         });
     }
     disconnectedCallback(): void {
@@ -85,7 +88,7 @@ class PoLRTouchpad extends LitElement {
             padding: 20px;
             background-color: #1e0d40;
             border-radius: 50%;
-            visibility: hidden;
+            opacity: 0%;
         }
     `;
 
