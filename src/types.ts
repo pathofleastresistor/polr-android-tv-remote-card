@@ -5,15 +5,14 @@ export interface ATVRemoteCardConfig {
     volume: boolean;
 }
 
-export interface App {    
-}
+export interface App {}
 
 export interface CustomApp extends App {
-    icon : string;
-    url : string;
+    icon: string;
+    url: string;
 }
 
 export interface ServiceApp extends App {
-    service : string;
-    data : {};
+    service: string;
+    data: {};
 }

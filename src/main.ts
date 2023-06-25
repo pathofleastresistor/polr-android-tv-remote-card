@@ -1,33 +1,27 @@
 import { LitElement, html, css } from "lit";
 import { property } from "lit/decorators.js";
-import { ATVRemoteCardConfig, CustomApp, ServiceApp } from "./types";
+import { ATVRemoteCardConfig, ServiceApp } from "./types";
 import {
     DisneyPlusApp,
-    HuluApp,
     NetflixApp,
     PrimeVideoApp,
     TvAppInterface,
     YouTubeApp,
 } from "./utils/apps";
+import { buttonCommands } from "./utils/buttonCommands";
 import {
     BackIcon,
     CenterIcon,
-    DisneyPlusIcon,
     DownIcon,
     FavoriteIcon,
-    HBOMaxIcon,
     HomeIcon,
-    HuluIcon,
     LeftIcon,
-    NetflixIcon,
     PowerIcon,
-    PrimeVideoIcon,
     RightIcon,
     UpIcon,
     VolumeDownIcon,
     VolumeMuteIcon,
     VolumeUpIcon,
-    YouTubeIcon,
 } from "./utils/icons";
 import "./elements/dpad";
 import "./elements/header";
@@ -37,13 +31,6 @@ import "./elements/touchpad";
 class PoLRATVRemoteCard extends LitElement {
     @property() _config: any;
     @property() _hass: any;
-    active: any = false;
-    currentX: any = 0;
-    currentY: any = 0;
-    initialX: any = 0;
-    initialY: any = 0;
-    _touchpad: any;
-    _dragItem: any;
 
     static getConfigElement() {
         return document.createElement("polr-android-tv-remote-card-editor");
@@ -103,7 +90,7 @@ class PoLRATVRemoteCard extends LitElement {
             <ha-card>
                 <polr-headercard icon=${PowerIcon}></polr-headercard>
                 <div class="grid card-grid">
-                    ${padlayout} ${this._render_apps()}
+                    ${padlayout} ${this._renderApps()}
                     ${this._config.volume ? this._render_volume() : html``}
                 </div>
             </ha-card>
@@ -114,26 +101,27 @@ class PoLRATVRemoteCard extends LitElement {
         return html`
             <div class="grid volume-grid">
                 <polr-remotebutton
-                    @click=${this._press_volume_down}
+                    @click=${() =>
+                        this._press(buttonCommands.volumedown.config)}
                     icon=${VolumeDownIcon}></polr-remotebutton>
                 <polr-remotebutton
-                    @click=${this._press_volume_mute}
+                    @click=${() =>
+                        this._press(buttonCommands.volumemute.config)}
                     icon=${VolumeMuteIcon}></polr-remotebutton>
                 <polr-remotebutton
-                    @click=${this._press_volume_up}
+                    @click=${() => this._press(buttonCommands.volumeup.config)}
                     icon=${VolumeUpIcon}></polr-remotebutton>
             </div>
         `;
     }
 
-    /** REMOTE LAYOUTS **/
     _render_dpad() {
         return html` <polr-dpad
-            @clickup=${this._press_up}
-            @clickdown=${this._press_down}
-            @clickleft=${this._press_left}
-            @clickright=${this._press_right}
-            @clickcenter=${this._press_center}>
+            @clickup=${() => this._press(buttonCommands.up.config)}
+            @clickdown=${() => this._press(buttonCommands.down.config)}
+            @clickleft=${() => this._press(buttonCommands.left.config)}
+            @clickright=${() => this._press(buttonCommands.right.config)}
+            @clickcenter=${() => this._press(buttonCommands.center.config)}>
         </polr-dpad>`;
     }
 
@@ -142,7 +130,7 @@ class PoLRATVRemoteCard extends LitElement {
             <div id="touchpad-grid">
                 <polr-touchpad
                     _hass=${this._hass}
-                    @padaction=${this._handleAction}></polr-touchpad>
+                    @padaction=${this._handleTouchpadAction}></polr-touchpad>
                 <div id="basicbutton-grid">
                     <polr-remotebutton icon=${HomeIcon}></polr-remotebutton>
                     <polr-remotebutton icon=${BackIcon}></polr-remotebutton>
@@ -158,25 +146,25 @@ class PoLRATVRemoteCard extends LitElement {
                     @click=${this._press_power}
                     icon=${PowerIcon}></polr-remotebutton>
                 <polr-remotebutton
-                    @click=${this._press_up}
+                    @click=${() => this._press(buttonCommands.up.config)}
                     icon=${UpIcon}></polr-remotebutton>
                 <polr-remotebutton
-                    @click=${this._press_home}
+                    @click=${() => this._press(buttonCommands.home.config)}
                     icon=${HomeIcon}></polr-remotebutton>
                 <polr-remotebutton
-                    @click=${this._press_left}
+                    @click=${() => this._press(buttonCommands.left.config)}
                     icon=${LeftIcon}></polr-remotebutton>
                 <polr-remotebutton
-                    @click=${this._press_center}
+                    @click=${() => this._press(buttonCommands.center.config)}
                     icon=${CenterIcon}></polr-remotebutton>
                 <polr-remotebutton
-                    @click=${this._press_right}
+                    @click=${() => this._press(buttonCommands.right.config)}
                     icon=${RightIcon}></polr-remotebutton>
                 <polr-remotebutton
-                    @click=${this._press_back}
+                    @click=${() => this._press(buttonCommands.back.config)}
                     icon=${BackIcon}></polr-remotebutton>
                 <polr-remotebutton
-                    @click=${this._press_down}
+                    @click=${() => this._press(buttonCommands.down.config)}
                     icon=${DownIcon}></polr-remotebutton>
                 <polr-remotebutton
                     @click=${this._press_favorite_2}
@@ -185,30 +173,29 @@ class PoLRATVRemoteCard extends LitElement {
         `;
     }
 
-    _handleAction(ev) {
+    _handleTouchpadAction(ev) {
         switch (ev.detail?.action) {
             case "swipeup":
-                this._press_up();
+                this._press(buttonCommands.up.config);
                 break;
             case "swipedown":
-                this._press_down();
+                this._press(buttonCommands.down.config);
                 break;
             case "swipeleft":
-                this._press_left();
+                this._press(buttonCommands.left.config);
                 break;
             case "swiperight":
-                this._press_right();
+                this._press(buttonCommands.right.config);
                 break;
             case "tap":
-                this._press_center();
+                this._press(buttonCommands.center.config);
                 break;
             default:
                 break;
         }
     }
 
-    /** APP LAYOUTS **/
-    _render_apps() {
+    _renderApps() {
         if (!this._config.apps) {
             return html``;
         }
@@ -218,25 +205,25 @@ class PoLRATVRemoteCard extends LitElement {
         for (const app of this._config?.apps) {
             switch (app) {
                 case "disneyplus":
-                    app_buttons.push(this._renderapp(DisneyPlusApp));
+                    app_buttons.push(this._renderApp(DisneyPlusApp));
                     break;
                 case "netflix":
-                    app_buttons.push(this._renderapp(NetflixApp));
+                    app_buttons.push(this._renderApp(NetflixApp));
                     break;
                 case "prime":
-                    app_buttons.push(this._renderapp(PrimeVideoApp));
+                    app_buttons.push(this._renderApp(PrimeVideoApp));
                     break;
                 case "youtube":
-                    app_buttons.push(this._renderapp(YouTubeApp));
+                    app_buttons.push(this._renderApp(YouTubeApp));
                     break;
                 default:
-                    app_buttons.push(this._rendercustomapp(app));
+                    app_buttons.push(this._renderCustomApp(app));
             }
         }
         return html` <div class="grid app-grid">${app_buttons}</div> `;
     }
 
-    _renderapp(app: TvAppInterface) {
+    _renderApp(app: TvAppInterface) {
         return html`
             <polr-remotebutton
                 @click=${{ handleEvent: () => this._turn_on(app.url) }}
@@ -245,7 +232,7 @@ class PoLRATVRemoteCard extends LitElement {
         `;
     }
 
-    _rendercustomapp(app: CustomApp) {
+    _renderCustomApp(app: TvAppInterface) {
         return html`
             <polr-remotebutton
                 @click=${{ handleEvent: () => this._press_custom(app) }}>
@@ -254,7 +241,7 @@ class PoLRATVRemoteCard extends LitElement {
         `;
     }
 
-    _send_command(action: string) {
+    _sendCommand(action: string) {
         this._hass.callService("remote", "send_command", {
             entity_id: this._config.entity_id,
             command: action,
@@ -270,89 +257,22 @@ class PoLRATVRemoteCard extends LitElement {
         console.log(`${action} was called`);
     }
 
+    _press(command: string) {
+        if (!buttonCommands.hasOwnProperty(command)) {
+            return;
+        }
+
+        if (this._config[command]) {
+            this._callService(this._config[command]);
+            return;
+        }
+
+        this._sendCommand(buttonCommands[command].command);
+    }
+
     _press_power() {
         if (this._config["power"]) {
             this._callService(this._config["power"]);
-        }
-    }
-
-    _press_up() {
-        if (this._config["up"]) {
-            this._callService(this._config["up"]);
-        } else {
-            this._send_command("DPAD_UP");
-        }
-    }
-
-    _press_left() {
-        if (this._config["left"]) {
-            this._callService(this._config["left"]);
-        } else {
-            this._send_command("DPAD_LEFT");
-        }
-    }
-
-    _press_right() {
-        if (this._config["right"]) {
-            this._callService(this._config["right"]);
-        } else {
-            this._send_command("DPAD_RIGHT");
-        }
-    }
-
-    _press_down() {
-        if (this._config["down"]) {
-            this._callService(this._config["down"]);
-        } else {
-            this._send_command("DPAD_DOWN");
-        }
-    }
-
-    _press_center() {
-        if (this._config["center"]) {
-            this._callService(this._config["center"]);
-        } else {
-            this._send_command("DPAD_CENTER");
-        }
-    }
-
-    _press_home() {
-        if (this._config["home"]) {
-            this._callService(this._config["home"]);
-        } else {
-            this._send_command("HOME");
-        }
-    }
-
-    _press_back() {
-        if (this._config["back"]) {
-            this._callService(this._config["back"]);
-        } else {
-            this._send_command("BACK");
-        }
-    }
-
-    _press_volume_up() {
-        if (this._config["volumeup"]) {
-            this._callService(this._config["volumeup"]);
-        } else {
-            this._send_command("VOLUME_UP");
-        }
-    }
-
-    _press_volume_mute() {
-        if (this._config["volumemute"]) {
-            this._callService(this._config["volumemute"]);
-        } else {
-            this._send_command("MUTE");
-        }
-    }
-
-    _press_volume_down() {
-        if (this._config["volumedown"]) {
-            this._callService(this._config["volumedown"]);
-        } else {
-            this._send_command("VOLUME_DOWN");
         }
     }
 
