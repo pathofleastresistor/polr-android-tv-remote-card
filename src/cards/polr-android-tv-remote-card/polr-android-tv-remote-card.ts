@@ -23,10 +23,10 @@ import {
     VolumeMuteIcon,
     VolumeUpIcon,
 } from "../../utils/icons";
-import "../../elements/dpad";
-import "../../elements/header";
-import "../../elements/remote-button";
-import "../../elements/touchpad";
+import "../elements/dpad";
+import "../elements/header";
+import "../elements/remote-button";
+import "../elements/touchpad";
 
 export class PoLRATVRemoteCard extends LitElement {
     @property() _config: any;
