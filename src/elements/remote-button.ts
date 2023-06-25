@@ -31,8 +31,8 @@ class PoLRRemoteButton extends LitElement {
         }
 
         svg {
-            height: 24px;
-            width: 24px;
+            height: 36px;
+            width: 36px;
         }
     `;
 }

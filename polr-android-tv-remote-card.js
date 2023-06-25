@@ -172,31 +172,21 @@ const TelevisionIcon = x `
     </svg>
 `;
 const VolumeDownIcon = x `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-        <title>volume-minus</title>
-        <path d="M3,9H7L12,4V20L7,15H3V9M14,11H22V13H14V11Z" />
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+        <path
+            d="M360-360H230q-13 0-21.5-8.5T200-390v-180q0-13 8.5-21.5T230-600h130l149-149q14-14 32.5-6.5T560-728v496q0 20-18.5 27.5T509-211L360-360Zm380-120q0 52-26 94t-73 64q-8 4-14.5-1t-6.5-13v-289q0-8 6.5-13t14.5-1q47 22 73 65t26 94ZM500-648 387-540H260v120h127l113 109v-337ZM378-480Z" />
     </svg>
 `;
 const VolumeMuteIcon = x `
-    <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="48"
-        height="48"
-        viewBox="0 0 24 24">
-        <title>volume-mute</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
         <path
-            d="M3,9H7L12,4V20L7,15H3V9M16.59,12L14,9.41L15.41,8L18,10.59L20.59,8L22,9.41L19.41,12L22,14.59L20.59,16L18,13.41L15.41,16L14,14.59L16.59,12Z" />
+            d="M440-360H310q-13 0-21.5-8.5T280-390v-180q0-13 8.5-21.5T310-600h130l149-149q14-14 32.5-6.5T640-728v496q0 20-18.5 27.5T589-211L440-360Zm-100-60h127l113 109v-337L467-540H340v120Zm119-60Z" />
     </svg>
 `;
 const VolumeUpIcon = x `
-    <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="48"
-        height="48"
-        viewBox="0 0 24 24">
-        <title>volume-plus</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
         <path
-            d="M3,9H7L12,4V20L7,15H3V9M14,11H17V8H19V11H22V13H19V16H17V13H14V11Z" />
+            d="M780-481q0-94-52.5-169T590-759q-12-5-17-16t0-22q5-12 17.5-16.5t25.5.5q101 41 162.5 131T840-481q0 111-61.5 201T616-149q-13 5-25.5.5T573-165q-5-11 0-22t17-16q85-34 137.5-109T780-481ZM280-360H150q-13 0-21.5-8.5T120-390v-180q0-13 8.5-21.5T150-600h130l149-149q14-14 32.5-6.5T480-728v496q0 20-18.5 27.5T429-211L280-360Zm380-120q0 52-26 94t-73 64q-8 4-14.5-1t-6.5-13v-289q0-8 6.5-13t14.5-1q47 22 73 65t26 94ZM420-648 307-540H180v120h127l113 109v-337ZM298-480Z" />
     </svg>
 `;
 const YouTubeIcon = x `
@@ -498,8 +488,8 @@ PoLRRemoteButton.styles = i$3 `
         }
 
         svg {
-            height: 24px;
-            width: 24px;
+            height: 36px;
+            width: 36px;
         }
     `;
 __decorate([
