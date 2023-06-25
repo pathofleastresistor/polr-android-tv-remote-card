@@ -2,17 +2,12 @@ import { LitElement, html, css } from "lit";
 import { property, query } from "lit/decorators.js";
 
 class PoLRHeaderCard extends LitElement {
-    @property()
-    private _hass: any;
-
-    @property()
-    public icon: any;
-
-    @property()
-    public additionalIcon;
-
-    @property()
-    public entity_id;
+    @property() private _hass: any;
+    @property() public icon: any;
+    @property() public additionalIcon;
+    @property() public primaryInfo;
+    @property() public secondaryInfo;
+    @property() public entity_id;
 
     constructor() {
         super();
@@ -20,22 +15,20 @@ class PoLRHeaderCard extends LitElement {
 
     render() {
         var state = this._hass["states"][this.entity_id]["state"];
-        var primary_info =
-            this._hass["states"][this.entity_id]["attributes"][
-                "friendly_name"
-            ] || "TV Remote";
-        var secondary_info =
-            this._hass["states"][this.entity_id]["attributes"][
-                "current_activity"
-            ] || "Info";
 
+        var header_content = [];
+        header_content.push(
+            html`<div class="primary-info">${this.primaryInfo}</div>`
+        );
+        if (this.secondaryInfo) {
+            header_content.push(
+                html`<div class="secondary-info">${this.secondaryInfo}</div>`
+            );
+        }
         return html`
             <div class="header-grid">
                 <div class="header-icon">${this.icon}</div>
-                <div class="header-content">
-                    <div class="primary-info">${primary_info}</div>
-                    <div class="secondary-info"></div>
-                </div>
+                <div class="header-content">${header_content}</div>
                 <div
                     class="header-additional ${state === "on" ? "on" : "off"}"
                     @click=${this._additionalClick}>

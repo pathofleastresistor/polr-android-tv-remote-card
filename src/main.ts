@@ -86,6 +86,12 @@ class PoLRATVRemoteCard extends LitElement {
                 icon=${TelevisionIcon}
                 _hass=${this._hass}
                 entity_id=${entity_id}
+                primaryInfo=${this._hass["states"][entity_id]["attributes"][
+                    "friendly_name"
+                ]}
+                secondaryInfo=${this._hass["states"][entity_id]["attributes"][
+                    "current_activity"
+                ]}
                 additionalIcon=${PowerIcon}
                 @additionalclick=${this._press_power}>
             </polr-headercard>

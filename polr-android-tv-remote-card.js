@@ -386,15 +386,15 @@ class PoLRHeaderCard extends s {
     }
     render() {
         var state = this._hass["states"][this.entity_id]["state"];
-        var primary_info = this._hass["states"][this.entity_id]["attributes"]["friendly_name"] || "TV Remote";
-        this._hass["states"][this.entity_id]["attributes"]["current_activity"] || "Info";
+        var header_content = [];
+        header_content.push(x `<div class="primary-info">${this.primaryInfo}</div>`);
+        if (this.secondaryInfo) {
+            header_content.push(x `<div class="secondary-info">${this.secondaryInfo}</div>`);
+        }
         return x `
             <div class="header-grid">
                 <div class="header-icon">${this.icon}</div>
-                <div class="header-content">
-                    <div class="primary-info">${primary_info}</div>
-                    <div class="secondary-info"></div>
-                </div>
+                <div class="header-content">${header_content}</div>
                 <div
                     class="header-additional ${state === "on" ? "on" : "off"}"
                     @click=${this._additionalClick}>
@@ -462,6 +462,12 @@ __decorate([
 __decorate([
     n$1()
 ], PoLRHeaderCard.prototype, "additionalIcon", void 0);
+__decorate([
+    n$1()
+], PoLRHeaderCard.prototype, "primaryInfo", void 0);
+__decorate([
+    n$1()
+], PoLRHeaderCard.prototype, "secondaryInfo", void 0);
 __decorate([
     n$1()
 ], PoLRHeaderCard.prototype, "entity_id", void 0);
@@ -3312,6 +3318,8 @@ class PoLRATVRemoteCard extends s {
                 icon=${TelevisionIcon}
                 _hass=${this._hass}
                 entity_id=${entity_id}
+                primaryInfo=${this._hass["states"][entity_id]["attributes"]["friendly_name"]}
+                secondaryInfo=${this._hass["states"][entity_id]["attributes"]["current_activity"]}
                 additionalIcon=${PowerIcon}
                 @additionalclick=${this._press_power}>
             </polr-headercard>
