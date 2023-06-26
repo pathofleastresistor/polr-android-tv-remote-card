@@ -11,6 +11,7 @@ class PoLRHeaderCard extends LitElement {
     @property() public primaryInfo;
     @property() public secondaryInfo;
     @property() public entity_id;
+    @property() public toggleIcon;
 
     constructor() {
         super();
@@ -18,6 +19,14 @@ class PoLRHeaderCard extends LitElement {
 
     render() {
         var state = this._hass["states"][this.entity_id]["state"];
+
+        //TODO: improve on this logic
+        var icon_content;
+        if (this.icon) {
+            icon_content = html` ${this.icon} `;
+        } else if (this.mdiIcon) {
+            icon_content = html` <ha-icon icon="${this.mdiIcon}"></ha-icon> `;
+        }
 
         var header_content = [];
         header_content.push(
@@ -35,7 +44,9 @@ class PoLRHeaderCard extends LitElement {
             additional_content = html`
                 <div class="header-additional">
                     <div
-                        class="button ${state === "on" ? "on" : "off"}"
+                        class="button ${this.toggleIcon && state === "on"
+                            ? "on"
+                            : "off"}"
                         @click=${this._additionalClick}>
                         ${this.additionalIcon}
                     </div>
@@ -45,7 +56,9 @@ class PoLRHeaderCard extends LitElement {
             additional_content = html`
                 <div class="header-additional">
                     <div
-                        class="button ${state === "on" ? "on" : "off"}"
+                        class="button ${this.toggleIcon && state === "on"
+                            ? "on"
+                            : "off"}"
                         @click=${this._additionalClick}>
                         ${this.mdiAdditionalIcon}
                     </div>
@@ -58,8 +71,11 @@ class PoLRHeaderCard extends LitElement {
         }
 
         return html`
-            <div class="header-grid">
-                <div class="header-icon">${this.icon}</div>
+            <div
+                class="header-grid ${additional_content
+                    ? "grid-col-3"
+                    : "grid-col-2"}">
+                <div class="header-icon">${icon_content}</div>
                 <div class="header-content">${header_content}</div>
                 ${additional_content}
             </div>
@@ -75,15 +91,23 @@ class PoLRHeaderCard extends LitElement {
             color: #d0bcff;
         }
         .header-grid {
-            background: #381e72;
             display: grid;
-            grid-template-columns: 36px 1fr 70px;
             align-items: center;
+            background: #381e72;
             height: 56px;
             padding: 20px 20px;
             gap: 20px;
         }
+        .grid-col-2 {
+            grid-template-columns: 36px 1fr;
+        }
+        .grid-col-3 {
+            grid-template-columns: 36px 1fr 70px;
+        }
         .header-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border-radius: 5px;
             width: 36px;
             height: 36px;
@@ -115,6 +139,11 @@ class PoLRHeaderCard extends LitElement {
         }
         .on {
             background: #1e0d40;
+            transition: background 0.4s;
+        }
+        .off {
+            background: none;
+            transition: background 0.4s;
         }
         .header-additional svg {
             fill: #d0bcff;

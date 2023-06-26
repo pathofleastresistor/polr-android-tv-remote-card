@@ -362,6 +362,14 @@ let PoLRHeaderCard$1 = class PoLRHeaderCard extends s {
     }
     render() {
         var state = this._hass["states"][this.entity_id]["state"];
+        //TODO: improve on this logic
+        var icon_content;
+        if (this.icon) {
+            icon_content = x ` ${this.icon} `;
+        }
+        else if (this.mdiIcon) {
+            icon_content = x ` <ha-icon icon="${this.mdiIcon}"></ha-icon> `;
+        }
         var header_content = [];
         header_content.push(x `<div class="primary-info">${this.primaryInfo}</div>`);
         if (this.secondaryInfo) {
@@ -373,7 +381,9 @@ let PoLRHeaderCard$1 = class PoLRHeaderCard extends s {
             additional_content = x `
                 <div class="header-additional">
                     <div
-                        class="button ${state === "on" ? "on" : "off"}"
+                        class="button ${this.toggleIcon && state === "on"
+                ? "on"
+                : "off"}"
                         @click=${this._additionalClick}>
                         ${this.additionalIcon}
                     </div>
@@ -384,7 +394,9 @@ let PoLRHeaderCard$1 = class PoLRHeaderCard extends s {
             additional_content = x `
                 <div class="header-additional">
                     <div
-                        class="button ${state === "on" ? "on" : "off"}"
+                        class="button ${this.toggleIcon && state === "on"
+                ? "on"
+                : "off"}"
                         @click=${this._additionalClick}>
                         ${this.mdiAdditionalIcon}
                     </div>
@@ -397,8 +409,11 @@ let PoLRHeaderCard$1 = class PoLRHeaderCard extends s {
             `;
         }
         return x `
-            <div class="header-grid">
-                <div class="header-icon">${this.icon}</div>
+            <div
+                class="header-grid ${additional_content
+            ? "grid-col-3"
+            : "grid-col-2"}">
+                <div class="header-icon">${icon_content}</div>
                 <div class="header-content">${header_content}</div>
                 ${additional_content}
             </div>
@@ -413,15 +428,23 @@ PoLRHeaderCard$1.styles = i$3 `
             color: #d0bcff;
         }
         .header-grid {
-            background: #381e72;
             display: grid;
-            grid-template-columns: 36px 1fr 70px;
             align-items: center;
+            background: #381e72;
             height: 56px;
             padding: 20px 20px;
             gap: 20px;
         }
+        .grid-col-2 {
+            grid-template-columns: 36px 1fr;
+        }
+        .grid-col-3 {
+            grid-template-columns: 36px 1fr 70px;
+        }
         .header-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border-radius: 5px;
             width: 36px;
             height: 36px;
@@ -453,6 +476,11 @@ PoLRHeaderCard$1.styles = i$3 `
         }
         .on {
             background: #1e0d40;
+            transition: background 0.4s;
+        }
+        .off {
+            background: none;
+            transition: background 0.4s;
         }
         .header-additional svg {
             fill: #d0bcff;
@@ -497,6 +525,9 @@ __decorate([
 __decorate([
     n$1()
 ], PoLRHeaderCard$1.prototype, "entity_id", void 0);
+__decorate([
+    n$1()
+], PoLRHeaderCard$1.prototype, "toggleIcon", void 0);
 customElements.define("polr-headercard", PoLRHeaderCard$1);
 
 class PoLRRemoteButton extends s {
@@ -3348,7 +3379,8 @@ class PoLRATVRemoteCard extends s {
                 primaryInfo=${this._hass["states"][entity_id]["attributes"]["friendly_name"]}
                 secondaryInfo=${this._hass["states"][entity_id]["attributes"]["current_activity"]}
                 additionalIcon=${PowerIcon}
-                @additionalclick=${this._press_power}>
+                @additionalclick=${this._press_power}
+                toggleIcon="true">
             </polr-headercard>
         `);
         if (state === "on") {
@@ -3986,4 +4018,84 @@ window.customCards.push({
     description: "A weather card.",
 });
 
-export { PoLRATVRemoteCard, PoLRHeaderCard, PoLRWeatherCard };
+class PoLRToggleCard extends s {
+    static getConfigElement() { }
+    static getStubConfig() { }
+    static get properties() {
+        return {
+            _hass: {},
+            _config: {},
+        };
+    }
+    setConfig(config) {
+        if (!config.entity_id) {
+            throw new Error("entity_id must be specified");
+        }
+        this._entity = config.entity_id;
+        this._icon = config.icon || "mdi:lightbulb";
+    }
+    set hass(hass) {
+        this._hass = hass;
+    }
+    render() {
+        var _a, _b;
+        var entity = (_a = this._hass) === null || _a === void 0 ? void 0 : _a.states[this._entity];
+        var brightness = (_b = entity.attributes.brightness) !== null && _b !== void 0 ? _b : 0;
+        return x `
+            <ha-card>
+                <polr-headercard
+                    @click=${this._toggle}
+                    mdiIcon=${this._icon}
+                    _hass=${this._hass}
+                    entity_id=${this._entity}
+                    primaryInfo=${entity.attributes.friendly_name}
+                    secondaryInfo="${Math.round((100 * brightness) / 255)}%">
+                </polr-headercard>
+            </ha-card>
+        `;
+    }
+    _toggle(ev) {
+        var _a;
+        (_a = this._hass) === null || _a === void 0 ? void 0 : _a.callService("light", "toggle", {
+            entity_id: this._entity,
+        });
+    }
+    _moreinfo(ev) {
+        console.log("more-info");
+        const event = new Event("hass-more-info", {
+            bubbles: true,
+            cancelable: true,
+            composed: true,
+        });
+        event.detail = {
+            entityId: this._entity,
+        };
+        this.dispatchEvent(event);
+    }
+}
+PoLRToggleCard.styles = i$3 `
+        ha-card {
+            overflow: hidden;
+        }
+    `;
+__decorate([
+    n$1()
+], PoLRToggleCard.prototype, "_config", void 0);
+__decorate([
+    n$1()
+], PoLRToggleCard.prototype, "_hass", void 0);
+__decorate([
+    n$1()
+], PoLRToggleCard.prototype, "_entity", void 0);
+__decorate([
+    n$1()
+], PoLRToggleCard.prototype, "_icon", void 0);
+customElements.define("polr-toggle-card", PoLRToggleCard);
+window.customCards = window.customCards || [];
+window.customCards.push({
+    type: "polr-toggle-card",
+    name: "PoLR Toggle Card",
+    description: "A toggle card.",
+});
+
+export { PoLRATVRemoteCard, PoLRHeaderCard, PoLRToggleCard, PoLRWeatherCard };

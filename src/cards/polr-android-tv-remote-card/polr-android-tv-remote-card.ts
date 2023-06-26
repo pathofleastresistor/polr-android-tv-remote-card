@@ -92,7 +92,8 @@ export class PoLRATVRemoteCard extends LitElement {
                     "current_activity"
                 ]}
                 additionalIcon=${PowerIcon}
-                @additionalclick=${this._press_power}>
+                @additionalclick=${this._press_power}
+                toggleIcon="true">
             </polr-headercard>
         `);
 
