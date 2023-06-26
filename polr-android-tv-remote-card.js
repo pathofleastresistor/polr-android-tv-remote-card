@@ -40,7 +40,7 @@ const t$1=window,e$3=t$1.ShadowRoot&&(void 0===t$1.ShadyCSS||t$1.ShadyCSS.native
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-var t;const i$2=window,s$1=i$2.trustedTypes,e$1=s$1?s$1.createPolicy("lit-html",{createHTML:t=>t}):void 0,o$2="$lit$",n$3=`lit$${(Math.random()+"").slice(9)}$`,l$1="?"+n$3,h=`<${l$1}>`,r=document,d=()=>r.createComment(""),u=t=>null===t||"object"!=typeof t&&"function"!=typeof t,c=Array.isArray,v=t=>c(t)||"function"==typeof(null==t?void 0:t[Symbol.iterator]),a="[ \t\n\f\r]",f=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,_=/-->/g,m=/>/g,p=RegExp(`>|${a}(?:([^\\s"'>=/]+)(${a}*=${a}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),g=/'/g,$=/"/g,y=/^(?:script|style|textarea|title)$/i,w=t=>(i,...s)=>({_$litType$:t,strings:i,values:s}),x=w(1),T=Symbol.for("lit-noChange"),A=Symbol.for("lit-nothing"),E=new WeakMap,C=r.createTreeWalker(r,129,null,!1),P=(t,i)=>{const s=t.length-1,l=[];let r,d=2===i?"<svg>":"",u=f;for(let i=0;i<s;i++){const s=t[i];let e,c,v=-1,a=0;for(;a<s.length&&(u.lastIndex=a,c=u.exec(s),null!==c);)a=u.lastIndex,u===f?"!--"===c[1]?u=_:void 0!==c[1]?u=m:void 0!==c[2]?(y.test(c[2])&&(r=RegExp("</"+c[2],"g")),u=p):void 0!==c[3]&&(u=p):u===p?">"===c[0]?(u=null!=r?r:f,v=-1):void 0===c[1]?v=-2:(v=u.lastIndex-c[2].length,e=c[1],u=void 0===c[3]?p:'"'===c[3]?$:g):u===$||u===g?u=p:u===_||u===m?u=f:(u=p,r=void 0);const w=u===p&&t[i+1].startsWith("/>")?" ":"";d+=u===f?s+h:v>=0?(l.push(e),s.slice(0,v)+o$2+s.slice(v)+n$3+w):s+n$3+(-2===v?(l.push(void 0),i):w);}const c=d+(t[s]||"<?>")+(2===i?"</svg>":"");if(!Array.isArray(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return [void 0!==e$1?e$1.createHTML(c):c,l]};class V{constructor({strings:t,_$litType$:i},e){let h;this.parts=[];let r=0,u=0;const c=t.length-1,v=this.parts,[a,f]=P(t,i);if(this.el=V.createElement(a,e),C.currentNode=this.el.content,2===i){const t=this.el.content,i=t.firstChild;i.remove(),t.append(...i.childNodes);}for(;null!==(h=C.nextNode())&&v.length<c;){if(1===h.nodeType){if(h.hasAttributes()){const t=[];for(const i of h.getAttributeNames())if(i.endsWith(o$2)||i.startsWith(n$3)){const s=f[u++];if(t.push(i),void 0!==s){const t=h.getAttribute(s.toLowerCase()+o$2).split(n$3),i=/([.?@])?(.*)/.exec(s);v.push({type:1,index:r,name:i[2],strings:t,ctor:"."===i[1]?k:"?"===i[1]?I:"@"===i[1]?L:R});}else v.push({type:6,index:r});}for(const i of t)h.removeAttribute(i);}if(y.test(h.tagName)){const t=h.textContent.split(n$3),i=t.length-1;if(i>0){h.textContent=s$1?s$1.emptyScript:"";for(let s=0;s<i;s++)h.append(t[s],d()),C.nextNode(),v.push({type:2,index:++r});h.append(t[i],d());}}}else if(8===h.nodeType)if(h.data===l$1)v.push({type:2,index:r});else {let t=-1;for(;-1!==(t=h.data.indexOf(n$3,t+1));)v.push({type:7,index:r}),t+=n$3.length-1;}r++;}}static createElement(t,i){const s=r.createElement("template");return s.innerHTML=t,s}}function N(t,i,s=t,e){var o,n,l,h;if(i===T)return i;let r=void 0!==e?null===(o=s._$Co)||void 0===o?void 0:o[e]:s._$Cl;const d=u(i)?void 0:i._$litDirective$;return (null==r?void 0:r.constructor)!==d&&(null===(n=null==r?void 0:r._$AO)||void 0===n||n.call(r,!1),void 0===d?r=void 0:(r=new d(t),r._$AT(t,s,e)),void 0!==e?(null!==(l=(h=s)._$Co)&&void 0!==l?l:h._$Co=[])[e]=r:s._$Cl=r),void 0!==r&&(i=N(t,r._$AS(t,i.values),r,e)),i}class S{constructor(t,i){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=i;}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){var i;const{el:{content:s},parts:e}=this._$AD,o=(null!==(i=null==t?void 0:t.creationScope)&&void 0!==i?i:r).importNode(s,!0);C.currentNode=o;let n=C.nextNode(),l=0,h=0,d=e[0];for(;void 0!==d;){if(l===d.index){let i;2===d.type?i=new M(n,n.nextSibling,this,t):1===d.type?i=new d.ctor(n,d.name,d.strings,this,t):6===d.type&&(i=new z(n,this,t)),this._$AV.push(i),d=e[++h];}l!==(null==d?void 0:d.index)&&(n=C.nextNode(),l++);}return C.currentNode=r,o}v(t){let i=0;for(const s of this._$AV)void 0!==s&&(void 0!==s.strings?(s._$AI(t,s,i),i+=s.strings.length-2):s._$AI(t[i])),i++;}}class M{constructor(t,i,s,e){var o;this.type=2,this._$AH=A,this._$AN=void 0,this._$AA=t,this._$AB=i,this._$AM=s,this.options=e,this._$Cp=null===(o=null==e?void 0:e.isConnected)||void 0===o||o;}get _$AU(){var t,i;return null!==(i=null===(t=this._$AM)||void 0===t?void 0:t._$AU)&&void 0!==i?i:this._$Cp}get parentNode(){let t=this._$AA.parentNode;const i=this._$AM;return void 0!==i&&11===(null==t?void 0:t.nodeType)&&(t=i.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,i=this){t=N(this,t,i),u(t)?t===A||null==t||""===t?(this._$AH!==A&&this._$AR(),this._$AH=A):t!==this._$AH&&t!==T&&this._(t):void 0!==t._$litType$?this.g(t):void 0!==t.nodeType?this.$(t):v(t)?this.T(t):this._(t);}k(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}$(t){this._$AH!==t&&(this._$AR(),this._$AH=this.k(t));}_(t){this._$AH!==A&&u(this._$AH)?this._$AA.nextSibling.data=t:this.$(r.createTextNode(t)),this._$AH=t;}g(t){var i;const{values:s,_$litType$:e}=t,o="number"==typeof e?this._$AC(t):(void 0===e.el&&(e.el=V.createElement(e.h,this.options)),e);if((null===(i=this._$AH)||void 0===i?void 0:i._$AD)===o)this._$AH.v(s);else {const t=new S(o,this),i=t.u(this.options);t.v(s),this.$(i),this._$AH=t;}}_$AC(t){let i=E.get(t.strings);return void 0===i&&E.set(t.strings,i=new V(t)),i}T(t){c(this._$AH)||(this._$AH=[],this._$AR());const i=this._$AH;let s,e=0;for(const o of t)e===i.length?i.push(s=new M(this.k(d()),this.k(d()),this,this.options)):s=i[e],s._$AI(o),e++;e<i.length&&(this._$AR(s&&s._$AB.nextSibling,e),i.length=e);}_$AR(t=this._$AA.nextSibling,i){var s;for(null===(s=this._$AP)||void 0===s||s.call(this,!1,!0,i);t&&t!==this._$AB;){const i=t.nextSibling;t.remove(),t=i;}}setConnected(t){var i;void 0===this._$AM&&(this._$Cp=t,null===(i=this._$AP)||void 0===i||i.call(this,t));}}class R{constructor(t,i,s,e,o){this.type=1,this._$AH=A,this._$AN=void 0,this.element=t,this.name=i,this._$AM=e,this.options=o,s.length>2||""!==s[0]||""!==s[1]?(this._$AH=Array(s.length-1).fill(new String),this.strings=s):this._$AH=A;}get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}_$AI(t,i=this,s,e){const o=this.strings;let n=!1;if(void 0===o)t=N(this,t,i,0),n=!u(t)||t!==this._$AH&&t!==T,n&&(this._$AH=t);else {const e=t;let l,h;for(t=o[0],l=0;l<o.length-1;l++)h=N(this,e[s+l],i,l),h===T&&(h=this._$AH[l]),n||(n=!u(h)||h!==this._$AH[l]),h===A?t=A:t!==A&&(t+=(null!=h?h:"")+o[l+1]),this._$AH[l]=h;}n&&!e&&this.j(t);}j(t){t===A?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,null!=t?t:"");}}class k extends R{constructor(){super(...arguments),this.type=3;}j(t){this.element[this.name]=t===A?void 0:t;}}const H=s$1?s$1.emptyScript:"";class I extends R{constructor(){super(...arguments),this.type=4;}j(t){t&&t!==A?this.element.setAttribute(this.name,H):this.element.removeAttribute(this.name);}}class L extends R{constructor(t,i,s,e,o){super(t,i,s,e,o),this.type=5;}_$AI(t,i=this){var s;if((t=null!==(s=N(this,t,i,0))&&void 0!==s?s:A)===T)return;const e=this._$AH,o=t===A&&e!==A||t.capture!==e.capture||t.once!==e.once||t.passive!==e.passive,n=t!==A&&(e===A||o);o&&this.element.removeEventListener(this.name,this,e),n&&this.element.addEventListener(this.name,this,t),this._$AH=t;}handleEvent(t){var i,s;"function"==typeof this._$AH?this._$AH.call(null!==(s=null===(i=this.options)||void 0===i?void 0:i.host)&&void 0!==s?s:this.element,t):this._$AH.handleEvent(t);}}class z{constructor(t,i,s){this.element=t,this.type=6,this._$AN=void 0,this._$AM=i,this.options=s;}get _$AU(){return this._$AM._$AU}_$AI(t){N(this,t);}}const j=i$2.litHtmlPolyfillSupport;null==j||j(V,M),(null!==(t=i$2.litHtmlVersions)&&void 0!==t?t:i$2.litHtmlVersions=[]).push("2.7.4");const B=(t,i,s)=>{var e,o;const n=null!==(e=null==s?void 0:s.renderBefore)&&void 0!==e?e:i;let l=n._$litPart$;if(void 0===l){const t=null!==(o=null==s?void 0:s.renderBefore)&&void 0!==o?o:null;n._$litPart$=l=new M(i.insertBefore(d(),t),t,void 0,null!=s?s:{});}return l._$AI(t),l};
+var t;const i$2=window,s$1=i$2.trustedTypes,e$1=s$1?s$1.createPolicy("lit-html",{createHTML:t=>t}):void 0,o$2="$lit$",n$3=`lit$${(Math.random()+"").slice(9)}$`,l$1="?"+n$3,h=`<${l$1}>`,r=document,d=()=>r.createComment(""),u=t=>null===t||"object"!=typeof t&&"function"!=typeof t,c=Array.isArray,v=t=>c(t)||"function"==typeof(null==t?void 0:t[Symbol.iterator]),a="[ \t\n\f\r]",f=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,_=/-->/g,m=/>/g,p=RegExp(`>|${a}(?:([^\\s"'>=/]+)(${a}*=${a}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),g=/'/g,$=/"/g,y=/^(?:script|style|textarea|title)$/i,w=t=>(i,...s)=>({_$litType$:t,strings:i,values:s}),x=w(1),b=w(2),T=Symbol.for("lit-noChange"),A=Symbol.for("lit-nothing"),E=new WeakMap,C=r.createTreeWalker(r,129,null,!1),P=(t,i)=>{const s=t.length-1,l=[];let r,d=2===i?"<svg>":"",u=f;for(let i=0;i<s;i++){const s=t[i];let e,c,v=-1,a=0;for(;a<s.length&&(u.lastIndex=a,c=u.exec(s),null!==c);)a=u.lastIndex,u===f?"!--"===c[1]?u=_:void 0!==c[1]?u=m:void 0!==c[2]?(y.test(c[2])&&(r=RegExp("</"+c[2],"g")),u=p):void 0!==c[3]&&(u=p):u===p?">"===c[0]?(u=null!=r?r:f,v=-1):void 0===c[1]?v=-2:(v=u.lastIndex-c[2].length,e=c[1],u=void 0===c[3]?p:'"'===c[3]?$:g):u===$||u===g?u=p:u===_||u===m?u=f:(u=p,r=void 0);const w=u===p&&t[i+1].startsWith("/>")?" ":"";d+=u===f?s+h:v>=0?(l.push(e),s.slice(0,v)+o$2+s.slice(v)+n$3+w):s+n$3+(-2===v?(l.push(void 0),i):w);}const c=d+(t[s]||"<?>")+(2===i?"</svg>":"");if(!Array.isArray(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return [void 0!==e$1?e$1.createHTML(c):c,l]};class V{constructor({strings:t,_$litType$:i},e){let h;this.parts=[];let r=0,u=0;const c=t.length-1,v=this.parts,[a,f]=P(t,i);if(this.el=V.createElement(a,e),C.currentNode=this.el.content,2===i){const t=this.el.content,i=t.firstChild;i.remove(),t.append(...i.childNodes);}for(;null!==(h=C.nextNode())&&v.length<c;){if(1===h.nodeType){if(h.hasAttributes()){const t=[];for(const i of h.getAttributeNames())if(i.endsWith(o$2)||i.startsWith(n$3)){const s=f[u++];if(t.push(i),void 0!==s){const t=h.getAttribute(s.toLowerCase()+o$2).split(n$3),i=/([.?@])?(.*)/.exec(s);v.push({type:1,index:r,name:i[2],strings:t,ctor:"."===i[1]?k:"?"===i[1]?I:"@"===i[1]?L:R});}else v.push({type:6,index:r});}for(const i of t)h.removeAttribute(i);}if(y.test(h.tagName)){const t=h.textContent.split(n$3),i=t.length-1;if(i>0){h.textContent=s$1?s$1.emptyScript:"";for(let s=0;s<i;s++)h.append(t[s],d()),C.nextNode(),v.push({type:2,index:++r});h.append(t[i],d());}}}else if(8===h.nodeType)if(h.data===l$1)v.push({type:2,index:r});else {let t=-1;for(;-1!==(t=h.data.indexOf(n$3,t+1));)v.push({type:7,index:r}),t+=n$3.length-1;}r++;}}static createElement(t,i){const s=r.createElement("template");return s.innerHTML=t,s}}function N(t,i,s=t,e){var o,n,l,h;if(i===T)return i;let r=void 0!==e?null===(o=s._$Co)||void 0===o?void 0:o[e]:s._$Cl;const d=u(i)?void 0:i._$litDirective$;return (null==r?void 0:r.constructor)!==d&&(null===(n=null==r?void 0:r._$AO)||void 0===n||n.call(r,!1),void 0===d?r=void 0:(r=new d(t),r._$AT(t,s,e)),void 0!==e?(null!==(l=(h=s)._$Co)&&void 0!==l?l:h._$Co=[])[e]=r:s._$Cl=r),void 0!==r&&(i=N(t,r._$AS(t,i.values),r,e)),i}class S{constructor(t,i){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=i;}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){var i;const{el:{content:s},parts:e}=this._$AD,o=(null!==(i=null==t?void 0:t.creationScope)&&void 0!==i?i:r).importNode(s,!0);C.currentNode=o;let n=C.nextNode(),l=0,h=0,d=e[0];for(;void 0!==d;){if(l===d.index){let i;2===d.type?i=new M(n,n.nextSibling,this,t):1===d.type?i=new d.ctor(n,d.name,d.strings,this,t):6===d.type&&(i=new z(n,this,t)),this._$AV.push(i),d=e[++h];}l!==(null==d?void 0:d.index)&&(n=C.nextNode(),l++);}return C.currentNode=r,o}v(t){let i=0;for(const s of this._$AV)void 0!==s&&(void 0!==s.strings?(s._$AI(t,s,i),i+=s.strings.length-2):s._$AI(t[i])),i++;}}class M{constructor(t,i,s,e){var o;this.type=2,this._$AH=A,this._$AN=void 0,this._$AA=t,this._$AB=i,this._$AM=s,this.options=e,this._$Cp=null===(o=null==e?void 0:e.isConnected)||void 0===o||o;}get _$AU(){var t,i;return null!==(i=null===(t=this._$AM)||void 0===t?void 0:t._$AU)&&void 0!==i?i:this._$Cp}get parentNode(){let t=this._$AA.parentNode;const i=this._$AM;return void 0!==i&&11===(null==t?void 0:t.nodeType)&&(t=i.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,i=this){t=N(this,t,i),u(t)?t===A||null==t||""===t?(this._$AH!==A&&this._$AR(),this._$AH=A):t!==this._$AH&&t!==T&&this._(t):void 0!==t._$litType$?this.g(t):void 0!==t.nodeType?this.$(t):v(t)?this.T(t):this._(t);}k(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}$(t){this._$AH!==t&&(this._$AR(),this._$AH=this.k(t));}_(t){this._$AH!==A&&u(this._$AH)?this._$AA.nextSibling.data=t:this.$(r.createTextNode(t)),this._$AH=t;}g(t){var i;const{values:s,_$litType$:e}=t,o="number"==typeof e?this._$AC(t):(void 0===e.el&&(e.el=V.createElement(e.h,this.options)),e);if((null===(i=this._$AH)||void 0===i?void 0:i._$AD)===o)this._$AH.v(s);else {const t=new S(o,this),i=t.u(this.options);t.v(s),this.$(i),this._$AH=t;}}_$AC(t){let i=E.get(t.strings);return void 0===i&&E.set(t.strings,i=new V(t)),i}T(t){c(this._$AH)||(this._$AH=[],this._$AR());const i=this._$AH;let s,e=0;for(const o of t)e===i.length?i.push(s=new M(this.k(d()),this.k(d()),this,this.options)):s=i[e],s._$AI(o),e++;e<i.length&&(this._$AR(s&&s._$AB.nextSibling,e),i.length=e);}_$AR(t=this._$AA.nextSibling,i){var s;for(null===(s=this._$AP)||void 0===s||s.call(this,!1,!0,i);t&&t!==this._$AB;){const i=t.nextSibling;t.remove(),t=i;}}setConnected(t){var i;void 0===this._$AM&&(this._$Cp=t,null===(i=this._$AP)||void 0===i||i.call(this,t));}}class R{constructor(t,i,s,e,o){this.type=1,this._$AH=A,this._$AN=void 0,this.element=t,this.name=i,this._$AM=e,this.options=o,s.length>2||""!==s[0]||""!==s[1]?(this._$AH=Array(s.length-1).fill(new String),this.strings=s):this._$AH=A;}get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}_$AI(t,i=this,s,e){const o=this.strings;let n=!1;if(void 0===o)t=N(this,t,i,0),n=!u(t)||t!==this._$AH&&t!==T,n&&(this._$AH=t);else {const e=t;let l,h;for(t=o[0],l=0;l<o.length-1;l++)h=N(this,e[s+l],i,l),h===T&&(h=this._$AH[l]),n||(n=!u(h)||h!==this._$AH[l]),h===A?t=A:t!==A&&(t+=(null!=h?h:"")+o[l+1]),this._$AH[l]=h;}n&&!e&&this.j(t);}j(t){t===A?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,null!=t?t:"");}}class k extends R{constructor(){super(...arguments),this.type=3;}j(t){this.element[this.name]=t===A?void 0:t;}}const H=s$1?s$1.emptyScript:"";class I extends R{constructor(){super(...arguments),this.type=4;}j(t){t&&t!==A?this.element.setAttribute(this.name,H):this.element.removeAttribute(this.name);}}class L extends R{constructor(t,i,s,e,o){super(t,i,s,e,o),this.type=5;}_$AI(t,i=this){var s;if((t=null!==(s=N(this,t,i,0))&&void 0!==s?s:A)===T)return;const e=this._$AH,o=t===A&&e!==A||t.capture!==e.capture||t.once!==e.once||t.passive!==e.passive,n=t!==A&&(e===A||o);o&&this.element.removeEventListener(this.name,this,e),n&&this.element.addEventListener(this.name,this,t),this._$AH=t;}handleEvent(t){var i,s;"function"==typeof this._$AH?this._$AH.call(null!==(s=null===(i=this.options)||void 0===i?void 0:i.host)&&void 0!==s?s:this.element,t):this._$AH.handleEvent(t);}}class z{constructor(t,i,s){this.element=t,this.type=6,this._$AN=void 0,this._$AM=i,this.options=s;}get _$AU(){return this._$AM._$AU}_$AI(t){N(this,t);}}const j=i$2.litHtmlPolyfillSupport;null==j||j(V,M),(null!==(t=i$2.litHtmlVersions)&&void 0!==t?t:i$2.litHtmlVersions=[]).push("2.7.4");const B=(t,i,s)=>{var e,o;const n=null!==(e=null==s?void 0:s.renderBefore)&&void 0!==e?e:i;let l=n._$litPart$;if(void 0===l){const t=null!==(o=null==s?void 0:s.renderBefore)&&void 0!==o?o:null;n._$litPart$=l=new M(i.insertBefore(d(),t),t,void 0,null!=s?s:{});}return l._$AI(t),l};
 
 /**
  * @license
@@ -356,7 +356,7 @@ __decorate([
 ], PoLRDpad.prototype, "up", void 0);
 customElements.define("polr-dpad", PoLRDpad);
 
-class PoLRHeaderCard extends s {
+let PoLRHeaderCard$1 = class PoLRHeaderCard extends s {
     constructor() {
         super();
     }
@@ -367,27 +367,55 @@ class PoLRHeaderCard extends s {
         if (this.secondaryInfo) {
             header_content.push(x `<div class="secondary-info">${this.secondaryInfo}</div>`);
         }
+        //TODO: improve on this logic
+        var additional_content;
+        if (this.additionalIcon) {
+            additional_content = x `
+                <div class="header-additional">
+                    <div
+                        class="button ${state === "on" ? "on" : "off"}"
+                        @click=${this._additionalClick}>
+                        ${this.additionalIcon}
+                    </div>
+                </div>
+            `;
+        }
+        else if (this.mdiAdditionalIcon) {
+            additional_content = x `
+                <div class="header-additional">
+                    <div
+                        class="button ${state === "on" ? "on" : "off"}"
+                        @click=${this._additionalClick}>
+                        ${this.mdiAdditionalIcon}
+                    </div>
+                </div>
+            `;
+        }
+        else if (this.additionalInfo) {
+            additional_content = x `
+                <div class="header-additional">${this.additionalInfo}</div>
+            `;
+        }
         return x `
             <div class="header-grid">
                 <div class="header-icon">${this.icon}</div>
                 <div class="header-content">${header_content}</div>
-                <div
-                    class="header-additional ${state === "on" ? "on" : "off"}"
-                    @click=${this._additionalClick}>
-                    ${this.additionalIcon}
-                </div>
+                ${additional_content}
             </div>
         `;
     }
     _additionalClick(ev) {
         this.dispatchEvent(new CustomEvent("additionalclick"));
     }
-}
-PoLRHeaderCard.styles = i$3 `
+};
+PoLRHeaderCard$1.styles = i$3 `
+        :host {
+            color: #d0bcff;
+        }
         .header-grid {
             background: #381e72;
             display: grid;
-            grid-template-columns: 36px 1fr min-content;
+            grid-template-columns: 36px 1fr 70px;
             align-items: center;
             height: 56px;
             padding: 20px 20px;
@@ -399,7 +427,7 @@ PoLRHeaderCard.styles = i$3 `
             height: 36px;
         }
         .header-icon svg {
-            fill: #ededed;
+            fill: #d0bcff;
         }
         .header-content {
             display: flex;
@@ -413,41 +441,63 @@ PoLRHeaderCard.styles = i$3 `
             font-size: 12px;
         }
         .header-additional {
+            display: flex;
+            flex-direction: column;
+            text-align: right;
+            justify-self: end;
+        }
+        .header-additional .button {
             border-radius: 5px;
-            width: 36px;
-            height: 36px;
-            margin: auto;
-            padding: 4px;
+            cursor: pointer;
+            width: fit-content;
         }
         .on {
             background: #1e0d40;
         }
         .header-additional svg {
-            fill: white;
+            fill: #d0bcff;
             width: 26px;
             height: 26px;
-            padding: 5px;
+            padding: 5px 5px 0 5px;
+        }
+        .header-additional .primary-info {
+            flex: 1fr;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .header-additional .secondary-info {
+            flex: 1fr;
+            font-size: 12px;
         }
     `;
 __decorate([
     n$1()
-], PoLRHeaderCard.prototype, "_hass", void 0);
+], PoLRHeaderCard$1.prototype, "_hass", void 0);
 __decorate([
     n$1()
-], PoLRHeaderCard.prototype, "icon", void 0);
+], PoLRHeaderCard$1.prototype, "icon", void 0);
 __decorate([
     n$1()
-], PoLRHeaderCard.prototype, "additionalIcon", void 0);
+], PoLRHeaderCard$1.prototype, "mdiIcon", void 0);
 __decorate([
     n$1()
-], PoLRHeaderCard.prototype, "primaryInfo", void 0);
+], PoLRHeaderCard$1.prototype, "additionalIcon", void 0);
 __decorate([
     n$1()
-], PoLRHeaderCard.prototype, "secondaryInfo", void 0);
+], PoLRHeaderCard$1.prototype, "mdiAdditionalIcon", void 0);
 __decorate([
     n$1()
-], PoLRHeaderCard.prototype, "entity_id", void 0);
-customElements.define("polr-headercard", PoLRHeaderCard);
+], PoLRHeaderCard$1.prototype, "additionalInfo", void 0);
+__decorate([
+    n$1()
+], PoLRHeaderCard$1.prototype, "primaryInfo", void 0);
+__decorate([
+    n$1()
+], PoLRHeaderCard$1.prototype, "secondaryInfo", void 0);
+__decorate([
+    n$1()
+], PoLRHeaderCard$1.prototype, "entity_id", void 0);
+customElements.define("polr-headercard", PoLRHeaderCard$1);
 
 class PoLRRemoteButton extends s {
     render() {
@@ -3561,16 +3611,22 @@ PoLRATVRemoteCard.styles = i$3 `
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
+            width: 90%;
+            margin: auto;
         }
         #app-grid {
             display: grid;
             grid-template-columns: auto auto auto auto;
+            width: 90%;
+            margin: auto;
             gap: 5px;
         }
         #volume-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 20px;
+            width: 90%;
+            margin: auto;
         }
     `;
 __decorate([
@@ -3587,4 +3643,347 @@ window.customCards.push({
     description: "Control your Android TV",
 });
 
-export { PoLRATVRemoteCard };
+class PoLRHeaderCard extends s {
+    constructor() {
+        super();
+        document.body.style.height = document.body.clientHeight + 100 + "px";
+    }
+    static getConfigElement() {
+        return document.createElement("polr-android-tv-remote-card-editor");
+    }
+    static getStubConfig() {
+        return {
+            entity_id: "remote.atvremote",
+            apps: ["disneyplus"],
+            remote: "touch",
+        };
+    }
+    static get properties() {
+        return {
+            _hass: {},
+            _config: {},
+        };
+    }
+    setConfig(config) {
+        if (!config.entity_id) {
+            throw new Error("entity_id must be specified");
+        }
+        this._config = JSON.parse(JSON.stringify(config));
+        this._primaryInfo = config["title"] || "Hello";
+        this._secondaryInfo = config["subtitle"] || "More information";
+    }
+    set hass(hass) {
+        this._hass = hass;
+    }
+    render() {
+        var _a, _b;
+        var entity_id = this._config["entity_id"];
+        var state = (_b = (_a = this._hass) === null || _a === void 0 ? void 0 : _a.states[entity_id]) === null || _b === void 0 ? void 0 : _b.state;
+        if (state !== "on") {
+            return x ``;
+        }
+        return x ``;
+    }
+}
+PoLRHeaderCard.styles = i$3 `
+        :host {
+        }
+        svg {
+            display: block;
+            margin: auto;
+            fill: white;
+            height: 48px;
+            width: 48px;
+        }
+        #footer {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            z-index: 11;
+            height: 80px;
+            background: rgb(56, 30, 114);
+            box-shadow: 0 3px 3px #121212;
+            display: grid;
+            grid-template-columns: min-content 2fr;
+            gap: 10px;
+            align-items: center;
+        }
+        #play-homespeakers,
+        #play-tv {
+            cursor: pointer;
+            padding: 0 10px;
+        }
+        #info-tv {
+            text-align: right;
+        }
+        .primary-info {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .secondary-info {
+            font-size: 12px;
+            line-height: 1em;
+        }
+    `;
+__decorate([
+    n$1()
+], PoLRHeaderCard.prototype, "_config", void 0);
+__decorate([
+    n$1()
+], PoLRHeaderCard.prototype, "_hass", void 0);
+__decorate([
+    n$1()
+], PoLRHeaderCard.prototype, "_primaryInfo", void 0);
+__decorate([
+    n$1()
+], PoLRHeaderCard.prototype, "_secondaryInfo", void 0);
+customElements.define("polr-header-card", PoLRHeaderCard);
+window.customCards = window.customCards || [];
+window.customCards.push({
+    type: "polr-header-card",
+    name: "PoLR Header Card",
+    description: "A header card.",
+});
+
+const cloudyStates = new Set([
+    "partlycloudy",
+    "cloudy",
+    "fog",
+    "windy",
+    "windy-variant",
+    "hail",
+    "rainy",
+    "snowy",
+    "snowy-rainy",
+    "pouring",
+    "lightning",
+    "lightning-rainy",
+]);
+const rainStates = new Set(["hail", "rainy", "pouring"]);
+const windyStates = new Set(["windy", "windy-variant"]);
+const snowyStates = new Set(["snowy", "snowy-rainy"]);
+const lightningStates = new Set(["lightning", "lightning-rainy"]);
+i$3 `
+    .rain {
+        fill: var(--weather-icon-rain-color, #30b3ff);
+    }
+    .sun {
+        fill: var(--weather-icon-sun-color, #fdd93c);
+    }
+    .moon {
+        fill: var(--weather-icon-moon-color, #fcf497);
+    }
+    .cloud-back {
+        fill: var(--weather-icon-cloud-back-color, #d4d4d4);
+    }
+    .cloud-front {
+        fill: var(--weather-icon-cloud-front-color, #f9f9f9);
+    }
+`;
+const getWeatherStateSVG = (state, nightTime) => b `
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 17 17"
+  >
+  ${state === "sunny"
+    ? b `
+          <path
+            class="sun"
+            d="m 14.39303,8.4033507 c 0,3.3114723 -2.684145,5.9956173 -5.9956169,5.9956173 -3.3114716,0 -5.9956168,-2.684145 -5.9956168,-5.9956173 0,-3.311471 2.6841452,-5.995617 5.9956168,-5.995617 3.3114719,0 5.9956169,2.684146 5.9956169,5.995617"
+          />
+        `
+    : ""}
+  ${state === "clear-night"
+    ? b `
+          <path
+            class="moon"
+            d="m 13.502891,11.382935 c -1.011285,1.859223 -2.976664,3.121381 -5.2405751,3.121381 -3.289929,0 -5.953329,-2.663833 -5.953329,-5.9537625 0,-2.263911 1.261724,-4.228856 3.120948,-5.240575 -0.452782,0.842738 -0.712753,1.806363 -0.712753,2.832381 0,3.289928 2.663833,5.9533275 5.9533291,5.9533275 1.026017,0 1.989641,-0.259969 2.83238,-0.712752"
+          />
+        `
+    : ""}
+  ${state === "partlycloudy" && nightTime
+    ? b `
+          <path
+            class="moon"
+            d="m14.981 4.2112c0 1.9244-1.56 3.4844-3.484 3.4844-1.9244 0-3.4844-1.56-3.4844-3.4844s1.56-3.484 3.4844-3.484c1.924 0 3.484 1.5596 3.484 3.484"
+          />
+        `
+    : state === "partlycloudy"
+        ? b `
+          <path
+            class="sun"
+            d="m14.981 4.2112c0 1.9244-1.56 3.4844-3.484 3.4844-1.9244 0-3.4844-1.56-3.4844-3.4844s1.56-3.484 3.4844-3.484c1.924 0 3.484 1.5596 3.484 3.484"
+          />
+        `
+        : ""}
+  ${cloudyStates.has(state)
+    ? b `
+          <path
+            class="cloud-back"
+            d="m3.8863 5.035c-0.54892 0.16898-1.04 0.46637-1.4372 0.8636-0.63077 0.63041-1.0206 1.4933-1.0206 2.455 0 1.9251 1.5589 3.4682 3.4837 3.4682h6.9688c1.9251 0 3.484-1.5981 3.484-3.5232 0-1.9251-1.5589-3.5232-3.484-3.5232h-1.0834c-0.25294-1.6916-1.6986-2.9083-3.4463-2.9083-1.7995 0-3.2805 1.4153-3.465 3.1679"
+          />
+          <path
+            class="cloud-front"
+            d="m4.1996 7.6995c-0.33902 0.10407-0.64276 0.28787-0.88794 0.5334-0.39017 0.38982-0.63147 0.92322-0.63147 1.5176 0 1.1896 0.96414 2.1431 2.1537 2.1431h4.3071c1.1896 0 2.153-0.98742 2.153-2.1777 0-1.1896-0.96344-2.1777-2.153-2.1777h-0.66992c-0.15593-1.0449-1.0499-1.7974-2.1297-1.7974-1.112 0-2.0274 0.87524-2.1417 1.9586"
+          />
+        `
+    : ""}
+  ${rainStates.has(state)
+    ? b `
+          <path
+            class="rain"
+            d="m5.2852 14.734c-0.22401 0.24765-0.57115 0.2988-0.77505 0.11395-0.20391-0.1845-0.18732-0.53481 0.036689-0.78281 0.14817-0.16298 0.59126-0.32914 0.87559-0.42369 0.12453-0.04092 0.22684 0.05186 0.19791 0.17956-0.065617 0.2921-0.18732 0.74965-0.33514 0.91299"
+          />
+          <path
+            class="rain"
+            d="m11.257 14.163c-0.22437 0.24765-0.57115 0.2988-0.77505 0.11395-0.2039-0.1845-0.18768-0.53481 0.03669-0.78281 0.14817-0.16298 0.59126-0.32914 0.8756-0.42369 0.12453-0.04092 0.22684 0.05186 0.19791 0.17956-0.06562 0.2921-0.18732 0.74965-0.33514 0.91299"
+          />
+          <path
+            class="rain"
+            d="m8.432 15.878c-0.15452 0.17039-0.3937 0.20567-0.53446 0.07867-0.14041-0.12735-0.12876-0.36865 0.025753-0.53975 0.10195-0.11218 0.40711-0.22684 0.60325-0.29175 0.085725-0.02858 0.15628 0.03563 0.13652 0.12382-0.045508 0.20108-0.12912 0.51647-0.23107 0.629"
+          />
+          <path
+            class="rain"
+            d="m7.9991 14.118c-0.19226 0.21237-0.49001 0.25612-0.66499 0.09737-0.17462-0.15804-0.16051-0.45861 0.03175-0.67098 0.12665-0.14005 0.50729-0.28293 0.75071-0.36336 0.10689-0.03563 0.19473 0.0441 0.17004 0.15346-0.056092 0.25082-0.16051 0.64347-0.28751 0.78352"
+          />
+        `
+    : ""}
+  ${state === "pouring"
+    ? b `
+          <path
+            class="rain"
+            d="m10.648 16.448c-0.19226 0.21449-0.49001 0.25894-0.66499 0.09878-0.17498-0.16016-0.16087-0.4639 0.03175-0.67874 0.12665-0.14146 0.50694-0.2854 0.75071-0.36724 0.10689-0.03563 0.19473 0.0448 0.17004 0.15558-0.05645 0.25365-0.16051 0.65017-0.28751 0.79163"
+          />
+          <path
+            class="rain"
+            d="m5.9383 16.658c-0.22437 0.25012-0.5715 0.30162-0.77505 0.11501-0.20391-0.18627-0.18768-0.54046 0.036689-0.79093 0.14817-0.1651 0.59126-0.33267 0.87559-0.42827 0.12418-0.04127 0.22648 0.05221 0.19791 0.18168-0.065617 0.29528-0.18732 0.75741-0.33514 0.92251"
+          />
+        `
+    : ""}
+  ${windyStates.has(state)
+    ? b `
+          <path
+            class="cloud-back"
+            d="m 13.59616,15.30968 c 0,0 -0.09137,-0.0071 -0.250472,-0.0187 -0.158045,-0.01235 -0.381353,-0.02893 -0.64382,-0.05715 -0.262466,-0.02716 -0.564444,-0.06385 -0.877358,-0.124531 -0.156986,-0.03034 -0.315383,-0.06844 -0.473781,-0.111478 -0.157691,-0.04551 -0.313266,-0.09842 -0.463902,-0.161219 l -0.267406,-0.0949 c -0.09984,-0.02646 -0.205669,-0.04904 -0.305153,-0.06738 -0.193322,-0.02716 -0.3838218,-0.03316 -0.5640912,-0.02011 -0.3626556,0.02611 -0.6847417,0.119239 -0.94615,0.226483 -0.2617611,0.108656 -0.4642556,0.230364 -0.600075,0.324203 -0.1358195,0.09419 -0.2049639,0.160514 -0.2049639,0.160514 0,0 0.089958,-0.01623 0.24765,-0.04445 0.1559278,-0.02575 0.3764139,-0.06174 0.6367639,-0.08714 0.2596444,-0.02646 0.5591527,-0.0441 0.8678333,-0.02328 0.076905,0.0035 0.1538111,0.01658 0.2321278,0.02293 0.077611,0.01058 0.1534581,0.02893 0.2314221,0.04022 0.07267,0.01834 0.1397,0.03986 0.213078,0.05644 l 0.238125,0.08925 c 0.09207,0.03281 0.183444,0.07055 0.275872,0.09878 0.09243,0.0261 0.185208,0.05327 0.277636,0.07161 0.184856,0.0388 0.367947,0.06174 0.543983,0.0702 0.353131,0.01905 0.678745,-0.01341 0.951442,-0.06456 0.27305,-0.05292 0.494595,-0.123119 0.646642,-0.181681 0.152047,-0.05785 0.234597,-0.104069 0.234597,-0.104069"
+          />
+          <path
+            class="cloud-back"
+            d="m 4.7519154,13.905801 c 0,0 0.091369,-0.0032 0.2511778,-0.0092 0.1580444,-0.0064 0.3820583,-0.01446 0.6455833,-0.03281 0.2631722,-0.01729 0.5662083,-0.04269 0.8812389,-0.09137 0.1576916,-0.02434 0.3175,-0.05609 0.4776611,-0.09384 0.1591027,-0.03951 0.3167944,-0.08643 0.4699,-0.14358 l 0.2702277,-0.08467 c 0.1008945,-0.02222 0.2074334,-0.04127 0.3072695,-0.05574 0.1943805,-0.01976 0.3848805,-0.0187 0.5651499,0.0014 0.3608917,0.03951 0.67945,0.144639 0.936625,0.261761 0.2575278,0.118534 0.4554364,0.247297 0.5873754,0.346781 0.132291,0.09913 0.198966,0.168275 0.198966,0.168275 0,0 -0.08925,-0.01976 -0.245886,-0.05397 C 9.9423347,14.087088 9.7232597,14.042988 9.4639681,14.00736 9.2057347,13.97173 8.9072848,13.94245 8.5978986,13.95162 c -0.077258,7.06e-4 -0.1541638,0.01058 -0.2328333,0.01411 -0.077964,0.0078 -0.1545166,0.02328 -0.2331861,0.03175 -0.073025,0.01588 -0.1404055,0.03422 -0.2141361,0.04798 l -0.2420055,0.08008 c -0.093486,0.02963 -0.1859139,0.06421 -0.2794,0.0889 C 7.3028516,14.23666 7.2093653,14.2603 7.116232,14.27512 6.9303181,14.30722 6.7465209,14.3231 6.5697792,14.32486 6.2166487,14.33046 5.8924459,14.28605 5.6218654,14.224318 5.3505793,14.161565 5.1318571,14.082895 4.9822793,14.01869 4.8327015,13.95519 4.7519154,13.905801 4.7519154,13.905801"
+          />
+        `
+    : ""}
+  ${snowyStates.has(state)
+    ? b `
+          <path
+            class="rain"
+            d="m 8.4319893,15.348341 c 0,0.257881 -0.209197,0.467079 -0.467078,0.467079 -0.258586,0 -0.46743,-0.209198 -0.46743,-0.467079 0,-0.258233 0.208844,-0.467431 0.46743,-0.467431 0.257881,0 0.467078,0.209198 0.467078,0.467431"
+          />
+          <path
+            class="rain"
+            d="m 11.263878,14.358553 c 0,0.364067 -0.295275,0.659694 -0.659695,0.659694 -0.364419,0 -0.6596937,-0.295627 -0.6596937,-0.659694 0,-0.364419 0.2952747,-0.659694 0.6596937,-0.659694 0.36442,0 0.659695,0.295275 0.659695,0.659694"
+          />
+          <path
+            class="rain"
+            d="m 5.3252173,13.69847 c 0,0.364419 -0.295275,0.660047 -0.659695,0.660047 -0.364067,0 -0.659694,-0.295628 -0.659694,-0.660047 0,-0.364067 0.295627,-0.659694 0.659694,-0.659694 0.36442,0 0.659695,0.295627 0.659695,0.659694"
+          />
+        `
+    : ""}
+  ${lightningStates.has(state)
+    ? b `
+          <path
+            class="sun"
+            d="m 9.9252695,10.935875 -1.6483986,2.341014 1.1170184,0.05929 -1.2169864,2.02141 3.0450261,-2.616159 H 9.8864918 L 10.97937,11.294651 10.700323,10.79794 h -0.508706 l -0.2663475,0.137936"
+          />
+        `
+    : ""}
+  </svg>`;
+const WeatherStrings = {
+    "clear-night": "Clear, night",
+    cloudy: "Cloudy",
+    exceptional: "Exceptional",
+    fog: "Fog",
+    hail: "Hail",
+    lightning: "Lightning",
+    "lightning-rainy": "Lightning, rainy",
+    partlycloudy: "Partly cloudy",
+    pouring: "Pouring",
+    rainy: "Rainy",
+    snowy: "Snowy",
+    "snowy-rainy": "Snowy, rainy",
+    sunny: "Sunny",
+    windy: "Windy",
+    "windy-variant": "Windy",
+};
+
+class PoLRWeatherCard extends s {
+    static getConfigElement() { }
+    static getStubConfig() { }
+    static get properties() {
+        return {
+            _hass: {},
+            _config: {},
+        };
+    }
+    setConfig(config) {
+        if (!config.entity_id) {
+            throw new Error("entity_id must be specified");
+        }
+        this._entity = config.entity_id;
+    }
+    set hass(hass) {
+        this._hass = hass;
+    }
+    render() {
+        var _a;
+        var weather = (_a = this._hass) === null || _a === void 0 ? void 0 : _a.states[this._entity];
+        var weather_additional_content = x `
+            <div class="primary-info">
+                ${weather.attributes.temperature}
+                ${weather.attributes.temperature_unit}
+            </div>
+            <div class="secondary-info">
+                ${weather.attributes.forecast[0].templow}
+                ${weather.attributes.temperature_unit} /
+                ${weather.attributes.forecast[0].temperature}
+                ${weather.attributes.temperature_unit}
+            </div>
+        `;
+        return x `
+            <ha-card>
+                <polr-headercard
+                    icon=${getWeatherStateSVG(weather.state, false)}
+                    _hass=${this._hass}
+                    entity_id=${this._entity}
+                    primaryInfo=${WeatherStrings[weather.state]}
+                    secondaryInfo=${WeatherStrings[weather.state]}
+                    additionalInfo=${weather_additional_content}>
+                </polr-headercard>
+            </ha-card>
+        `;
+    }
+}
+PoLRWeatherCard.styles = i$3 `
+        ha-card {
+            overflow: hidden;
+        }
+    `;
+__decorate([
+    n$1()
+], PoLRWeatherCard.prototype, "_config", void 0);
+__decorate([
+    n$1()
+], PoLRWeatherCard.prototype, "_hass", void 0);
+__decorate([
+    n$1()
+], PoLRWeatherCard.prototype, "_entity", void 0);
+customElements.define("polr-weather-card", PoLRWeatherCard);
+window.customCards = window.customCards || [];
+window.customCards.push({
+    type: "polr-weather-card",
+    name: "PoLR Weather Card",
+    description: "A weather card.",
+});
+
+export { PoLRATVRemoteCard, PoLRHeaderCard, PoLRWeatherCard };

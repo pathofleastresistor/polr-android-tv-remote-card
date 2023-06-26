@@ -379,16 +379,22 @@ export class PoLRATVRemoteCard extends LitElement {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
+            width: 90%;
+            margin: auto;
         }
         #app-grid {
             display: grid;
             grid-template-columns: auto auto auto auto;
+            width: 90%;
+            margin: auto;
             gap: 5px;
         }
         #volume-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 20px;
+            width: 90%;
+            margin: auto;
         }
     `;
 }
