@@ -1,5 +1,5 @@
 import { LitElement, html, css } from "lit";
-import { property } from "lit/decorators.js";
+import { property, query } from "lit/decorators.js";
 import { PowerIcon } from "../../utils/icons";
 import "../elements/header";
 
@@ -9,6 +9,7 @@ export class PoLRToggleCard extends LitElement {
     @property() private _entity: string;
     @property() private _icon: string;
     @property() private _attribute: number;
+    @query("ha-card") _card;
 
     static getConfigElement() {}
 
@@ -39,7 +40,11 @@ export class PoLRToggleCard extends LitElement {
         var info_value = entity.attributes[this._attribute] ?? 0;
 
         return html`
-            <ha-card>
+            <ha-card
+                @mousedown=${this._startPress}
+                @mouseup=${this._endPress}
+                @touchstart=${this._startPress}
+                @touchend=${this._endPress}>
                 <polr-headercard
                     @click=${this._toggle}
                     mdiIcon=${this._icon}
@@ -50,6 +55,13 @@ export class PoLRToggleCard extends LitElement {
                 </polr-headercard>
             </ha-card>
         `;
+    }
+
+    _startPress(ev) {
+        this._card.classList.add("pressed");
+    }
+    _endPress(ev) {
+        this._card.classList.remove("pressed");
     }
 
     _toggle(ev) {
@@ -74,6 +86,11 @@ export class PoLRToggleCard extends LitElement {
     static styles = css`
         ha-card {
             overflow: hidden;
+            cursor: pointer;
+        }
+
+        .pressed {
+            transform: matrix(0.95, 0, 0, 0.95, 0, 0);
         }
     `;
 }

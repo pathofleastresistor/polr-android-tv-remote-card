@@ -4043,7 +4043,11 @@ class PoLRToggleCard extends s {
         var entity = (_a = this._hass) === null || _a === void 0 ? void 0 : _a.states[this._entity];
         var info_value = (_b = entity.attributes[this._attribute]) !== null && _b !== void 0 ? _b : 0;
         return x `
-            <ha-card>
+            <ha-card
+                @mousedown=${this._startPress}
+                @mouseup=${this._endPress}
+                @touchstart=${this._startPress}
+                @touchend=${this._endPress}>
                 <polr-headercard
                     @click=${this._toggle}
                     mdiIcon=${this._icon}
@@ -4054,6 +4058,12 @@ class PoLRToggleCard extends s {
                 </polr-headercard>
             </ha-card>
         `;
+    }
+    _startPress(ev) {
+        this._card.classList.add("pressed");
+    }
+    _endPress(ev) {
+        this._card.classList.remove("pressed");
     }
     _toggle(ev) {
         var _a;
@@ -4077,6 +4087,11 @@ class PoLRToggleCard extends s {
 PoLRToggleCard.styles = i$3 `
         ha-card {
             overflow: hidden;
+            cursor: pointer;
+        }
+
+        .pressed {
+            transform: matrix(0.95, 0, 0, 0.95, 0, 0);
         }
     `;
 __decorate([
@@ -4094,6 +4109,9 @@ __decorate([
 __decorate([
     n$1()
 ], PoLRToggleCard.prototype, "_attribute", void 0);
+__decorate([
+    i("ha-card")
+], PoLRToggleCard.prototype, "_card", void 0);
 customElements.define("polr-toggle-card", PoLRToggleCard);
 window.customCards = window.customCards || [];
 window.customCards.push({
