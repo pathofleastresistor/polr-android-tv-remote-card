@@ -91,7 +91,7 @@ class PoLRTouchpad extends LitElement {
             max-height: 600px;
             width: 100%;
             min-width: 250px;
-            background: #ededed;
+            background: #d0bcff;
             border-radius: 12px;
             cursor: pointer;
             overflow: hidden;

@@ -20,9 +20,9 @@ class PoLRRemoteButton extends LitElement {
             align-items: center;
             justify-content: center;
             justify-items: center;
-            fill: var(--primary-text-color);
+            fill: #381e72;
             border-radius: 8px;
-            background-color: #373737;
+            background-color: #d0bcff;
             cursor: pointer;
             height: 100%;
             min-height: 30px;

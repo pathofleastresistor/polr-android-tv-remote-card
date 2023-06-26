@@ -513,9 +513,9 @@ PoLRRemoteButton.styles = i$3 `
             align-items: center;
             justify-content: center;
             justify-items: center;
-            fill: var(--primary-text-color);
+            fill: #381e72;
             border-radius: 8px;
-            background-color: #373737;
+            background-color: #d0bcff;
             cursor: pointer;
             height: 100%;
             min-height: 30px;
@@ -3248,7 +3248,7 @@ PoLRTouchpad.styles = i$3 `
             max-height: 600px;
             width: 100%;
             min-width: 250px;
-            background: #ededed;
+            background: #d0bcff;
             border-radius: 12px;
             cursor: pointer;
             overflow: hidden;
