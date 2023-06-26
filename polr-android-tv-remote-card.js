@@ -533,8 +533,22 @@ customElements.define("polr-headercard", PoLRHeaderCard$1);
 class PoLRRemoteButton extends s {
     render() {
         return x `
-            <div @click=${this._click} id="remotebutton">${this.icon}</div>
+            <div
+                @click=${this._click}
+                @mousedown=${this._startPress}
+                @mouseup=${this._endPress}
+                @touchstart=${this._startPress}
+                @touchend=${this._endPress}
+                id="remotebutton">
+                ${this.icon}
+            </div>
         `;
+    }
+    _startPress(ev) {
+        this.remotebutton.classList.add("pressed");
+    }
+    _endPress(ev) {
+        this.remotebutton.classList.remove("pressed");
     }
     _click(ev) { }
 }
@@ -557,6 +571,9 @@ PoLRRemoteButton.styles = i$3 `
         svg {
             height: 36px;
             width: 36px;
+        }
+        .pressed {
+            transform: matrix(0.95, 0, 0, 0.95, 0, 0);
         }
     `;
 __decorate([
@@ -3983,7 +4000,7 @@ class PoLRWeatherCard extends s {
             </div>
         `;
         return x `
-            <ha-card>
+            <ha-card @click=${this._moreinfo}>
                 <polr-headercard
                     icon=${getWeatherStateSVG(weather.state, false)}
                     _hass=${this._hass}
@@ -3994,6 +4011,18 @@ class PoLRWeatherCard extends s {
                 </polr-headercard>
             </ha-card>
         `;
+    }
+    _moreinfo(ev) {
+        console.log("more-info");
+        const event = new Event("hass-more-info", {
+            bubbles: true,
+            cancelable: true,
+            composed: true,
+        });
+        event.detail = {
+            entityId: this._entity,
+        };
+        this.dispatchEvent(event);
     }
 }
 PoLRWeatherCard.styles = i$3 `

@@ -48,7 +48,7 @@ export class PoLRWeatherCard extends LitElement {
         `;
 
         return html`
-            <ha-card>
+            <ha-card @click=${this._moreinfo}>
                 <polr-headercard
                     icon=${getWeatherStateSVG(weather.state, false)}
                     _hass=${this._hass}
@@ -59,6 +59,19 @@ export class PoLRWeatherCard extends LitElement {
                 </polr-headercard>
             </ha-card>
         `;
+    }
+
+    _moreinfo(ev) {
+        console.log("more-info");
+        const event = new Event("hass-more-info", {
+            bubbles: true,
+            cancelable: true,
+            composed: true,
+        });
+        (event as any).detail = {
+            entityId: this._entity,
+        };
+        this.dispatchEvent(event);
     }
     static styles = css`
         ha-card {

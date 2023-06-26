@@ -8,8 +8,23 @@ class PoLRRemoteButton extends LitElement {
 
     render() {
         return html`
-            <div @click=${this._click} id="remotebutton">${this.icon}</div>
+            <div
+                @click=${this._click}
+                @mousedown=${this._startPress}
+                @mouseup=${this._endPress}
+                @touchstart=${this._startPress}
+                @touchend=${this._endPress}
+                id="remotebutton">
+                ${this.icon}
+            </div>
         `;
+    }
+
+    _startPress(ev) {
+        this.remotebutton.classList.add("pressed");
+    }
+    _endPress(ev) {
+        this.remotebutton.classList.remove("pressed");
     }
 
     _click(ev) {}
@@ -33,6 +48,9 @@ class PoLRRemoteButton extends LitElement {
         svg {
             height: 36px;
             width: 36px;
+        }
+        .pressed {
+            transform: matrix(0.95, 0, 0, 0.95, 0, 0);
         }
     `;
 }
