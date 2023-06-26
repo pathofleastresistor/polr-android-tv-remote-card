@@ -4033,6 +4033,7 @@ class PoLRToggleCard extends s {
         }
         this._entity = config.entity_id;
         this._icon = config.icon || "mdi:lightbulb";
+        this._attribute = config.info || 0;
     }
     set hass(hass) {
         this._hass = hass;
@@ -4040,7 +4041,7 @@ class PoLRToggleCard extends s {
     render() {
         var _a, _b;
         var entity = (_a = this._hass) === null || _a === void 0 ? void 0 : _a.states[this._entity];
-        var brightness = (_b = entity.attributes.brightness) !== null && _b !== void 0 ? _b : 0;
+        var info_value = (_b = entity.attributes[this._attribute]) !== null && _b !== void 0 ? _b : 0;
         return x `
             <ha-card>
                 <polr-headercard
@@ -4049,7 +4050,7 @@ class PoLRToggleCard extends s {
                     _hass=${this._hass}
                     entity_id=${this._entity}
                     primaryInfo=${entity.attributes.friendly_name}
-                    secondaryInfo="${Math.round((100 * brightness) / 255)}%">
+                    secondaryInfo="${Math.round((100 * info_value) / 255)}%">
                 </polr-headercard>
             </ha-card>
         `;
@@ -4090,6 +4091,9 @@ __decorate([
 __decorate([
     n$1()
 ], PoLRToggleCard.prototype, "_icon", void 0);
+__decorate([
+    n$1()
+], PoLRToggleCard.prototype, "_attribute", void 0);
 customElements.define("polr-toggle-card", PoLRToggleCard);
 window.customCards = window.customCards || [];
 window.customCards.push({

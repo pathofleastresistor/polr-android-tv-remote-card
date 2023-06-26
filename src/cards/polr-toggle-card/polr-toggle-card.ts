@@ -8,6 +8,7 @@ export class PoLRToggleCard extends LitElement {
     @property() private _hass: any;
     @property() private _entity: string;
     @property() private _icon: string;
+    @property() private _attribute: number;
 
     static getConfigElement() {}
 
@@ -26,6 +27,7 @@ export class PoLRToggleCard extends LitElement {
         }
         this._entity = config.entity_id;
         this._icon = config.icon || "mdi:lightbulb";
+        this._attribute = config.info || 0;
     }
 
     set hass(hass) {
@@ -34,7 +36,7 @@ export class PoLRToggleCard extends LitElement {
 
     render() {
         var entity = this._hass?.states[this._entity];
-        var brightness = entity.attributes.brightness ?? 0;
+        var info_value = entity.attributes[this._attribute] ?? 0;
 
         return html`
             <ha-card>
@@ -44,7 +46,7 @@ export class PoLRToggleCard extends LitElement {
                     _hass=${this._hass}
                     entity_id=${this._entity}
                     primaryInfo=${entity.attributes.friendly_name}
-                    secondaryInfo="${Math.round((100 * brightness) / 255)}%">
+                    secondaryInfo="${Math.round((100 * info_value) / 255)}%">
                 </polr-headercard>
             </ha-card>
         `;
