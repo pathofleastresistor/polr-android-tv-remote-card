@@ -73,13 +73,8 @@ export class PoLRBirthdayCard extends LitElement {
     }
 
     render() {
-        var birthday_additional_content = html`
-            <div class="primary-info"></div>
-            <div class="secondary-info"></div>
-        `;
-
         return html`
-            <ha-card @click=${this._moreinfo}>
+            <ha-card>
                 <polr-headercard
                     icon=${CalendarIcon}
                     _hass=${this._hass}
@@ -102,19 +97,6 @@ export class PoLRBirthdayCard extends LitElement {
                 </div>
             </ha-card>
         `;
-    }
-
-    _moreinfo(ev) {
-        console.log("more-info");
-        const event = new Event("hass-more-info", {
-            bubbles: true,
-            cancelable: true,
-            composed: true,
-        });
-        (event as any).detail = {
-            entityId: this._entity,
-        };
-        this.dispatchEvent(event);
     }
 
     static get styles(): CSSResultGroup {

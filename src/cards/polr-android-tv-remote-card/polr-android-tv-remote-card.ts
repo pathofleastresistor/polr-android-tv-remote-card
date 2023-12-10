@@ -1,17 +1,14 @@
 import { LitElement, html, css } from "lit";
 import { property } from "lit/decorators.js";
 import {
-    DisneyPlusApp,
-    NetflixApp,
-    PrimeVideoApp,
-    TvAppInterface,
-} from "./apps";
-import {
     BackIcon,
     CenterIcon,
+    DisneyPlusIcon,
     DownIcon,
     HomeIcon,
     LeftIcon,
+    NetflixIcon,
+    PrimeVideoIcon,
     RemoteIcon,
     RightIcon,
     TelevisionIcon,
@@ -36,6 +33,9 @@ export const buttonCommands = {
     volumeup: { config: "volumeup", command: "VOLUME_UP" },
     volumedown: { config: "volumedown", command: "VOLUME_DOWN" },
     volumemute: { config: "volumemute", command: "MUTE" },
+    play: { config: "play", command: "MEDIA_PLAY" },
+    pause: { config: "pause", command: "MEDIA_PAUSE" },
+    stop: { config: "stop", command: "MEDIA_STOP" },
 };
 
 export interface ATVRemoteCardConfig {
@@ -87,13 +87,23 @@ export class PoLRATVRemoteCard extends LitElement {
 
         this._config = structuredClone(config);
 
-        if (!this._config.hasOwnProperty("volume")) {
-            this._config.volume = true;
-        }
+        this._config.remote = this._config.remote || "default";
 
-        if (!this._config.hasOwnProperty("remote")) {
-            this._config.remote = "default";
-        }
+        !this._config.hasOwnProperty("showRemote")
+            ? (this._config.showRemote = true)
+            : "";
+        !this._config.hasOwnProperty("showVolume")
+            ? (this._config.showVolume = true)
+            : "";
+        !this._config.hasOwnProperty("showBasic")
+            ? (this._config.showBasic = true)
+            : "";
+        !this._config.hasOwnProperty("showApps")
+            ? (this._config.showApps = true)
+            : "";
+        !this._config.hasOwnProperty("showMedia")
+            ? (this._config.showMedia = false)
+            : "";
     }
 
     set hass(hass) {
@@ -103,26 +113,36 @@ export class PoLRATVRemoteCard extends LitElement {
     render() {
         var entity_id = this._config["entity_id"];
         var state = this._hass?.states[entity_id]?.state;
+        console.log(state);
+        console.log(this._config.showVolume);
 
         return html`
             <ha-card>
                 <polr-headercard
                     icon=${TelevisionIcon}
+                    actionIcon=${RemoteIcon}
                     _hass=${this._hass}
                     entity_id=${entity_id}
                     primaryInfo=${this._hass["states"][entity_id]["attributes"][
                         "friendly_name"
                     ]}
-                    additionalIcon=${RemoteIcon}
                     @additionalclick=${this._changeRemote}
-                    @headericonclick=${this._press_power}
-                    toggleIcon="true">
+                    @headericonclick=${this._press_power}>
                 </polr-headercard>
                 <div id="main-grid">
-                    ${state === "on" ? this._renderPad() : ""}
-                    ${state === "on" ? this._renderBasicGrid() : ""}
-                    ${this._renderApps()}
-                    ${state === "on" ? this._renderVolume() : ""}
+                    ${state === "on" && this._config.showRemote
+                        ? this._renderPad()
+                        : ""}
+                    ${state === "on" && this._config.showBasic
+                        ? this._renderBasicGrid()
+                        : ""}
+                    ${this._config.showApps ? this._renderApps() : ""}
+                    ${state === "on" && this._config.showVolume
+                        ? this._renderVolume()
+                        : ""}
+                    ${state === "on" && this._config.showMedia
+                        ? this._renderMedia()
+                        : ""}
                 </div>
             </ha-card>
         `;
@@ -233,10 +253,11 @@ export class PoLRATVRemoteCard extends LitElement {
                             <polr-button
                                 @click=${{
                                     handleEvent: () =>
-                                        this._turn_on(DisneyPlusApp.url),
+                                        this._turn_on(
+                                            "https://www.disneyplus.com"
+                                        ),
                                 }}
-                                icon=${DisneyPlusApp.icon}>
-                            </polr-button>
+                                icon=${DisneyPlusIcon}></polr-button>
                         `
                     );
                     break;
@@ -246,10 +267,11 @@ export class PoLRATVRemoteCard extends LitElement {
                             <polr-button
                                 @click=${{
                                     handleEvent: () =>
-                                        this._turn_on(NetflixApp.url),
+                                        this._turn_on(
+                                            "https://www.netflix.com/title"
+                                        ),
                                 }}
-                                icon=${NetflixApp.icon}>
-                            </polr-button>
+                                icon=${NetflixIcon}></polr-button>
                         `
                     );
                     break;
@@ -259,10 +281,11 @@ export class PoLRATVRemoteCard extends LitElement {
                             <polr-button
                                 @click=${{
                                     handleEvent: () =>
-                                        this._turn_on(PrimeVideoApp.url),
+                                        this._turn_on(
+                                            "https://app.primevideo.com"
+                                        ),
                                 }}
-                                icon=${PrimeVideoApp.icon}>
-                            </polr-button>
+                                icon=${PrimeVideoIcon}></polr-button>
                         `
                     );
                     break;
@@ -270,9 +293,7 @@ export class PoLRATVRemoteCard extends LitElement {
                     app_buttons.push(
                         html`
                             <polr-button
-                                @click=${{
-                                    handleEvent: () => this._press_custom(app),
-                                }}>
+                                @click=${() => this._press_custom(app)}>
                                 <ha-icon icon="${app.icon}"></ha-icon>
                             </polr-button>
                         `
@@ -296,6 +317,25 @@ export class PoLRATVRemoteCard extends LitElement {
                 <polr-button
                     @click=${() => this._press(buttonCommands.volumeup.config)}
                     icon=${VolumeUpIcon}></polr-button>
+            </div>
+        `;
+    }
+
+    private _renderMedia() {
+        return html`
+            <div class="grid">
+                <polr-button
+                    @click=${() => this._press(buttonCommands.play.config)}
+                    ><ha-icon icon="mdi:play"></ha-icon
+                ></polr-button>
+                <polr-button
+                    @click=${() => this._press(buttonCommands.pause.config)}
+                    ><ha-icon icon="mdi:pause"></ha-icon
+                ></polr-button>
+                <polr-button
+                    @click=${() => this._press(buttonCommands.stop.config)}
+                    ><ha-icon icon="mdi:stop"></ha-icon
+                ></polr-button>
             </div>
         `;
     }
@@ -376,7 +416,8 @@ export class PoLRATVRemoteCard extends LitElement {
         }
         #basicbutton-grid,
         #app-grid,
-        #volume-grid {
+        #volume-grid,
+        .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
             gap: 12px;
@@ -413,6 +454,12 @@ class PoLRATVRemoteCardEditor extends LitElement {
         _config.entity_id = ev.detail.value.entity_id;
         _config.remote = ev.detail.value.remote;
         _config.apps = ev.detail.value.apps;
+
+        _config.showRemote = ev.detail.value.showRemote;
+        _config.showBasic = ev.detail.value.showBasic;
+        _config.showApps = ev.detail.value.showApps;
+        _config.showVolume = ev.detail.value.showVolume;
+        _config.showMedia = ev.detail.value.showMedia;
 
         this._config = _config;
 
@@ -473,6 +520,36 @@ class PoLRATVRemoteCardEditor extends LitElement {
                             },
                         },
                     },
+                    {
+                        name: "showRemote",
+                        selector: {
+                            boolean: {},
+                        },
+                    },
+                    {
+                        name: "showBasic",
+                        selector: {
+                            boolean: {},
+                        },
+                    },
+                    {
+                        name: "showApps",
+                        selector: {
+                            boolean: {},
+                        },
+                    },
+                    {
+                        name: "showVolume",
+                        selector: {
+                            boolean: {},
+                        },
+                    },
+                    {
+                        name: "showMedia",
+                        selector: {
+                            boolean: {},
+                        },
+                    },
                 ]}
                 .computeLabel=${this._computeLabel}
                 @value-changed=${this._valueChanged}></ha-form>
@@ -484,6 +561,11 @@ class PoLRATVRemoteCardEditor extends LitElement {
             entity_id: "Entity",
             remote: "Remote Style",
             apps: "Apps",
+            showRemote: "Show navigation",
+            showBasic: "Show home/back buttons",
+            showApps: "Show apps",
+            showVolume: "Show volume",
+            showMedia: "Show media",
         };
         return labelMap[schema.name];
     }
