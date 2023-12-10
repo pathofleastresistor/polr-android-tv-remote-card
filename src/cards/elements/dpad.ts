@@ -69,13 +69,6 @@ class PoLRDpad extends LitElement {
             overflow: hidden;
         }
 
-        .center {
-            border-radius: 50%;
-            background-color: none;
-            border: 1px
-                var(--ha-card-border-color, var(--divider-color, #e0e0e0)) solid;
-        }
-
         .slice {
             overflow: hidden;
             position: absolute;
@@ -87,6 +80,7 @@ class PoLRDpad extends LitElement {
             border: 2px
                 var(--ha-card-border-color, var(--divider-color, #e0e0e0)) solid;
             box-sizing: border-box;
+            cursor: pointer;
         }
 
         .slice-contents {
@@ -119,7 +113,6 @@ class PoLRDpad extends LitElement {
 
         .slice:nth-child(4) .slice-contents {
             transform: skewY(-30deg);
-            // background-color: #222222;
         }
 
         .inner-dpad {
@@ -133,6 +126,7 @@ class PoLRDpad extends LitElement {
             border: 4px
                 var(--ha-card-border-color, var(--divider-color, #e0e0e0)) solid;
             background-color: #222222;
+            cursor: pointer;
         }
     `;
 }

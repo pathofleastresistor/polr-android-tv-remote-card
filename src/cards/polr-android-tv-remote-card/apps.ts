@@ -1,11 +1,5 @@
 import { TemplateResult } from "lit";
-import {
-    DisneyPlusIcon,
-    HuluIcon,
-    NetflixIcon,
-    PrimeVideoIcon,
-    YouTubeIcon,
-} from "../../utils/icons";
+import { DisneyPlusIcon, NetflixIcon, PrimeVideoIcon } from "../../utils/icons";
 
 export interface TvAppInterface {
     url: string;

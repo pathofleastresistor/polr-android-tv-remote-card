@@ -1,21 +1,17 @@
 import { LitElement, html, css } from "lit";
 import { property } from "lit/decorators.js";
-import { ATVRemoteCardConfig, ServiceApp } from "./types";
 import {
     DisneyPlusApp,
     NetflixApp,
     PrimeVideoApp,
     TvAppInterface,
 } from "./apps";
-import { buttonCommands } from "./buttonCommands";
 import {
     BackIcon,
     CenterIcon,
     DownIcon,
-    FavoriteIcon,
     HomeIcon,
     LeftIcon,
-    PowerIcon,
     RemoteIcon,
     RightIcon,
     TelevisionIcon,
@@ -26,8 +22,40 @@ import {
 } from "../../utils/icons";
 import "../elements/dpad";
 import "../elements/header";
-import "../elements/remote-button";
+import "../elements/button";
 import "../elements/touchpad";
+
+export const buttonCommands = {
+    up: { config: "up", command: "DPAD_UP" },
+    down: { config: "down", command: "DPAD_DOWN" },
+    left: { config: "left", command: "DPAD_LEFT" },
+    right: { config: "right", command: "DPAD_RIGHT" },
+    center: { config: "center", command: "DPAD_CENTER" },
+    home: { config: "home", command: "HOME" },
+    back: { config: "back", command: "BACK" },
+    volumeup: { config: "volumeup", command: "VOLUME_UP" },
+    volumedown: { config: "volumedown", command: "VOLUME_DOWN" },
+    volumemute: { config: "volumemute", command: "MUTE" },
+};
+
+export interface ATVRemoteCardConfig {
+    entity_id: string;
+    remote: string;
+    apps: Array<App> | [];
+    volume: boolean;
+}
+
+export interface App {}
+
+export interface CustomApp extends App {
+    icon: string;
+    url: string;
+}
+
+export interface ServiceApp extends App {
+    service: string;
+    data: {};
+}
 
 export class PoLRATVRemoteCard extends LitElement {
     @property() _config: any;
@@ -57,7 +85,7 @@ export class PoLRATVRemoteCard extends LitElement {
             throw new Error("entity_id must be specified");
         }
 
-        this._config = JSON.parse(JSON.stringify(config));
+        this._config = structuredClone(config);
 
         if (!this._config.hasOwnProperty("volume")) {
             this._config.volume = true;
@@ -75,84 +103,43 @@ export class PoLRATVRemoteCard extends LitElement {
     render() {
         var entity_id = this._config["entity_id"];
         var state = this._hass?.states[entity_id]?.state;
-        var padlayout;
-        var applayout;
-        var volumelayout;
 
-        var layout = [];
-        layout.push(html`
-            <polr-headercard
-                icon=${TelevisionIcon}
-                _hass=${this._hass}
-                entity_id=${entity_id}
-                primaryInfo=${this._hass["states"][entity_id]["attributes"][
-                    "friendly_name"
-                ]}
-                additionalIcon=${RemoteIcon}
-                @additionalclick=${this._change_remote}
-                @headericonclick=${this._press_power}
-                toggleIcon="true">
-            </polr-headercard>
-        `);
-
-        if (state === "on") {
-            padlayout = this._choosePad(padlayout);
-            applayout = this._chooseApps();
-            volumelayout = this._config.volume ? this._chooseVolume() : html``;
-            layout.push(html`
-                <div id="main-grid">
-                    ${padlayout} ${applayout} ${volumelayout}
-                </div>
-            `);
-        } else {
-            applayout = this._chooseApps();
-            layout.push(html`
-                <div id="main-grid">
-                    ${padlayout} ${applayout} ${volumelayout}
-                </div>
-            `);
-        }
-        var entity_id = this._config["entity_id"];
-
-        return html` <ha-card>${layout} </ha-card> `;
-    }
-
-    private _choosePad(padlayout: any) {
-        switch (this._config?.remote) {
-            case "default":
-                padlayout = this._render_defaultpad();
-                break;
-            case "touch":
-                padlayout = this._render_touchpad();
-                break;
-            case "dpad":
-                padlayout = this._render_dpad();
-                break;
-            default:
-                break;
-        }
-        return padlayout;
-    }
-
-    private _chooseVolume() {
         return html`
-            <div id="volume-grid">
-                <polr-remotebutton
-                    @click=${() =>
-                        this._press(buttonCommands.volumedown.config)}
-                    icon=${VolumeDownIcon}></polr-remotebutton>
-                <polr-remotebutton
-                    @click=${() =>
-                        this._press(buttonCommands.volumemute.config)}
-                    icon=${VolumeMuteIcon}></polr-remotebutton>
-                <polr-remotebutton
-                    @click=${() => this._press(buttonCommands.volumeup.config)}
-                    icon=${VolumeUpIcon}></polr-remotebutton>
-            </div>
+            <ha-card>
+                <polr-headercard
+                    icon=${TelevisionIcon}
+                    _hass=${this._hass}
+                    entity_id=${entity_id}
+                    primaryInfo=${this._hass["states"][entity_id]["attributes"][
+                        "friendly_name"
+                    ]}
+                    additionalIcon=${RemoteIcon}
+                    @additionalclick=${this._changeRemote}
+                    @headericonclick=${this._press_power}
+                    toggleIcon="true">
+                </polr-headercard>
+                <div id="main-grid">
+                    ${state === "on" ? this._renderPad() : ""}
+                    ${state === "on" ? this._renderBasicGrid() : ""}
+                    ${this._renderApps()}
+                    ${state === "on" ? this._renderVolume() : ""}
+                </div>
+            </ha-card>
         `;
     }
 
-    private _render_dpad() {
+    private _renderPad() {
+        switch (this._config?.remote) {
+            case "default":
+                return this._renderDefaultpad();
+            case "touch":
+                return this._renderTouchpad();
+            case "dpad":
+                return this._renderDpad();
+        }
+    }
+
+    private _renderDpad() {
         return html`
             <polr-dpad
                 id="dpad-grid"
@@ -162,176 +149,49 @@ export class PoLRATVRemoteCard extends LitElement {
                 @clickright=${() => this._press(buttonCommands.right.config)}
                 @clickcenter=${() => this._press(buttonCommands.center.config)}>
             </polr-dpad>
-            <div id="basicbutton-grid">
-                <polr-remotebutton
-                    @click=${() => this._press(buttonCommands.home.config)}
-                    icon=${HomeIcon}></polr-remotebutton>
-                <polr-remotebutton
-                    @click=${() => this._press(buttonCommands.back.config)}
-                    icon=${BackIcon}></polr-remotebutton>
-            </div>
         `;
     }
 
-    private _render_touchpad() {
+    private _renderTouchpad() {
         return html`
             <polr-touchpad
                 _hass=${this._hass}
-                @padaction=${this._handleTouchpadAction}></polr-touchpad>
-            <div id="basicbutton-grid">
-                <polr-remotebutton
-                    @click=${() => this._press(buttonCommands.home.config)}
-                    icon=${HomeIcon}></polr-remotebutton>
-                <polr-remotebutton
-                    @click=${() => this._press(buttonCommands.back.config)}
-                    icon=${BackIcon}></polr-remotebutton>
-            </div>
+                @touchup=${() => this._press(buttonCommands.up.config)}
+                @touchdown=${() => this._press(buttonCommands.down.config)}
+                @touchleft=${() => this._press(buttonCommands.left.config)}
+                @touchright=${() => this._press(buttonCommands.right.config)}
+                @touchtap=${() =>
+                    this._press(buttonCommands.center.config)}></polr-touchpad>
         `;
     }
 
-    private _render_defaultpad() {
+    private _renderDefaultpad() {
         return html`
             <div id="defaultpad-grid">
                 <div></div>
-                <polr-remotebutton
+                <polr-button
                     @click=${() => this._press(buttonCommands.up.config)}
-                    icon=${UpIcon}></polr-remotebutton>
+                    icon=${UpIcon}></polr-button>
                 <div></div>
-                <polr-remotebutton
+                <polr-button
                     @click=${() => this._press(buttonCommands.left.config)}
-                    icon=${LeftIcon}></polr-remotebutton>
-                <polr-remotebutton
+                    icon=${LeftIcon}></polr-button>
+                <polr-button
                     @click=${() => this._press(buttonCommands.center.config)}
-                    icon=${CenterIcon}></polr-remotebutton>
-                <polr-remotebutton
+                    icon=${CenterIcon}></polr-button>
+                <polr-button
                     @click=${() => this._press(buttonCommands.right.config)}
-                    icon=${RightIcon}></polr-remotebutton>
+                    icon=${RightIcon}></polr-button>
                 <div></div>
-                <polr-remotebutton
+                <polr-button
                     @click=${() => this._press(buttonCommands.down.config)}
-                    icon=${DownIcon}></polr-remotebutton>
+                    icon=${DownIcon}></polr-button>
                 <div></div>
             </div>
-            <div id="basicbutton-grid">
-                <polr-remotebutton
-                    @click=${() => this._press(buttonCommands.home.config)}
-                    icon=${HomeIcon}></polr-remotebutton>
-                <polr-remotebutton
-                    @click=${() => this._press(buttonCommands.back.config)}
-                    icon=${BackIcon}></polr-remotebutton>
-            </div>
         `;
     }
 
-    private _handleTouchpadAction(ev) {
-        switch (ev.detail?.action) {
-            case "swipeup":
-                this._press(buttonCommands.up.config);
-                break;
-            case "swipedown":
-                this._press(buttonCommands.down.config);
-                break;
-            case "swipeleft":
-                this._press(buttonCommands.left.config);
-                break;
-            case "swiperight":
-                this._press(buttonCommands.right.config);
-                break;
-            case "tap":
-                this._press(buttonCommands.center.config);
-                break;
-            default:
-                break;
-        }
-    }
-
-    _chooseApps() {
-        if (!this._config.apps) {
-            return html``;
-        }
-
-        let app_buttons = [];
-        for (const app of this._config?.apps) {
-            switch (app) {
-                case "disneyplus":
-                    app_buttons.push(this._renderApp(DisneyPlusApp));
-                    break;
-                case "netflix":
-                    app_buttons.push(this._renderApp(NetflixApp));
-                    break;
-                case "prime":
-                    app_buttons.push(this._renderApp(PrimeVideoApp));
-                    break;
-                default:
-                    app_buttons.push(this._renderCustomApp(app));
-            }
-        }
-        return html`<div id="app-grid">${app_buttons}</div>`;
-    }
-
-    _renderApp(app: TvAppInterface) {
-        return html`
-            <polr-remotebutton
-                @click=${{ handleEvent: () => this._turn_on(app.url) }}
-                icon=${app.icon}>
-            </polr-remotebutton>
-        `;
-    }
-
-    _renderCustomApp(app: TvAppInterface) {
-        return html`
-            <polr-remotebutton
-                @click=${{ handleEvent: () => this._press_custom(app) }}>
-                <ha-icon icon="${app.icon}"></ha-icon>
-            </polr-remotebutton>
-        `;
-    }
-
-    _sendCommand(action: string) {
-        this._hass.callService("remote", "send_command", {
-            entity_id: this._config.entity_id,
-            command: action,
-        });
-        console.log(`${action} was called`);
-    }
-
-    _turn_on(action: string) {
-        this._hass.callService("remote", "turn_on", {
-            entity_id: this._config.entity_id,
-            activity: action,
-        });
-        console.log(`${action} was called`);
-    }
-
-    _press(command: string) {
-        if (!buttonCommands.hasOwnProperty(command)) {
-            return;
-        }
-
-        if (this._config[command]) {
-            this._callService(this._config[command]);
-            return;
-        }
-
-        this._sendCommand(buttonCommands[command].command);
-    }
-
-    _press_power() {
-        if (this._config["power"]) {
-            this._callService(this._config["power"]);
-        }
-        this._hass.callService("remote", "toggle", {
-            entity_id: this._config.entity_id,
-        });
-        console.log(`Power was called`);
-    }
-
-    _press_favorite_2() {
-        console.log("favorite was pressed");
-        this._callService(this._config["favorite"]);
-    }
-
-    _change_remote() {
+    private _changeRemote() {
         switch (this._config.remote) {
             case "default":
                 this._config.remote = "dpad";
@@ -348,8 +208,131 @@ export class PoLRATVRemoteCard extends LitElement {
         this.requestUpdate();
     }
 
-    _press_custom(app) {
-        console.log(app);
+    private _renderBasicGrid() {
+        return html` <div id="basicbutton-grid">
+            <polr-button
+                @click=${() => this._press(buttonCommands.home.config)}
+                icon=${HomeIcon}></polr-button>
+            <polr-button
+                @click=${() => this._press(buttonCommands.back.config)}
+                icon=${BackIcon}></polr-button>
+        </div>`;
+    }
+
+    private _renderApps() {
+        if (!this._config.apps) {
+            return html``;
+        }
+
+        let app_buttons = [];
+        for (const app of this._config?.apps) {
+            switch (app) {
+                case "disneyplus":
+                    app_buttons.push(
+                        html`
+                            <polr-button
+                                @click=${{
+                                    handleEvent: () =>
+                                        this._turn_on(DisneyPlusApp.url),
+                                }}
+                                icon=${DisneyPlusApp.icon}>
+                            </polr-button>
+                        `
+                    );
+                    break;
+                case "netflix":
+                    app_buttons.push(
+                        html`
+                            <polr-button
+                                @click=${{
+                                    handleEvent: () =>
+                                        this._turn_on(NetflixApp.url),
+                                }}
+                                icon=${NetflixApp.icon}>
+                            </polr-button>
+                        `
+                    );
+                    break;
+                case "prime":
+                    app_buttons.push(
+                        html`
+                            <polr-button
+                                @click=${{
+                                    handleEvent: () =>
+                                        this._turn_on(PrimeVideoApp.url),
+                                }}
+                                icon=${PrimeVideoApp.icon}>
+                            </polr-button>
+                        `
+                    );
+                    break;
+                default:
+                    app_buttons.push(
+                        html`
+                            <polr-button
+                                @click=${{
+                                    handleEvent: () => this._press_custom(app),
+                                }}>
+                                <ha-icon icon="${app.icon}"></ha-icon>
+                            </polr-button>
+                        `
+                    );
+            }
+        }
+        return html`<div id="app-grid">${app_buttons}</div>`;
+    }
+
+    private _renderVolume() {
+        return html`
+            <div id="volume-grid">
+                <polr-button
+                    @click=${() =>
+                        this._press(buttonCommands.volumedown.config)}
+                    icon=${VolumeDownIcon}></polr-button>
+                <polr-button
+                    @click=${() =>
+                        this._press(buttonCommands.volumemute.config)}
+                    icon=${VolumeMuteIcon}></polr-button>
+                <polr-button
+                    @click=${() => this._press(buttonCommands.volumeup.config)}
+                    icon=${VolumeUpIcon}></polr-button>
+            </div>
+        `;
+    }
+
+    private _turn_on(action: string) {
+        this._hass.callService("remote", "turn_on", {
+            entity_id: this._config.entity_id,
+            activity: action,
+        });
+    }
+
+    private _press(command: string) {
+        if (!buttonCommands.hasOwnProperty(command)) {
+            return;
+        }
+
+        if (this._config[command]) {
+            this._callService(this._config[command]);
+            return;
+        }
+
+        this._hass.callService("remote", "send_command", {
+            entity_id: this._config.entity_id,
+            command: buttonCommands[command].command,
+        });
+    }
+
+    private _press_power() {
+        if (this._config["power"]) {
+            this._callService(this._config["power"]);
+        }
+        this._hass.callService("remote", "toggle", {
+            entity_id: this._config.entity_id,
+        });
+    }
+
+    private _press_custom(app) {
         if (app.hasOwnProperty("service")) {
             this._callService(app);
         } else {
@@ -357,10 +340,9 @@ export class PoLRATVRemoteCard extends LitElement {
         }
     }
 
-    _callService(s: ServiceApp) {
+    private _callService(s: ServiceApp) {
         let vals: any;
         vals = s.service.split(".");
-        console.log(s, vals);
         this._hass.callService(vals[0], vals[1], s.data);
     }
 
@@ -381,21 +363,11 @@ export class PoLRATVRemoteCard extends LitElement {
         ha-card {
             overflow: hidden;
         }
-        polr-remotebutton {
-        }
-        polr-touchpad {
-            height: 150px;
-            display: block;
-        }
         #main-grid {
             margin: auto;
             padding: 0 12px 12px 12px;
             display: grid;
             gap: 12px;
-        }
-        #touchpad-grid {
-            display: grid;
-            grid-template-columns: 1fr;
         }
         #defaultpad-grid {
             display: grid;
@@ -414,6 +386,113 @@ export class PoLRATVRemoteCard extends LitElement {
     `;
 }
 
+class PoLRATVRemoteCardEditor extends LitElement {
+    @property() _config: any;
+    @property() _hass: any;
+
+    static get properties() {
+        return {
+            hass: {},
+            _config: {},
+        };
+    }
+
+    setConfig(config) {
+        this._config = config;
+    }
+
+    set hass(hass) {
+        this._hass = hass;
+    }
+
+    _valueChanged(ev) {
+        if (!this._config || !this._hass) {
+            return;
+        }
+        const _config = Object.assign({}, this._config);
+        _config.entity_id = ev.detail.value.entity_id;
+        _config.remote = ev.detail.value.remote;
+        _config.apps = ev.detail.value.apps;
+
+        this._config = _config;
+
+        const event = new CustomEvent("config-changed", {
+            detail: { config: _config },
+            bubbles: true,
+            composed: true,
+        });
+        this.dispatchEvent(event);
+    }
+
+    render() {
+        if (!this._hass || !this._config) {
+            return html``;
+        }
+        return html`
+            <ha-form
+                .hass=${this._hass}
+                .data=${this._config}
+                .schema=${[
+                    {
+                        name: "entity_id",
+                        selector: {
+                            entity: {
+                                filter: [
+                                    {
+                                        integration: "androidtv_remote",
+                                        domain: "remote",
+                                    },
+                                ],
+                            },
+                        },
+                    },
+                    {
+                        name: "remote",
+                        selector: {
+                            select: {
+                                mode: "dropdown",
+                                options: [
+                                    { label: "Basic", value: "default" },
+                                    { label: "Touch", value: "touch" },
+                                    { label: "DPad", value: "dpad" },
+                                ],
+                            },
+                        },
+                    },
+                    {
+                        name: "apps",
+                        selector: {
+                            select: {
+                                mode: "dropdown",
+                                multiple: true,
+                                options: [
+                                    { label: "Disney+", value: "disneyplus" },
+                                    { label: "Netflix", value: "netflix" },
+                                    { label: "Amazon Prime", value: "prime" },
+                                ],
+                            },
+                        },
+                    },
+                ]}
+                .computeLabel=${this._computeLabel}
+                @value-changed=${this._valueChanged}></ha-form>
+        `;
+    }
+
+    _computeLabel(schema) {
+        var labelMap = {
+            entity_id: "Entity",
+            remote: "Remote Style",
+            apps: "Apps",
+        };
+        return labelMap[schema.name];
+    }
+}
+
+customElements.define(
+    "polr-android-tv-remote-card-editor",
+    PoLRATVRemoteCardEditor
+);
 customElements.define("polr-android-tv-remote-card", PoLRATVRemoteCard);
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({

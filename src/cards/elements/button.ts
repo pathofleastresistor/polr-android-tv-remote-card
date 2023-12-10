@@ -2,7 +2,7 @@ import { LitElement, html, css } from "lit";
 import { property, query } from "lit/decorators.js";
 import "hammerjs";
 
-class PoLRRemoteButton extends LitElement {
+class PoLRButton extends LitElement {
     @property() _hass: any;
     @property() icon: any;
     private _mc: any;
@@ -62,4 +62,4 @@ class PoLRRemoteButton extends LitElement {
         }
     `;
 }
-customElements.define("polr-remotebutton", PoLRRemoteButton);
+customElements.define("polr-button", PoLRButton);

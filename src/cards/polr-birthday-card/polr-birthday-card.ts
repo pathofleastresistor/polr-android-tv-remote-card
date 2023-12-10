@@ -1,8 +1,8 @@
 import { LitElement, html, css, CSSResultGroup } from "lit";
 import { property } from "lit/decorators.js";
-import { CalendarIcon } from "../../utils/icons";
-import "../elements/header";
 import { map } from "lit/directives/map.js";
+import "../elements/header";
+import { CalendarIcon } from "../../utils/icons";
 
 export class PoLRBirthdayCard extends LitElement {
     @property() _config: any;

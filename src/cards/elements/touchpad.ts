@@ -17,13 +17,53 @@ class PoLRTouchpad extends LitElement {
         this._mc.on(
             "swipeup swipedown swiperight swipeleft tap press",
             (ev) => {
-                this.dispatchEvent(
-                    new CustomEvent("padaction", {
-                        detail: {
-                            action: ev.type,
-                        },
-                    })
-                );
+                switch (ev.type) {
+                    case "swipeup":
+                        this.dispatchEvent(
+                            new CustomEvent("touchup", {
+                                detail: {
+                                    action: ev.type,
+                                },
+                            })
+                        );
+                        break;
+                    case "swipedown":
+                        this.dispatchEvent(
+                            new CustomEvent("touchdown", {
+                                detail: {
+                                    action: ev.type,
+                                },
+                            })
+                        );
+                        break;
+                    case "swipeleft":
+                        this.dispatchEvent(
+                            new CustomEvent("touchleft", {
+                                detail: {
+                                    action: ev.type,
+                                },
+                            })
+                        );
+                        break;
+                    case "swiperight":
+                        this.dispatchEvent(
+                            new CustomEvent("touchright", {
+                                detail: {
+                                    action: ev.type,
+                                },
+                            })
+                        );
+                        break;
+                    case "tap":
+                        this.dispatchEvent(
+                            new CustomEvent("touchtap", {
+                                detail: {
+                                    action: ev.type,
+                                },
+                            })
+                        );
+                        break;
+                }
             }
         );
         this._mc.on("panstart panmove", (event) => {
@@ -84,6 +124,11 @@ class PoLRTouchpad extends LitElement {
         );
     }
     static styles = css`
+        :host {
+            --polr-touchpad-height: 150px;
+            height: var(--polr-touchpad-height, 150px);
+            display: block;
+        }
         #pad {
             position: relative;
             height: 100%;
