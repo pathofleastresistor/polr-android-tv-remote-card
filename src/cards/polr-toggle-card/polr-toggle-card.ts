@@ -6,8 +6,10 @@ import "../elements/header";
 export class PoLRToggleCard extends LitElement {
     @property() private _config: any;
     @property() private _hass: any;
-    @property() private _entity: string;
+    @property() private _entity_id: string;
     @property() private _icon: string;
+    @property() private _name;
+    string;
     @property() private _attribute: number;
     @query("ha-card") _card;
 
@@ -26,8 +28,9 @@ export class PoLRToggleCard extends LitElement {
         if (!config.entity_id) {
             throw new Error("entity_id must be specified");
         }
-        this._entity = config.entity_id;
+        this._entity_id = config.entity_id;
         this._icon = config.icon || "mdi:lightbulb";
+        this._name = config.name || "No name";
         this._attribute = config.info || 0;
     }
 
@@ -36,7 +39,7 @@ export class PoLRToggleCard extends LitElement {
     }
 
     render() {
-        var entity = this._hass?.states[this._entity];
+        var entity = this._hass?.states[this._entity_id];
         var info_value = entity.attributes[this._attribute] ?? 0;
 
         return html`
@@ -49,8 +52,8 @@ export class PoLRToggleCard extends LitElement {
                     @click=${this._toggle}
                     mdiIcon=${this._icon}
                     _hass=${this._hass}
-                    entity_id=${this._entity}
-                    primaryInfo=${entity.attributes.friendly_name}
+                    entity_id=${this._entity_id}
+                    primaryInfo=${this._name}
                     secondaryInfo="${Math.round((100 * info_value) / 255)}%">
                 </polr-headercard>
             </ha-card>
@@ -66,7 +69,7 @@ export class PoLRToggleCard extends LitElement {
 
     _toggle(ev) {
         this._hass?.callService("light", "toggle", {
-            entity_id: this._entity,
+            entity_id: this._entity_id,
         });
     }
 
@@ -78,15 +81,21 @@ export class PoLRToggleCard extends LitElement {
             composed: true,
         });
         (event as any).detail = {
-            entityId: this._entity,
+            entityId: this._entity_id,
         };
         this.dispatchEvent(event);
     }
 
     static styles = css`
+        :host {
+            --polr-fox-color-primary: #d0bcff;
+            --polr-fox-color-background: #381e72;
+        }
         ha-card {
             overflow: hidden;
             cursor: pointer;
+            border: none;
+            border-radius: 12px;
         }
 
         .pressed {
