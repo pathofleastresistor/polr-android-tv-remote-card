@@ -72,8 +72,8 @@ export class PoLRHeaderCard extends LitElement {
             display: block;
             margin: auto;
             fill: white;
-            height: 48px;
-            width: 48px;
+            height: var(--polr-fox-icon-primary-size, 24px);
+            width: var(--polr-fox-icon-primary-size, 24px);
         }
         #footer {
             position: fixed;

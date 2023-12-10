@@ -1,5 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { property, query } from "lit/decorators.js";
+import "hammerjs";
 
 class PoLRHeaderCard extends LitElement {
     @property() private _hass: any;
@@ -12,9 +13,38 @@ class PoLRHeaderCard extends LitElement {
     @property() public secondaryInfo;
     @property() public entity_id;
     @property() public toggleIcon;
+    private _mc: any;
+    @query("#additional-button") additionalButton;
+    private _mcAdditionaButton: any;
 
-    constructor() {
-        super();
+    connectedCallback() {
+        super.connectedCallback();
+        this._mc = new Hammer(this);
+        this._mc.add(new Hammer.Press({ time: 0 }));
+        this._mc.on("pressup", (ev) => {
+            this.dispatchEvent(new CustomEvent("pressup"));
+        });
+        this._mc.on("press", (ev) => {
+            this.dispatchEvent(new CustomEvent("press"));
+        });
+        if (this.additionalButton) {
+            this._mcAdditionaButton = new Hammer(this.additionalButton);
+            this._mcAdditionaButton.add(new Hammer.Press({ time: 0 }));
+            this._mcAdditionaButton.on("pressup", (ev) => {
+                this.dispatchEvent(new CustomEvent("pressup-addl-button"));
+            });
+            this._mcAdditionaButton.on("press", (ev) => {
+                this.dispatchEvent(new CustomEvent("press-addl-button"));
+            });
+        }
+    }
+
+    disconnectedCallback(): void {
+        super.disconnectedCallback();
+        if (this._mcAdditionaButton) {
+            this._mc.destroy();
+            this._mc = undefined;
+        }
     }
 
     render() {
@@ -44,6 +74,7 @@ class PoLRHeaderCard extends LitElement {
             additional_content = html`
                 <div class="header-additional">
                     <div
+                        id="additional-button"
                         class="button ${this.toggleIcon && state === "on"
                             ? "on"
                             : "off"}"
@@ -56,6 +87,7 @@ class PoLRHeaderCard extends LitElement {
             additional_content = html`
                 <div class="header-additional">
                     <div
+                        id="additional-button"
                         class="button ${this.toggleIcon && state === "on"
                             ? "on"
                             : "off"}"
@@ -75,56 +107,87 @@ class PoLRHeaderCard extends LitElement {
                 class="header-grid ${additional_content
                     ? "grid-col-3"
                     : "grid-col-2"}">
-                <div class="header-icon">${icon_content}</div>
+                <div
+                    @click=${this._headericonClick}
+                    class="header-icon ${this.toggleIcon && state === "on"
+                        ? "icon-on"
+                        : "icon-off"}">
+                    ${icon_content}
+                </div>
                 <div class="header-content">${header_content}</div>
                 ${additional_content}
             </div>
         `;
     }
 
+    _headericonClick(ev) {
+        const event = new Event("headericonclick", {
+            bubbles: true,
+            composed: true,
+        });
+        this.dispatchEvent(event);
+    }
     _additionalClick(ev) {
-        this.dispatchEvent(new CustomEvent("additionalclick"));
+        const event = new Event("additionalclick", {
+            bubbles: true,
+            composed: true,
+        });
+        this.dispatchEvent(event);
     }
 
     static styles = css`
         :host {
-            color: #d0bcff;
+            color: var(--primary-text-color);
+            overflow: hidden;
+            height: 100%;
         }
         .header-grid {
             display: grid;
             align-items: center;
-            background: #381e72;
-            height: 56px;
-            padding: 20px 20px;
-            gap: 20px;
+            background: var(
+                --ha-card-background,
+                var(--card-background-color, #fff)
+            );
+            padding: 12px;
+            gap: 12px;
         }
         .grid-col-2 {
-            grid-template-columns: 36px 1fr;
+            grid-template-columns: auto 1fr;
         }
         .grid-col-3 {
-            grid-template-columns: 36px 1fr 70px;
+            grid-template-columns: auto 1fr auto;
         }
         .header-icon {
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 5px;
-            width: 36px;
-            height: 36px;
+            border-radius: 50%;
+            margin: auto;
+            background-color: rgba(111, 111, 111, 0.2);
+            height: 40px;
+            width: 40px;
+            cursor: pointer;
         }
-        .header-icon svg {
-            fill: #d0bcff;
+        .icon-off > svg {
+            fill: var(--polr-fox-icon-color-disabled, rgba(111, 111, 111));
+            width: 24px;
+        }
+        .icon-on > svg {
+            fill: var(--polr-fox-icon-color, #ffffff);
+            width: 24px;
         }
         .header-content {
             display: flex;
             flex-direction: column;
         }
         .header-content .primary-info {
-            font-weight: bold;
-            font-size: 14px;
+            font-size: var(--polr-fox-primary-font-size, 14px);
+            font-weight: var(--card-primary-font-weight, bold);
         }
         .header-content .secondary-info {
-            font-size: 12px;
+            font-size: var(--polr-fox-secondary-font-size, 12px);
+            font-weight: var(--card-secondary-font-weight, bold);
+            color: var(--secondary-text-color);
         }
         .header-additional {
             display: flex;
@@ -138,17 +201,17 @@ class PoLRHeaderCard extends LitElement {
             width: fit-content;
         }
         .on {
-            background: #1e0d40;
             transition: background 0.4s;
         }
         .off {
             background: none;
             transition: background 0.4s;
+            display: none;
         }
         .header-additional svg {
-            fill: #d0bcff;
-            width: 26px;
-            height: 26px;
+            fill: #ffffff;
+            width: 21px;
+            height: 21px;
             padding: 5px 5px 0 5px;
         }
         .header-additional .primary-info {

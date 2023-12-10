@@ -8,10 +8,13 @@ const dev = process.env.ROLLUP_WATCH;
 
 export default {
     input: "src/polr-fox-card.ts",
-    output: {
-        file: "polr-android-tv-remote-card.js",
+    output: [{
+        file: "polr-fox-card.js",
         format: "es"
-    },
+    },{
+        file: "/home/amitvaria/projects/homeassistant/www/polr-fox-card.js",
+        format: "es"
+    }],
     plugins: [
         nodeResolve(),
         json(),

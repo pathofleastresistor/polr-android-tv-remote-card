@@ -59,8 +59,8 @@ class PoLRDpad extends LitElement {
     static styles = css`
         .dpad {
             position: relative;
-            margin: 1em auto;
-            border: 4px
+            margin: 0 auto;
+            border: 2px
                 var(--ha-card-border-color, var(--divider-color, #e0e0e0)) solid;
             padding: 0;
             width: 15em;

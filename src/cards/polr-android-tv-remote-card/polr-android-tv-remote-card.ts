@@ -16,6 +16,7 @@ import {
     HomeIcon,
     LeftIcon,
     PowerIcon,
+    RemoteIcon,
     RightIcon,
     TelevisionIcon,
     UpIcon,
@@ -77,7 +78,6 @@ export class PoLRATVRemoteCard extends LitElement {
         var padlayout;
         var applayout;
         var volumelayout;
-        var expanded;
 
         var layout = [];
         layout.push(html`
@@ -88,11 +88,9 @@ export class PoLRATVRemoteCard extends LitElement {
                 primaryInfo=${this._hass["states"][entity_id]["attributes"][
                     "friendly_name"
                 ]}
-                secondaryInfo=${this._hass["states"][entity_id]["attributes"][
-                    "current_activity"
-                ]}
-                additionalIcon=${PowerIcon}
-                @additionalclick=${this._press_power}
+                additionalIcon=${RemoteIcon}
+                @additionalclick=${this._change_remote}
+                @headericonclick=${this._press_power}
                 toggleIcon="true">
             </polr-headercard>
         `);
@@ -156,44 +154,37 @@ export class PoLRATVRemoteCard extends LitElement {
 
     private _render_dpad() {
         return html`
-            <div id="dpad-grid">
-                <polr-dpad
-                    id="dpad-grid"
-                    @clickup=${() => this._press(buttonCommands.up.config)}
-                    @clickdown=${() => this._press(buttonCommands.down.config)}
-                    @clickleft=${() => this._press(buttonCommands.left.config)}
-                    @clickright=${() =>
-                        this._press(buttonCommands.right.config)}
-                    @clickcenter=${() =>
-                        this._press(buttonCommands.center.config)}>
-                </polr-dpad>
-
-                <div id="basicbutton-grid">
-                    <polr-remotebutton
-                        @click=${() => this._press(buttonCommands.home.config)}
-                        icon=${HomeIcon}></polr-remotebutton>
-                    <polr-remotebutton
-                        @click=${() => this._press(buttonCommands.back.config)}
-                        icon=${BackIcon}></polr-remotebutton>
-                </div>
+            <polr-dpad
+                id="dpad-grid"
+                @clickup=${() => this._press(buttonCommands.up.config)}
+                @clickdown=${() => this._press(buttonCommands.down.config)}
+                @clickleft=${() => this._press(buttonCommands.left.config)}
+                @clickright=${() => this._press(buttonCommands.right.config)}
+                @clickcenter=${() => this._press(buttonCommands.center.config)}>
+            </polr-dpad>
+            <div id="basicbutton-grid">
+                <polr-remotebutton
+                    @click=${() => this._press(buttonCommands.home.config)}
+                    icon=${HomeIcon}></polr-remotebutton>
+                <polr-remotebutton
+                    @click=${() => this._press(buttonCommands.back.config)}
+                    icon=${BackIcon}></polr-remotebutton>
             </div>
         `;
     }
 
     private _render_touchpad() {
         return html`
-            <div id="touchpad-grid">
-                <polr-touchpad
-                    _hass=${this._hass}
-                    @padaction=${this._handleTouchpadAction}></polr-touchpad>
-                <div id="basicbutton-grid">
-                    <polr-remotebutton
-                        @click=${() => this._press(buttonCommands.home.config)}
-                        icon=${HomeIcon}></polr-remotebutton>
-                    <polr-remotebutton
-                        @click=${() => this._press(buttonCommands.back.config)}
-                        icon=${BackIcon}></polr-remotebutton>
-                </div>
+            <polr-touchpad
+                _hass=${this._hass}
+                @padaction=${this._handleTouchpadAction}></polr-touchpad>
+            <div id="basicbutton-grid">
+                <polr-remotebutton
+                    @click=${() => this._press(buttonCommands.home.config)}
+                    icon=${HomeIcon}></polr-remotebutton>
+                <polr-remotebutton
+                    @click=${() => this._press(buttonCommands.back.config)}
+                    icon=${BackIcon}></polr-remotebutton>
             </div>
         `;
     }
@@ -201,15 +192,11 @@ export class PoLRATVRemoteCard extends LitElement {
     private _render_defaultpad() {
         return html`
             <div id="defaultpad-grid">
-                <polr-remotebutton
-                    @click=${this._press_power}
-                    icon=${PowerIcon}></polr-remotebutton>
+                <div></div>
                 <polr-remotebutton
                     @click=${() => this._press(buttonCommands.up.config)}
                     icon=${UpIcon}></polr-remotebutton>
-                <polr-remotebutton
-                    @click=${() => this._press(buttonCommands.home.config)}
-                    icon=${HomeIcon}></polr-remotebutton>
+                <div></div>
                 <polr-remotebutton
                     @click=${() => this._press(buttonCommands.left.config)}
                     icon=${LeftIcon}></polr-remotebutton>
@@ -219,15 +206,19 @@ export class PoLRATVRemoteCard extends LitElement {
                 <polr-remotebutton
                     @click=${() => this._press(buttonCommands.right.config)}
                     icon=${RightIcon}></polr-remotebutton>
-                <polr-remotebutton
-                    @click=${() => this._press(buttonCommands.back.config)}
-                    icon=${BackIcon}></polr-remotebutton>
+                <div></div>
                 <polr-remotebutton
                     @click=${() => this._press(buttonCommands.down.config)}
                     icon=${DownIcon}></polr-remotebutton>
+                <div></div>
+            </div>
+            <div id="basicbutton-grid">
                 <polr-remotebutton
-                    @click=${this._press_favorite_2}
-                    icon=${FavoriteIcon}></polr-remotebutton>
+                    @click=${() => this._press(buttonCommands.home.config)}
+                    icon=${HomeIcon}></polr-remotebutton>
+                <polr-remotebutton
+                    @click=${() => this._press(buttonCommands.back.config)}
+                    icon=${BackIcon}></polr-remotebutton>
             </div>
         `;
     }
@@ -340,6 +331,23 @@ export class PoLRATVRemoteCard extends LitElement {
         this._callService(this._config["favorite"]);
     }
 
+    _change_remote() {
+        switch (this._config.remote) {
+            case "default":
+                this._config.remote = "dpad";
+                break;
+            case "dpad":
+                this._config.remote = "touch";
+                break;
+            case "touch":
+                this._config.remote = "default";
+                break;
+            default:
+                break;
+        }
+        this.requestUpdate();
+    }
+
     _press_custom(app) {
         console.log(app);
         if (app.hasOwnProperty("service")) {
@@ -357,44 +365,50 @@ export class PoLRATVRemoteCard extends LitElement {
     }
 
     static styles = css`
+        :host {
+            --polr-fox-color-primary: #ffffff;
+            --polr-fox-color-background: #00000000;
+            --mdc-icon-size: 21px;
+            --polr-fox-primary-font-size: 14px;
+            --polr-fox-card-height: 44px;
+            --polr-fox-primary-icon-size: 21px;
+            --polr-fox-remote-icon-width: 100%;
+            --polr-fox-remote-icon-height: 40px;
+            --polr-fox-remote-icon-size: 21px;
+            --polr-fox-remote-button-background: rgba(111, 111, 111, 0.2);
+            --polr-fox-remote-button-fill: rgb(255, 255, 255);
+        }
         ha-card {
             overflow: hidden;
         }
         polr-remotebutton {
-            padding: 20px 5px;
-            height: 50px;
         }
         polr-touchpad {
-            height: 250px;
+            height: 150px;
+            display: block;
         }
         #main-grid {
-            width: 90%;
             margin: auto;
-            padding: 20px 0;
+            padding: 0 12px 12px 12px;
+            display: grid;
+            gap: 12px;
         }
         #touchpad-grid {
             display: grid;
             grid-template-columns: 1fr;
         }
-        #touchpad-grid > #basicbutton-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            width: 90%;
-            margin: auto;
-        }
-        #app-grid {
-            display: grid;
-            grid-template-columns: auto auto auto auto;
-            width: 90%;
-            margin: auto;
-            gap: 5px;
-        }
-        #volume-grid {
+        #defaultpad-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 20px;
-            width: 90%;
+            gap: 12px;
+        }
+        #basicbutton-grid,
+        #app-grid,
+        #volume-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+            gap: 12px;
+            width: 100%;
             margin: auto;
         }
     `;

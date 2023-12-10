@@ -1,17 +1,14 @@
 import { LitElement, html, css } from "lit";
 import { property, query } from "lit/decorators.js";
 import { PowerIcon } from "../../utils/icons";
-import "hammerjs";
 import "../elements/header";
 
-export class PoLRToggleCard extends LitElement {
-    @property() _mc: any;
+export class PoLRMiniCard extends LitElement {
     @property() private _config: any;
     @property() private _hass: any;
     @property() private _entity_id: string;
     @property() private _icon: string;
     @property() private _name;
-    private _timer;
     string;
     @property() private _attribute: number;
     @query("ha-card") _card;
@@ -41,18 +38,6 @@ export class PoLRToggleCard extends LitElement {
         this._hass = hass;
     }
 
-    connectedCallback() {
-        super.connectedCallback();
-    }
-
-    disconnectedCallback(): void {
-        super.disconnectedCallback();
-        if (this._mc) {
-            this._mc.destroy();
-            this._mc = undefined;
-        }
-    }
-
     render() {
         var entity = this._hass?.states[this._entity_id];
         var info_value = entity.attributes[this._attribute] ?? 0;
@@ -61,13 +46,14 @@ export class PoLRToggleCard extends LitElement {
             <ha-card>
                 <polr-headercard
                     @click=${this._toggle}
-                    @press=${this._startPress}
-                    @pressup=${this._endPress}
                     mdiIcon=${this._icon}
                     _hass=${this._hass}
                     entity_id=${this._entity_id}
                     primaryInfo=${this._name}
-                    secondaryInfo="${Math.round((100 * info_value) / 255)}%">
+                    @mousedown=${this._startPress}
+                    @mouseup=${this._endPress}
+                    @touchstart=${this._startPress}
+                    @touchend=${this._endPress}>
                 </polr-headercard>
             </ha-card>
         `;
@@ -103,16 +89,16 @@ export class PoLRToggleCard extends LitElement {
         :host {
             --polr-fox-color-primary: #d0bcff;
             --polr-fox-color-background: #381e72;
-            --mdc-icon-size: 24px;
             --polr-fox-icon-primary-size: 18px;
-            --polr-fox-primary-font-size: 14px;
-            --polr-fox-card-height: 76px;
+            --polr-fox-card-height: 34px;
+            --polr-fox-card-width: 180px;
+            --polr-fox-primary-font-size: 10px;
+            --mdc-icon-size: 18px;
         }
+
         ha-card {
             overflow: hidden;
-            cursor: pointer;
-            border: none;
-            border-radius: 12px;
+            border-radius: 50px;
         }
 
         .pressed {
@@ -121,10 +107,10 @@ export class PoLRToggleCard extends LitElement {
     `;
 }
 
-customElements.define("polr-toggle-card", PoLRToggleCard);
+customElements.define("polr-mini-card", PoLRMiniCard);
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({
-    type: "polr-toggle-card",
-    name: "PoLR Toggle Card",
-    description: "A toggle card.",
+    type: "polr-mini-card",
+    name: "PoLR Mini Card",
+    description: "A mini card.",
 });

@@ -39,7 +39,7 @@ class PoLRTouchpad extends LitElement {
             this.circle.style.left = `${this.clamp(
                 clientX - rect.left - size,
                 0 - size,
-                rect.width + size - rect.left
+                rect.width - size
             )}px`;
 
             this.circle.style.top = `${this.clamp(
@@ -91,7 +91,7 @@ class PoLRTouchpad extends LitElement {
             max-height: 600px;
             width: 100%;
             min-width: 250px;
-            background: #d0bcff;
+            background: #333;
             border-radius: 12px;
             cursor: pointer;
             overflow: hidden;
@@ -100,17 +100,18 @@ class PoLRTouchpad extends LitElement {
         #circle {
             position: absolute;
             padding: 20px;
-            background-color: #1e0d40;
+            background-color: #fff;
             border-radius: 50%;
             opacity: 0%;
         }
 
         div.clickEffect {
             position: fixed;
-            background-color: #1e0d40;
+            background-color: #fff;
             border-radius: 50%;
             animation: clickEffect 0.4s ease-out;
         }
+
         @keyframes clickEffect {
             0% {
                 opacity: 1;
