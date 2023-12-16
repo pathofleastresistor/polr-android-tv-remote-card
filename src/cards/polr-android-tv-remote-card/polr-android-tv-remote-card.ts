@@ -230,7 +230,7 @@ export class PoLRATVRemoteCard extends LitElement {
     }
 
     private _renderBasicGrid() {
-        return html` <div id="basicbutton-grid">
+        return html` <div class="grid">
             <polr-button
                 @click=${() => this._press(buttonCommands.home.config)}
                 icon=${HomeIcon}></polr-button>
@@ -301,12 +301,12 @@ export class PoLRATVRemoteCard extends LitElement {
                     );
             }
         }
-        return html`<div id="app-grid">${app_buttons}</div>`;
+        return html`<div class="grid">${app_buttons}</div>`;
     }
 
     private _renderVolume() {
         return html`
-            <div id="volume-grid">
+            <div class="grid">
                 <polr-button
                     @click=${() =>
                         this._press(buttonCommands.volumedown.config)}
@@ -391,9 +391,7 @@ export class PoLRATVRemoteCard extends LitElement {
                     break;
             }
         }
-        return html`<div id="app-grid">${buttons}</div>`;
-
-        return html` <div class="grid"></div> `;
+        return html`<div class="grid">${buttons}</div>`;
     }
 
     private _turn_on(action: string) {
@@ -470,9 +468,6 @@ export class PoLRATVRemoteCard extends LitElement {
             grid-template-columns: 1fr 1fr 1fr;
             gap: 12px;
         }
-        #basicbutton-grid,
-        #app-grid,
-        #volume-grid,
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));

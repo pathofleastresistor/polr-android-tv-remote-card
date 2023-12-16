@@ -3642,7 +3642,7 @@ class PoLRATVRemoteCard extends s {
         this.requestUpdate();
     }
     _renderBasicGrid() {
-        return x ` <div id="basicbutton-grid">
+        return x ` <div class="grid">
             <polr-button
                 @click=${() => this._press(buttonCommands.home.config)}
                 icon=${HomeIcon}></polr-button>
@@ -3695,11 +3695,11 @@ class PoLRATVRemoteCard extends s {
                         `);
             }
         }
-        return x `<div id="app-grid">${app_buttons}</div>`;
+        return x `<div class="grid">${app_buttons}</div>`;
     }
     _renderVolume() {
         return x `
-            <div id="volume-grid">
+            <div class="grid">
                 <polr-button
                     @click=${() => this._press(buttonCommands.volumedown.config)}
                     icon=${VolumeDownIcon}></polr-button>
@@ -3762,7 +3762,7 @@ class PoLRATVRemoteCard extends s {
                     break;
             }
         }
-        return x `<div id="app-grid">${buttons}</div>`;
+        return x `<div class="grid">${buttons}</div>`;
     }
     _turn_on(action) {
         this._hass.callService("remote", "turn_on", {
@@ -3833,9 +3833,6 @@ PoLRATVRemoteCard.styles = i$3 `
             grid-template-columns: 1fr 1fr 1fr;
             gap: 12px;
         }
-        #basicbutton-grid,
-        #app-grid,
-        #volume-grid,
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
