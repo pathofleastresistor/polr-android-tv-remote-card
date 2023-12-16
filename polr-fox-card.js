@@ -343,126 +343,6 @@ __decorate([
 ], PoLRDpad.prototype, "up", void 0);
 customElements.define("polr-dpad", PoLRDpad);
 
-class PoLRHeaderCard extends s {
-    render() {
-        var state = this._hass["states"][this.entity_id]["state"];
-        return x `
-            <div class="header">
-                <div
-                    class="icon-container ${state === "on" ? "on" : ""}"
-                    @click=${this._iconClick}>
-                    ${this.icon}
-                </div>
-                <div class="info-container">
-                    <div class="primary">${this.primaryInfo}</div>
-                    <div class="secondary">${this.secondaryInfo}</div>
-                </div>
-                <div
-                    class="action-container ${state === "on" ? "on" : "off"}"
-                    @click=${this._actionClick}>
-                    ${this.actionIcon}
-                </div>
-            </div>
-        `;
-    }
-    _iconClick(ev) {
-        const event = new Event("headericonclick", {
-            bubbles: true,
-            composed: true,
-        });
-        this.dispatchEvent(event);
-    }
-    _actionClick(ev) {
-        const event = new Event("additionalclick", {
-            bubbles: true,
-            composed: true,
-        });
-        this.dispatchEvent(event);
-    }
-}
-PoLRHeaderCard.styles = i$3 `
-        :host {
-            color: var(--primary-text-color);
-        }
-        .header {
-            display: grid;
-            align-items: center;
-            padding: 12px;
-            gap: 12px;
-            grid-template-columns: min-content 1fr min-content;
-            background: var(
-                --ha-card-background,
-                var(--card-background-color, #fff)
-            );
-        }
-        .icon-container {
-            display: flex;
-            justify-content: center;
-            border-radius: 50%;
-            background-color: rgba(111, 111, 111, 0.2);
-            height: 40px;
-            width: 40px;
-            cursor: pointer;
-        }
-        .icon-container > svg {
-            fill: var(--polr-fox-icon-color-disabled, rgba(111, 111, 111));
-            width: 24px;
-        }
-        .icon-container.on svg {
-            fill: var(--polr-fox-icon-color, #ffffff);
-        }
-        .info-container {
-            display: flex;
-            flex-direction: column;
-        }
-        .info-container .primary {
-            font-size: var(--polr-fox-primary-font-size, 14px);
-            font-weight: var(--card-primary-font-weight, bold);
-        }
-        .info-container .secondary {
-            font-size: var(--polr-fox-secondary-font-size, 12px);
-            font-weight: var(--card-secondary-font-weight, bold);
-            color: var(--secondary-text-color);
-        }
-        .action-container {
-            cursor: pointer;
-        }
-        .action-container.off {
-            display: none;
-        }
-        .action-container svg {
-            fill: #ffffff;
-            width: 21px;
-            height: 21px;
-            padding: 5px 5px 0 5px;
-        }
-    `;
-__decorate([
-    n$1()
-], PoLRHeaderCard.prototype, "_hass", void 0);
-__decorate([
-    n$1()
-], PoLRHeaderCard.prototype, "icon", void 0);
-__decorate([
-    n$1()
-], PoLRHeaderCard.prototype, "mdiIcon", void 0);
-__decorate([
-    n$1()
-], PoLRHeaderCard.prototype, "actionIcon", void 0);
-__decorate([
-    n$1()
-], PoLRHeaderCard.prototype, "mdiActionIcon", void 0);
-__decorate([
-    n$1()
-], PoLRHeaderCard.prototype, "primaryInfo", void 0);
-__decorate([
-    n$1()
-], PoLRHeaderCard.prototype, "secondaryInfo", void 0);
-__decorate([
-    n$1()
-], PoLRHeaderCard.prototype, "entity_id", void 0);
-customElements.define("polr-headercard", PoLRHeaderCard);
-
 /**
  * @license
  * Copyright 2020 Google LLC
@@ -551,7 +431,14 @@ class PoLRButton extends s {
                 @touchstart=${this.handleRippleActivate}
                 @touchend=${this.handleRippleDeactivate}
                 @touchcancel=${this.handleRippleDeactivate}>
-                <slot>${this.icon}</slot>
+                <slot>
+                    <div class="container">
+                        <div class="icon-container">${this.icon}</div>
+                        <div class="info-container">
+                            <div class="primary">${this.primary}</div>
+                            <div class="secondary"></div>
+                        </div></div
+                ></slot>
                 ${this._shouldRenderRipple
             ? x `<mwc-ripple></mwc-ripple>`
             : ""}
@@ -603,7 +490,6 @@ PoLRButton.styles = i$3 `
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            line-height: 0;
             outline: none;
             overflow: hidden;
             background: none;
@@ -641,6 +527,15 @@ PoLRButton.styles = i$3 `
             --control-button-icon-color: var(--disabled-text-color);
             --control-button-background-opacity: 0.2;
         }
+        .container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 0px;
+        }
+        .icon-container {
+            margin-right: 0px;
+        }
     `;
 __decorate([
     n$1()
@@ -648,6 +543,9 @@ __decorate([
 __decorate([
     n$1()
 ], PoLRButton.prototype, "icon", void 0);
+__decorate([
+    n$1()
+], PoLRButton.prototype, "primary", void 0);
 __decorate([
     e("mwc-ripple")
 ], PoLRButton.prototype, "_ripple", void 0);
@@ -658,6 +556,125 @@ __decorate([
     e$1({ passive: true })
 ], PoLRButton.prototype, "handleRippleActivate", null);
 customElements.define("polr-button", PoLRButton);
+
+class PoLRHeaderCard extends s {
+    render() {
+        var state = this._hass["states"][this.entity_id]["state"];
+        return x `
+            <div class="header">
+                <div
+                    class="icon-container ${state === "on" ? "on" : ""}"
+                    @click=${this._iconClick}>
+                    ${this.icon}
+                </div>
+                <div class="info-container">
+                    <div class="primary">${this.primaryInfo}</div>
+                    <div class="secondary">${this.secondaryInfo}</div>
+                </div>
+                <polr-button
+                    class="action-container ${state === "on" ? "on" : "off"}"
+                    @click=${this._actionClick}
+                    icon=${this.actionIcon}></polr-button>
+            </div>
+        `;
+    }
+    _iconClick(ev) {
+        const event = new Event("headericonclick", {
+            bubbles: true,
+            composed: true,
+        });
+        this.dispatchEvent(event);
+    }
+    _actionClick(ev) {
+        const event = new Event("additionalclick", {
+            bubbles: true,
+            composed: true,
+        });
+        this.dispatchEvent(event);
+    }
+}
+PoLRHeaderCard.styles = i$3 `
+        :host {
+            color: var(--primary-text-color);
+        }
+        .header {
+            display: grid;
+            align-items: center;
+            padding: 12px;
+            gap: 12px;
+            grid-template-columns: min-content 1fr 40px;
+            background: var(
+                --ha-card-background,
+                var(--card-background-color, #fff)
+            );
+        }
+        .icon-container {
+            display: flex;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: rgba(111, 111, 111, 0.2);
+            height: 40px;
+            width: 40px;
+            cursor: pointer;
+        }
+        .icon-container > svg {
+            fill: var(--polr-fox-icon-color-disabled, rgba(111, 111, 111));
+            width: 24px;
+        }
+        .icon-container.on svg {
+            fill: var(--polr-fox-icon-color, #ffffff);
+        }
+        .info-container {
+            display: flex;
+            flex-direction: column;
+        }
+        .info-container .primary {
+            font-size: var(--polr-fox-primary-font-size, 14px);
+            font-weight: var(--card-primary-font-weight, bold);
+        }
+        .info-container .secondary {
+            font-size: var(--polr-fox-secondary-font-size, 12px);
+            font-weight: var(--card-secondary-font-weight, bold);
+            color: var(--secondary-text-color);
+        }
+        .action-container {
+            cursor: pointer;
+        }
+        .action-container.off {
+            display: none;
+        }
+        .action-container svg {
+            fill: #ffffff;
+            width: 21px;
+            height: 21px;
+            padding: 5px 5px 0 5px;
+        }
+    `;
+__decorate([
+    n$1()
+], PoLRHeaderCard.prototype, "_hass", void 0);
+__decorate([
+    n$1()
+], PoLRHeaderCard.prototype, "icon", void 0);
+__decorate([
+    n$1()
+], PoLRHeaderCard.prototype, "mdiIcon", void 0);
+__decorate([
+    n$1()
+], PoLRHeaderCard.prototype, "actionIcon", void 0);
+__decorate([
+    n$1()
+], PoLRHeaderCard.prototype, "mdiActionIcon", void 0);
+__decorate([
+    n$1()
+], PoLRHeaderCard.prototype, "primaryInfo", void 0);
+__decorate([
+    n$1()
+], PoLRHeaderCard.prototype, "secondaryInfo", void 0);
+__decorate([
+    n$1()
+], PoLRHeaderCard.prototype, "entity_id", void 0);
+customElements.define("polr-headercard", PoLRHeaderCard);
 
 /*! Hammer.JS - v2.0.7 - 2016-04-22
  * http://hammerjs.github.io/

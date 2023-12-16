@@ -12,6 +12,7 @@ import { RippleHandlers } from "@material/mwc-ripple/ripple-handlers";
 class PoLRButton extends LitElement {
     @property() _hass: any;
     @property() icon: any;
+    @property() primary: any;
     @queryAsync("mwc-ripple") private _ripple!: Promise<Ripple | null>;
 
     @state() private _shouldRenderRipple = false;
@@ -30,7 +31,14 @@ class PoLRButton extends LitElement {
                 @touchstart=${this.handleRippleActivate}
                 @touchend=${this.handleRippleDeactivate}
                 @touchcancel=${this.handleRippleDeactivate}>
-                <slot>${this.icon}</slot>
+                <slot>
+                    <div class="container">
+                        <div class="icon-container">${this.icon}</div>
+                        <div class="info-container">
+                            <div class="primary">${this.primary}</div>
+                            <div class="secondary"></div>
+                        </div></div
+                ></slot>
                 ${this._shouldRenderRipple
                     ? html`<mwc-ripple></mwc-ripple>`
                     : ""}
@@ -93,7 +101,6 @@ class PoLRButton extends LitElement {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            line-height: 0;
             outline: none;
             overflow: hidden;
             background: none;
@@ -130,6 +137,15 @@ class PoLRButton extends LitElement {
             --control-button-background-color: var(--disabled-color);
             --control-button-icon-color: var(--disabled-text-color);
             --control-button-background-opacity: 0.2;
+        }
+        .container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 0px;
+        }
+        .icon-container {
+            margin-right: 0px;
         }
     `;
 }

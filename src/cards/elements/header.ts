@@ -1,5 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { property, query } from "lit/decorators.js";
+import "./button";
 
 class PoLRHeaderCard extends LitElement {
     @property() private _hass: any;
@@ -25,11 +26,10 @@ class PoLRHeaderCard extends LitElement {
                     <div class="primary">${this.primaryInfo}</div>
                     <div class="secondary">${this.secondaryInfo}</div>
                 </div>
-                <div
+                <polr-button
                     class="action-container ${state === "on" ? "on" : "off"}"
-                    @click=${this._actionClick}>
-                    ${this.actionIcon}
-                </div>
+                    @click=${this._actionClick}
+                    icon=${this.actionIcon}></polr-button>
             </div>
         `;
     }
@@ -58,7 +58,7 @@ class PoLRHeaderCard extends LitElement {
             align-items: center;
             padding: 12px;
             gap: 12px;
-            grid-template-columns: min-content 1fr min-content;
+            grid-template-columns: min-content 1fr 40px;
             background: var(
                 --ha-card-background,
                 var(--card-background-color, #fff)
