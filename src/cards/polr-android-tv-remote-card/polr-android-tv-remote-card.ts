@@ -36,6 +36,9 @@ export const buttonCommands = {
     play: { config: "play", command: "MEDIA_PLAY" },
     pause: { config: "pause", command: "MEDIA_PAUSE" },
     stop: { config: "stop", command: "MEDIA_STOP" },
+    play_pause: { config: "play_pause", command: "MEDIA_PLAY_PAUSE" },
+    fast_forward: { config: "fast_forward", command: "MEDIA_FAST_FORWARD" },
+    rewind: { config: "rewind", command: "MEDIA_REWIND" },
 };
 
 export interface ATVRemoteCardConfig {
@@ -113,8 +116,6 @@ export class PoLRATVRemoteCard extends LitElement {
     render() {
         var entity_id = this._config["entity_id"];
         var state = this._hass?.states[entity_id]?.state;
-        console.log(state);
-        console.log(this._config.showVolume);
 
         return html`
             <ha-card>
@@ -325,16 +326,18 @@ export class PoLRATVRemoteCard extends LitElement {
         return html`
             <div class="grid">
                 <polr-button
-                    @click=${() => this._press(buttonCommands.play.config)}
-                    ><ha-icon icon="mdi:play"></ha-icon
+                    @click=${() => this._press(buttonCommands.rewind.config)}
+                    ><ha-icon icon="mdi:rewind"></ha-icon
                 ></polr-button>
                 <polr-button
-                    @click=${() => this._press(buttonCommands.pause.config)}
-                    ><ha-icon icon="mdi:pause"></ha-icon
+                    @click=${() =>
+                        this._press(buttonCommands.play_pause.config)}
+                    ><ha-icon icon="mdi:play-pause"></ha-icon
                 ></polr-button>
                 <polr-button
-                    @click=${() => this._press(buttonCommands.stop.config)}
-                    ><ha-icon icon="mdi:stop"></ha-icon
+                    @click=${() =>
+                        this._press(buttonCommands.fast_forward.config)}
+                    ><ha-icon icon="mdi:fast-forward"></ha-icon
                 ></polr-button>
             </div>
         `;

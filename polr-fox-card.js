@@ -3489,6 +3489,9 @@ const buttonCommands = {
     play: { config: "play", command: "MEDIA_PLAY" },
     pause: { config: "pause", command: "MEDIA_PAUSE" },
     stop: { config: "stop", command: "MEDIA_STOP" },
+    play_pause: { config: "play_pause", command: "MEDIA_PLAY_PAUSE" },
+    fast_forward: { config: "fast_forward", command: "MEDIA_FAST_FORWARD" },
+    rewind: { config: "rewind", command: "MEDIA_REWIND" },
 };
 class PoLRATVRemoteCard extends s {
     static getConfigElement() {
@@ -3536,8 +3539,6 @@ class PoLRATVRemoteCard extends s {
         var _a, _b;
         var entity_id = this._config["entity_id"];
         var state = (_b = (_a = this._hass) === null || _a === void 0 ? void 0 : _a.states[entity_id]) === null || _b === void 0 ? void 0 : _b.state;
-        console.log(state);
-        console.log(this._config.showVolume);
         return x `
             <ha-card>
                 <polr-headercard
@@ -3715,16 +3716,16 @@ class PoLRATVRemoteCard extends s {
         return x `
             <div class="grid">
                 <polr-button
-                    @click=${() => this._press(buttonCommands.play.config)}
-                    ><ha-icon icon="mdi:play"></ha-icon
+                    @click=${() => this._press(buttonCommands.rewind.config)}
+                    ><ha-icon icon="mdi:rewind"></ha-icon
                 ></polr-button>
                 <polr-button
-                    @click=${() => this._press(buttonCommands.pause.config)}
-                    ><ha-icon icon="mdi:pause"></ha-icon
+                    @click=${() => this._press(buttonCommands.play_pause.config)}
+                    ><ha-icon icon="mdi:play-pause"></ha-icon
                 ></polr-button>
                 <polr-button
-                    @click=${() => this._press(buttonCommands.stop.config)}
-                    ><ha-icon icon="mdi:stop"></ha-icon
+                    @click=${() => this._press(buttonCommands.fast_forward.config)}
+                    ><ha-icon icon="mdi:fast-forward"></ha-icon
                 ></polr-button>
             </div>
         `;
