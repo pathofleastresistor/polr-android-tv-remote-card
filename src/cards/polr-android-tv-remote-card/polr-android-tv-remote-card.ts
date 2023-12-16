@@ -648,14 +648,14 @@ class PoLRATVRemoteCardEditor extends LitElement {
     _computeLabel(schema) {
         var labelMap = {
             entity_id: "Entity",
-            remote: "Remote Style",
+            remote: "Navigation Style",
+            showRemote: "Show Navigation",
+            showBasic: "Show Home/Back",
+            showApps: "Show Apps",
             apps: "Apps",
-            media_controls: "Media Controls",
-            showRemote: "Show navigation",
-            showBasic: "Show home/back buttons",
-            showApps: "Show apps",
-            showVolume: "Show volume",
-            showMedia: "Show media",
+            showVolume: "Show Volume",
+            showMedia: "Show Playback Controls",
+            media_controls: "Playback Controls",
         };
         return labelMap[schema.name];
     }

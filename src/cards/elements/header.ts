@@ -22,7 +22,7 @@ class PoLRHeaderCard extends LitElement {
                     @click=${this._iconClick}>
                     ${this.icon}
                 </div>
-                <div class="info-container">
+                <div class="info-container" @click=${this._iconClick}>
                     <div class="primary">${this.primaryInfo}</div>
                     <div class="secondary">${this.secondaryInfo}</div>
                 </div>
@@ -83,6 +83,7 @@ class PoLRHeaderCard extends LitElement {
         .info-container {
             display: flex;
             flex-direction: column;
+            cursor: pointer;
         }
         .info-container .primary {
             font-size: var(--polr-fox-primary-font-size, 14px);

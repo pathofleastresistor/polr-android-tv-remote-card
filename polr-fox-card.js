@@ -567,7 +567,7 @@ class PoLRHeaderCard extends s {
                     @click=${this._iconClick}>
                     ${this.icon}
                 </div>
-                <div class="info-container">
+                <div class="info-container" @click=${this._iconClick}>
                     <div class="primary">${this.primaryInfo}</div>
                     <div class="secondary">${this.secondaryInfo}</div>
                 </div>
@@ -627,6 +627,7 @@ PoLRHeaderCard.styles = i$3 `
         .info-container {
             display: flex;
             flex-direction: column;
+            cursor: pointer;
         }
         .info-container .primary {
             font-size: var(--polr-fox-primary-font-size, 14px);
@@ -4004,14 +4005,14 @@ class PoLRATVRemoteCardEditor extends s {
     _computeLabel(schema) {
         var labelMap = {
             entity_id: "Entity",
-            remote: "Remote Style",
+            remote: "Navigation Style",
+            showRemote: "Show Navigation",
+            showBasic: "Show Home/Back",
+            showApps: "Show Apps",
             apps: "Apps",
-            media_controls: "Media Controls",
-            showRemote: "Show navigation",
-            showBasic: "Show home/back buttons",
-            showApps: "Show apps",
-            showVolume: "Show volume",
-            showMedia: "Show media",
+            showVolume: "Show Volume",
+            showMedia: "Show Playback Controls",
+            media_controls: "Playback Controls",
         };
         return labelMap[schema.name];
     }
