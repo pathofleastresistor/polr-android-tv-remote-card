@@ -323,24 +323,77 @@ export class PoLRATVRemoteCard extends LitElement {
     }
 
     private _renderMedia() {
-        return html`
-            <div class="grid">
-                <polr-button
-                    @click=${() => this._press(buttonCommands.rewind.config)}
-                    ><ha-icon icon="mdi:rewind"></ha-icon
-                ></polr-button>
-                <polr-button
-                    @click=${() =>
-                        this._press(buttonCommands.play_pause.config)}
-                    ><ha-icon icon="mdi:play-pause"></ha-icon
-                ></polr-button>
-                <polr-button
-                    @click=${() =>
-                        this._press(buttonCommands.fast_forward.config)}
-                    ><ha-icon icon="mdi:fast-forward"></ha-icon
-                ></polr-button>
-            </div>
-        `;
+        if (!this._config.media_controls) {
+            return html``;
+        }
+
+        let buttons = [];
+        for (const item of this._config?.media_controls) {
+            switch (item) {
+                case "rewind":
+                    buttons.push(
+                        html`
+                            <polr-button
+                                @click=${() =>
+                                    this._press(buttonCommands.rewind.config)}
+                                ><ha-icon icon="mdi:rewind"></ha-icon
+                            ></polr-button>
+                        `
+                    );
+                    break;
+                case "play_pause":
+                    buttons.push(
+                        html`
+                            <polr-button
+                                @click=${() =>
+                                    this._press(
+                                        buttonCommands.play_pause.config
+                                    )}
+                                ><ha-icon icon="mdi:play-pause"></ha-icon
+                            ></polr-button>
+                        `
+                    );
+                    break;
+                case "fast_forward":
+                    buttons.push(
+                        html`
+                            <polr-button
+                                @click=${() =>
+                                    this._press(
+                                        buttonCommands.fast_forward.config
+                                    )}
+                                ><ha-icon icon="mdi:fast-forward"></ha-icon
+                            ></polr-button>
+                        `
+                    );
+                    break;
+                case "play":
+                    buttons.push(
+                        html`
+                            <polr-button
+                                @click=${() =>
+                                    this._press(buttonCommands.play.config)}
+                                ><ha-icon icon="mdi:play"></ha-icon
+                            ></polr-button>
+                        `
+                    );
+                    break;
+                case "stop":
+                    buttons.push(
+                        html`
+                            <polr-button
+                                @click=${() =>
+                                    this._press(buttonCommands.stop.config)}
+                                ><ha-icon icon="mdi:stop"></ha-icon
+                            ></polr-button>
+                        `
+                    );
+                    break;
+            }
+        }
+        return html`<div id="app-grid">${buttons}</div>`;
+
+        return html` <div class="grid"></div> `;
     }
 
     private _turn_on(action: string) {
@@ -457,6 +510,7 @@ class PoLRATVRemoteCardEditor extends LitElement {
         _config.entity_id = ev.detail.value.entity_id;
         _config.remote = ev.detail.value.remote;
         _config.apps = ev.detail.value.apps;
+        _config.media_controls = ev.detail.value.media_controls;
 
         _config.showRemote = ev.detail.value.showRemote;
         _config.showBasic = ev.detail.value.showBasic;
@@ -478,82 +532,119 @@ class PoLRATVRemoteCardEditor extends LitElement {
         if (!this._hass || !this._config) {
             return html``;
         }
+
+        var schema = [
+            {
+                name: "entity_id",
+                selector: {
+                    entity: {
+                        filter: [
+                            {
+                                integration: "androidtv_remote",
+                                domain: "remote",
+                            },
+                        ],
+                    },
+                },
+            },
+            {
+                name: "showRemote",
+                selector: {
+                    boolean: {},
+                },
+            },
+            ...(this._config.showRemote
+                ? [
+                      {
+                          name: "remote",
+                          selector: {
+                              select: {
+                                  mode: "dropdown",
+                                  options: [
+                                      { label: "Basic", value: "default" },
+                                      { label: "Touch", value: "touch" },
+                                      { label: "DPad", value: "dpad" },
+                                  ],
+                              },
+                          },
+                      },
+                  ]
+                : []),
+            {
+                name: "showBasic",
+                selector: {
+                    boolean: {},
+                },
+            },
+            {
+                name: "showApps",
+                selector: {
+                    boolean: {},
+                },
+            },
+            ...(this._config.showApps
+                ? [
+                      {
+                          name: "apps",
+                          selector: {
+                              select: {
+                                  mode: "dropdown",
+                                  multiple: true,
+                                  options: [
+                                      { label: "Disney+", value: "disneyplus" },
+                                      { label: "Netflix", value: "netflix" },
+                                      { label: "Amazon Prime", value: "prime" },
+                                  ],
+                              },
+                          },
+                      },
+                  ]
+                : []),
+            {
+                name: "showVolume",
+                selector: {
+                    boolean: {},
+                },
+            },
+            {
+                name: "showMedia",
+                selector: {
+                    boolean: {},
+                },
+            },
+            ...(this._config.showMedia
+                ? [
+                      {
+                          name: "media_controls",
+                          selector: {
+                              select: {
+                                  mode: "dropdown",
+                                  multiple: true,
+                                  options: [
+                                      { label: "Play", value: "play" },
+                                      {
+                                          label: "Play Pause",
+                                          value: "play_pause",
+                                      },
+                                      { label: "Stop", value: "stop" },
+                                      { label: "Rewind", value: "rewind" },
+                                      {
+                                          label: "Fast Forward",
+                                          value: "fast_forward",
+                                      },
+                                  ],
+                              },
+                          },
+                      },
+                  ]
+                : []),
+        ];
+
         return html`
             <ha-form
                 .hass=${this._hass}
                 .data=${this._config}
-                .schema=${[
-                    {
-                        name: "entity_id",
-                        selector: {
-                            entity: {
-                                filter: [
-                                    {
-                                        integration: "androidtv_remote",
-                                        domain: "remote",
-                                    },
-                                ],
-                            },
-                        },
-                    },
-                    {
-                        name: "remote",
-                        selector: {
-                            select: {
-                                mode: "dropdown",
-                                options: [
-                                    { label: "Basic", value: "default" },
-                                    { label: "Touch", value: "touch" },
-                                    { label: "DPad", value: "dpad" },
-                                ],
-                            },
-                        },
-                    },
-                    {
-                        name: "apps",
-                        selector: {
-                            select: {
-                                mode: "dropdown",
-                                multiple: true,
-                                options: [
-                                    { label: "Disney+", value: "disneyplus" },
-                                    { label: "Netflix", value: "netflix" },
-                                    { label: "Amazon Prime", value: "prime" },
-                                ],
-                            },
-                        },
-                    },
-                    {
-                        name: "showRemote",
-                        selector: {
-                            boolean: {},
-                        },
-                    },
-                    {
-                        name: "showBasic",
-                        selector: {
-                            boolean: {},
-                        },
-                    },
-                    {
-                        name: "showApps",
-                        selector: {
-                            boolean: {},
-                        },
-                    },
-                    {
-                        name: "showVolume",
-                        selector: {
-                            boolean: {},
-                        },
-                    },
-                    {
-                        name: "showMedia",
-                        selector: {
-                            boolean: {},
-                        },
-                    },
-                ]}
+                .schema=${schema}
                 .computeLabel=${this._computeLabel}
                 @value-changed=${this._valueChanged}></ha-form>
         `;
@@ -564,6 +655,7 @@ class PoLRATVRemoteCardEditor extends LitElement {
             entity_id: "Entity",
             remote: "Remote Style",
             apps: "Apps",
+            media_controls: "Media Controls",
             showRemote: "Show navigation",
             showBasic: "Show home/back buttons",
             showApps: "Show apps",

@@ -8,7 +8,6 @@ const dev = process.env.ROLLUP_WATCH;
 
 export default {
     input: "src/polr-fox-card.ts",
-    cache: false,
     output: [{
         file: "polr-fox-card.js",
         format: "es"
