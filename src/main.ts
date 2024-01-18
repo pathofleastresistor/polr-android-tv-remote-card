@@ -289,7 +289,7 @@ class PoLRATVRemoteCard extends LitElement {
 
   _render_basic_buttons() {
     return html`
-      <div class="grid basic-grid">
+      <div class="grid basic-grid ${this._config["input"] ? 'has-input' : ''}">
         ${ this._config["input"] ? html`
           <div @click=${ this._press_input } class="remote-button">
             <svg
@@ -705,6 +705,11 @@ class PoLRATVRemoteCard extends LitElement {
     .basic-grid {
       grid-template-columns: repeat(2, 1fr);
     }
+
+    .basic-grid.has-input {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
 
     .basic-grid > .remote-button {
       padding: 20px;
