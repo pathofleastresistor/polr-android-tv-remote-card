@@ -39,7 +39,7 @@ import { stateColor, type HomeAssistant } from "./kit/types";
 import "./nav-pad";
 import "./polr-android-tv-remote-card-editor";
 
-export const CARD_VERSION = "2.0.0-beta.11";
+export const CARD_VERSION = "2.0.0-beta.12";
 
 const CARD_TYPE = "polr-android-tv-remote-card";
 
@@ -122,7 +122,6 @@ export class PolrAndroidTvRemoteCard extends LitElement {
    */
   private _run(work: Promise<unknown>): void {
     void work.catch((error: unknown) => {
-      // eslint-disable-next-line no-console
       console.error("polr-android-tv-remote-card:", error);
     });
   }
@@ -520,5 +519,4 @@ window.customCards.push({
   documentationURL: "https://github.com/pathofleastresistor/polr-android-tv-remote-card",
 });
 
-// eslint-disable-next-line no-console
 console.info(`%c ${CARD_TYPE} %c ${CARD_VERSION} `, "background:#555;color:#fff", "background:#3f51b5;color:#fff");

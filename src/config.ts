@@ -328,7 +328,6 @@ let warned = new Set<string>();
 const warnOnce = (message: string): void => {
   if (warned.has(message)) return;
   warned.add(message);
-  // eslint-disable-next-line no-console
   console.warn(`polr-android-tv-remote-card: ${message}`);
 };
 

@@ -168,6 +168,58 @@ for (const dark of [false, true]) {
     console.log(`power override via "Turn on": ${usedOverride ? "ok" : "FAILED"}`);
   }
 
+  // Accessibility is a claim the README makes, so it is checked rather than
+  // asserted: v1 wired click handlers onto bare divs, and nothing but a test
+  // stops that creeping back.
+  if (!dark) {
+    const a11y = await page.evaluate(() => {
+      const card = document.querySelector("polr-android-tv-remote-card");
+      const root = card.shadowRoot;
+      const pad = root.querySelector("polr-atv-nav-pad")?.shadowRoot;
+      const controls = [
+        ...root.querySelectorAll("button, [role='button'], input, [tabindex]"),
+        ...(pad ? pad.querySelectorAll("button, [role='application'], [tabindex]") : []),
+      ];
+      const describe = (el) => el.className || el.tagName;
+      return {
+        count: controls.length,
+        unlabelled: controls
+          .filter(
+            (el) =>
+              !el.getAttribute("aria-label") &&
+              !el.textContent.trim() &&
+              !el.getAttribute("placeholder"),
+          )
+          .map(describe),
+        unfocusable: controls
+          .filter((el) => el.tagName !== "BUTTON" && el.tabIndex < 0)
+          .map(describe),
+        liveRegion: Boolean(root.querySelector("[aria-live]")),
+      };
+    });
+
+    if (a11y.count < 10) {
+      failed = true;
+      console.error(`[a11y] only ${a11y.count} controls found — did the card render?`);
+    }
+    for (const [what, list] of [
+      ["unlabelled", a11y.unlabelled],
+      ["not keyboard focusable", a11y.unfocusable],
+    ]) {
+      if (list.length) {
+        failed = true;
+        console.error(`[a11y] ${list.length} controls ${what}: ${list.join(", ")}`);
+      }
+    }
+    if (!a11y.liveRegion) {
+      failed = true;
+      console.error("[a11y] the now-playing line lost its aria-live region");
+    }
+    console.log(
+      `a11y: ${a11y.count} controls, all labelled and focusable, live region present`,
+    );
+  }
+
   const file = resolve(outDir, dark ? "dark.png" : "light.png");
   await page.screenshot({ path: file, fullPage: true });
   console.log(`wrote ${file}`);

@@ -333,6 +333,4 @@ console error.
 
 ## Screenshots
 
-<p align="center">
-  <img width="600" src="images/card-config.png">
-</p>
+The images in `images/` are of v1 and have not been retaken.
