@@ -3265,7 +3265,7 @@ O = q([
 window.customCards = window.customCards ?? [];
 window.customCards.push({
   type: at,
-  name: "Android TV Remote",
+  name: "PoLR Android TV Remote",
   description: "A remote for the Android TV Remote integration, with live state and an app launcher.",
   preview: !0,
   documentationURL: "https://github.com/pathofleastresistor/polr-android-tv-remote-card"

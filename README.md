@@ -1,4 +1,6 @@
-# polr-android-tv-remote-card
+# PoLR Android TV Remote
+
+`polr-android-tv-remote-card`
 
 A Lovelace remote for the
 [Android TV Remote](https://www.home-assistant.io/integrations/androidtv_remote/)
