@@ -9,7 +9,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { BRANDS, DEFAULTS, balancedColumns, normalizeConfig, stripLegacyKeys, _resetWarnings } from "./.build/config.mjs";
+import { BRANDS, DEFAULTS, normalizeConfig, stripLegacyKeys, _resetWarnings } from "./.build/config.mjs";
 
 const TYPE = "custom:polr-android-tv-remote-card";
 const base = (extra) => ({ type: TYPE, ...extra });
@@ -314,16 +314,22 @@ test("the README's v1 customisation example still resolves", () => {
   assert.equal(config.overrides.volume_mute, undefined);
 });
 
-test("app columns balance instead of stranding a tile on its own row", () => {
-  // The failure this exists to prevent: six apps laid out as five plus one.
-  assert.equal(balancedColumns(6), 3);
-  assert.equal(balancedColumns(8), 4);
-  assert.equal(balancedColumns(1), 1);
-  assert.equal(balancedColumns(4), 4);
-  assert.equal(balancedColumns(5), 5);
-  assert.equal(balancedColumns(10), 5);
-  assert.equal(balancedColumns(12), 4);
-  for (let n = 1; n <= 24; n += 1) {
-    assert.ok(balancedColumns(n) <= 5, `n=${n} exceeds the 5-column cap`);
+test("app_columns caps a row at five buttons by default", () => {
+  assert.equal(DEFAULTS.app_columns, 5);
+  assert.equal(normalizeConfig(base({ entity: "remote.atv" })).app_columns, 5);
+  assert.equal(
+    normalizeConfig(base({ entity: "remote.atv", app_columns: 3 })).app_columns,
+    3,
+  );
+});
+
+test("a nonsensical app_columns falls back to the default", () => {
+  // "auto" was the v2-beta spelling, before the tiles became fixed-width.
+  for (const value of ["auto", 0, -2, null]) {
+    assert.equal(
+      normalizeConfig(base({ entity: "remote.atv", app_columns: value })).app_columns,
+      5,
+      `app_columns: ${JSON.stringify(value)}`,
+    );
   }
 });

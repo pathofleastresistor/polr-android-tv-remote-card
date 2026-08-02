@@ -95,7 +95,8 @@ export interface PolrAtvRemoteCardConfig {
   show_section_labels?: boolean;
 
   apps?: AppConfig[];
-  app_columns?: number | "auto";
+  /** Most app buttons on one row before wrapping. */
+  app_columns?: number;
 
   hold_repeat?: boolean;
   haptics?: boolean;
@@ -118,7 +119,7 @@ export interface ResolvedConfig extends PolrAtvRemoteCardConfig {
   show_section_labels: boolean;
   show_favorite: boolean;
   apps: AppConfig[];
-  app_columns: number | "auto";
+  app_columns: number;
   hold_repeat: boolean;
   haptics: boolean;
   overrides: Partial<Record<ButtonId, ServiceAction>>;
@@ -136,7 +137,7 @@ export const DEFAULTS = {
   show_text_input: false,
   show_apps: true,
   show_section_labels: false,
-  app_columns: "auto" as number | "auto",
+  app_columns: 5,
   hold_repeat: true,
   haptics: true,
 };
@@ -359,27 +360,15 @@ export const normalizeConfig = (raw: PolrAtvRemoteCardConfig): ResolvedConfig =>
     show_favorite: overrides.favorite !== undefined,
 
     apps,
-    app_columns: pick(raw.app_columns, DEFAULTS.app_columns),
+    // "auto" was the v2-beta spelling, before the tiles became fixed-width.
+    app_columns:
+      typeof raw.app_columns === "number" && raw.app_columns > 0
+        ? raw.app_columns
+        : DEFAULTS.app_columns,
     hold_repeat: pick(raw.hold_repeat, DEFAULTS.hold_repeat),
     haptics: pick(raw.haptics, DEFAULTS.haptics),
     overrides,
   };
-};
-
-/** Widest row the app grid will use before it wraps. */
-const MAX_APP_COLUMNS = 5;
-
-/**
- * Choose a column count that fills every row evenly.
- *
- * A plain `auto-fit` packs as many tiles per row as will fit, which leaves the
- * sixth app alone on a second row. Balancing first — 6 becomes 3x2, 8 becomes
- * 4x2 — reads as a deliberate grid instead of an overflow.
- */
-export const balancedColumns = (count: number): number => {
-  if (count <= 1) return 1;
-  const rows = Math.ceil(count / MAX_APP_COLUMNS);
-  return Math.ceil(count / rows);
 };
 
 /**

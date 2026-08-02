@@ -81,7 +81,7 @@ apps:
 | `show_apps`           | `true`   | The app launcher.                                                            |
 | `show_section_labels` | `false`  | Small headings above sections.                                               |
 | `apps`                | `[]`     | See [Apps](#apps).                                                           |
-| `app_columns`         | `auto`   | A fixed column count, or `auto` to balance rows.                             |
+| `app_columns`         | `5`      | Most app buttons on one row before wrapping.                                 |
 | `hold_repeat`         | `true`   | Hold a d-pad or volume button to repeat it.                                  |
 | `haptics`             | `true`   | Haptic feedback (Companion app only).                                        |
 | `overrides`           | `{}`     | See [Overriding buttons](#overriding-buttons).                               |
@@ -107,6 +107,10 @@ apps:
 | `app`      | `app_id`   | `media_player.play_media` with an Android package id. Needs a player.      |
 | `key`      | `key`      | `remote.send_command` with a raw key code.                                 |
 | `service`  | `service`, `data`, `target` | Calls any action at all.                                 |
+
+The app row is `app_columns` columns wide, so a button is the same size whether
+you have two apps or ten, and a sixth wraps onto a second row aligned with the
+first.
 
 If you configure apps in the integration itself (Settings → Devices & Services
 → Android TV Remote → Configure), the editor offers them as one-click tiles and

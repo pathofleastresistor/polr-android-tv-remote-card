@@ -21,7 +21,6 @@ import {
   type DeviceState,
 } from "./atv";
 import {
-  balancedColumns,
   normalizeConfig,
   type AppConfig,
   type ButtonId,
@@ -355,16 +354,13 @@ export class PolrAndroidTvRemoteCard extends LitElement {
     const config = this._config!;
     if (!config.apps.length) return nothing;
 
-    const columns =
-      config.app_columns === "auto" ? balancedColumns(config.apps.length) : config.app_columns;
-
     return html`
       ${config.show_section_labels
         ? html`<div class="section-head">
             Apps<span class="grow"></span><span class="count">${config.apps.length}</span>
           </div>`
         : nothing}
-      <div class="app-grid" style="grid-template-columns: repeat(${columns}, 1fr)">
+      <div class="app-grid" style="--app-per-row: ${config.app_columns}">
         ${repeat(
           config.apps,
           (app, index) => `${index}:${app.icon ?? ""}`,

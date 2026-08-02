@@ -238,8 +238,17 @@ export const remoteStyles = css`
   }
 
   /* ------------------------------------------------------------ app grid -- */
+  /*
+   * A fixed number of columns, so a button is the same width whether there are
+   * two apps or ten, and a sixth app wraps onto a second row aligned with the
+   * first. Buttons stretch to fill the card like every other control row.
+   *
+   * The earlier failure this avoids: sizing columns to the app *count* made two
+   * apps into two half-card-wide logos.
+   */
   .app-grid {
     display: grid;
+    grid-template-columns: repeat(var(--app-per-row, 5), 1fr);
     /* Matches the kit's .features gap, so the app row lines up with the
        navigation, transport and volume rows above it. */
     gap: 12px;
@@ -248,7 +257,7 @@ export const remoteStyles = css`
   .app-tile {
     /* Same 40px height as every other control row, rather than a big square.
        Square tiles scale their logo with the card, so two apps in a wide card
-       became two enormous logos; a fixed height keeps the app row reading as a
+       became two enormous logos; a fixed size keeps the app row reading as a
        row of buttons, which is what it is. */
     width: 100%;
     position: relative;

@@ -204,7 +204,9 @@
         { title: "no paired player", config: { entity: "remote.orphan_tv", apps: APPS.slice(0, 3) }, hass: { orphan: true } },
         { title: "reduced features (no next/prev)", config: { entity: "remote.main_tv" }, hass: { playerAttrs: { supported_features: 1 | 1024 | 8 | 128 | 256 } } },
         { title: "missing entity", config: { entity: "remote.nope" } },
-        { title: "section labels + 3 columns", config: { entity: "remote.main_tv", show_section_labels: true, app_columns: 3, apps: APPS } },
+        { title: "section labels + 3 per row", config: { entity: "remote.main_tv", show_section_labels: true, app_columns: 3, apps: APPS } },
+        { title: "8 apps (wraps after 5)", config: { entity: "remote.main_tv", apps: [...APPS, "netflix", "hulu"] } },
+        { title: "2 apps (same button size)", config: { entity: "remote.main_tv", apps: APPS.slice(0, 2) } },
       ];
 
       const grid = document.getElementById("grid");
