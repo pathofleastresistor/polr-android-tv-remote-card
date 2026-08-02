@@ -13,12 +13,14 @@ import {
   FEATURE,
   KEYS,
   can,
+  canVolume,
   hasVolumeState,
   describeAction,
   pressButton,
   readDevice,
   resolvePlayer,
   runAppAction,
+  sendKey,
   sendText,
 } from "./.build/atv.mjs";
 import { normalizeConfig } from "./.build/config.mjs";
@@ -563,4 +565,32 @@ test("power still toggles when it has no override", async () => {
   const hass = fixture({ playerState: "on" });
   await pressButton(hass, config(), readDevice(hass, config()), "power", node());
   assert.equal(hass.calls[0].service, "turn_off");
+});
+
+test("favourite does nothing without an override, rather than sending a stray key", () => {
+  // It is the one button with no key code: it exists only to run whatever the
+  // user pointed it at, and only renders when they have.
+  const hass = fixture();
+  return pressButton(hass, config(), readDevice(hass, config()), "favorite", node()).then(
+    () => assert.equal(hass.calls.length, 0),
+  );
+});
+
+test("canVolume reads the volume target's features, not the TV's", () => {
+  const hass = fixture({ playerAttrs: { supported_features: 0 } });
+  hass.states["media_player.soundbar"] = {
+    entity_id: "media_player.soundbar",
+    state: "on",
+    attributes: { supported_features: FEATURE.VOLUME_STEP | FEATURE.VOLUME_MUTE },
+  };
+  const cfg = config({ volume_entity: "media_player.soundbar" });
+  const device = readDevice(hass, cfg);
+  assert.equal(canVolume(device, FEATURE.VOLUME_STEP), true);
+  assert.equal(can(device, FEATURE.VOLUME_STEP), false, "the TV itself cannot");
+});
+
+test("sendKey targets the remote entity", async () => {
+  const hass = fixture();
+  await sendKey(hass, readDevice(hass, config()), "GUIDE");
+  assert.deepEqual(hass.calls[0].data, { entity_id: "remote.main_tv", command: "GUIDE" });
 });

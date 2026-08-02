@@ -9,7 +9,16 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { BRANDS, DEFAULTS, entityAction, normalizeConfig, stripLegacyKeys, _resetWarnings } from "./.build/config.mjs";
+import {
+  BRANDS,
+  BRAND_IDS,
+  DEFAULTS,
+  brandFor,
+  entityAction,
+  normalizeConfig,
+  stripLegacyKeys,
+  _resetWarnings,
+} from "./.build/config.mjs";
 
 const TYPE = "custom:polr-android-tv-remote-card";
 const base = (extra) => ({ type: TYPE, ...extra });
@@ -630,4 +639,31 @@ test("branch keys are stripped when the editor writes back", () => {
     assert.equal(stripped[key], undefined, `${key} should not survive`);
   }
   assert.equal(stripped.show_text_input, true);
+});
+
+test("brandFor matches the names a TV actually reports", () => {
+  // app_name is whatever the TV feels like calling the app, so matching is
+  // normalised to letters: "Disney+" and "Prime Video" have to land.
+  assert.equal(brandFor("Netflix"), "netflix");
+  assert.equal(brandFor("Disney+"), "disneyplus");
+  assert.equal(brandFor("Prime Video"), "prime");
+  assert.equal(brandFor("HBO Max"), "hbomax");
+  assert.equal(brandFor("YouTube"), "youtube");
+  assert.equal(brandFor("hulu"), "hulu");
+});
+
+test("brandFor returns nothing rather than guessing", () => {
+  for (const name of ["Plex", "", undefined, "   ", "12345"]) {
+    assert.equal(brandFor(name), undefined, `${JSON.stringify(name)} should not match`);
+  }
+});
+
+test("every brand id has a label and an activity", () => {
+  // The logos live in a lit module that cannot load without a DOM; the harness
+  // renders all six chips in the editor, which is where a missing one shows up.
+  assert.ok(BRAND_IDS.length > 0);
+  for (const id of BRAND_IDS) {
+    assert.ok(BRANDS[id]?.label, `${id} has no label`);
+    assert.ok(BRANDS[id]?.activity, `${id} has no activity`);
+  }
 });

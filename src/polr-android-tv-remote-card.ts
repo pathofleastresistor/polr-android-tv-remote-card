@@ -21,6 +21,7 @@ import {
   type DeviceState,
 } from "./atv";
 import {
+  brandFor,
   normalizeConfig,
   type AppConfig,
   type ButtonId,
@@ -28,7 +29,7 @@ import {
   type PolrAtvRemoteCardConfig,
   type ResolvedConfig,
 } from "./config";
-import { BRAND_LOGOS, brandFor } from "./icons";
+import { BRAND_LOGOS } from "./icons";
 import { isActionable, runAction, type ActionConfig } from "./actions";
 import { press, type PressOptions } from "./press";
 import { remoteStyles } from "./styles";
@@ -38,7 +39,7 @@ import { stateColor, type HomeAssistant } from "./kit/types";
 import "./nav-pad";
 import "./polr-android-tv-remote-card-editor";
 
-export const CARD_VERSION = "2.0.0-beta.10";
+export const CARD_VERSION = "2.0.0-beta.11";
 
 const CARD_TYPE = "polr-android-tv-remote-card";
 
@@ -112,10 +113,24 @@ export class PolrAndroidTvRemoteCard extends LitElement {
     return readDevice(this.hass, this._config);
   }
 
+  /**
+   * Run a card action, reporting failures instead of dropping them.
+   *
+   * Every interaction here is fire-and-forget, so without this a rejected
+   * service call -- a typo'd override, an entity that has gone away -- becomes
+   * an unhandled promise rejection and the console shows nothing useful.
+   */
+  private _run(work: Promise<unknown>): void {
+    void work.catch((error: unknown) => {
+      // eslint-disable-next-line no-console
+      console.error("polr-android-tv-remote-card:", error);
+    });
+  }
+
   private _press(button: ButtonId): void {
     const device = this._device;
     if (!this.hass || !this._config || !device) return;
-    void pressButton(this.hass, this._config, device, button, this);
+    this._run(pressButton(this.hass, this._config, device, button, this));
   }
 
   /**
@@ -135,7 +150,7 @@ export class PolrAndroidTvRemoteCard extends LitElement {
     const doubleTap = actions?.double_tap_action;
 
     const run = (action: ActionConfig) => () => {
-      if (this.hass) void runAction(this, this.hass, action, config.entity);
+      if (this.hass) this._run(runAction(this, this.hass, action, config.entity));
     };
 
     return {
@@ -154,10 +169,7 @@ export class PolrAndroidTvRemoteCard extends LitElement {
   private _launch(app: AppConfig): void {
     const device = this._device;
     if (!this.hass || !device) return;
-    void runAppAction(this.hass, device, app.action).catch((error: Error) => {
-      // eslint-disable-next-line no-console
-      console.error(error);
-    });
+    this._run(runAppAction(this.hass, device, app.action));
   }
 
   private async _sendText(): Promise<void> {
@@ -361,7 +373,7 @@ export class PolrAndroidTvRemoteCard extends LitElement {
             this._text = (event.target as HTMLInputElement).value;
           }}
           @keydown=${(event: KeyboardEvent) => {
-            if (event.key === "Enter") void this._sendText();
+            if (event.key === "Enter") this._run(this._sendText());
           }}
         />
         <button
@@ -369,7 +381,7 @@ export class PolrAndroidTvRemoteCard extends LitElement {
           type="button"
           aria-label="Send text"
           ?disabled=${!this._text.trim() || this._sending}
-          @click=${() => void this._sendText()}
+          @click=${() => this._run(this._sendText())}
         >
           <ha-icon class=${this._sending ? "spin" : ""} icon="mdi:send"></ha-icon>
         </button>

@@ -7,7 +7,7 @@
  * understands, and anything written by hand behaves the way it does elsewhere.
  */
 
-import { fireEvent, showMoreInfo, type HomeAssistant } from "./kit/types";
+import { showMoreInfo, type HomeAssistant } from "./kit/types";
 
 export type ActionConfig =
   | { action: "none" }
@@ -46,6 +46,21 @@ export const isActionConfig = (value: unknown): value is ActionConfig =>
 /** Does this config do anything? Used to decide whether to wire a handler. */
 export const isActionable = (action: ActionConfig | undefined): boolean =>
   action !== undefined && action.action !== "none";
+
+/**
+ * Split "domain.service", refusing anything that is not exactly that.
+ *
+ * Destructuring `name.split(".")` looks equivalent but is not: "a.b.c" yields
+ * a and b, so a malformed name silently called a *different* service instead of
+ * being refused. Shared with atv.ts, which had the same shape.
+ */
+export const splitService = (name: string | undefined): [string, string] | null => {
+  const parts = (name ?? "").split(".");
+  if (parts.length !== 2) return null;
+  const [domain, service] = parts;
+  if (!domain || !service) return null;
+  return [domain, service];
+};
 
 /** Build the action a `{service, data, target}` override means. */
 export const serviceAction = (
@@ -108,12 +123,13 @@ export const runAction = (
     case "call-service": {
       const name =
         action.action === "perform-action" ? action.perform_action : action.service;
-      const [domain, service] = (name ?? "").split(".");
-      if (!domain || !service) {
+      const parts = splitService(name);
+      if (!parts) {
         return Promise.reject(
           new Error(`polr-android-tv-remote-card: invalid action "${name}"`),
         );
       }
+      const [domain, service] = parts;
       const data =
         action.action === "perform-action"
           ? action.data
@@ -122,7 +138,3 @@ export const runAction = (
     }
   }
 };
-
-/** Announce an interaction the way HA's own controls do. */
-export const fireHaptic = (node: HTMLElement, kind = "light"): void =>
-  fireEvent(node, "haptic", kind);

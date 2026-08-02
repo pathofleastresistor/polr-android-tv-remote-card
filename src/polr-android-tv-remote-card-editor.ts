@@ -21,6 +21,8 @@ import { isActionConfig } from "./actions";
 import { describeAction, resolvePlayer } from "./atv";
 import {
   BRANDS,
+  BRAND_IDS,
+  brandFor,
   normalizeConfig,
   stripLegacyKeys,
   type AppAction,
@@ -29,7 +31,7 @@ import {
   type PolrAtvRemoteCardConfig,
   type ResolvedConfig,
 } from "./config";
-import { BRAND_IDS, BRAND_LABELS, BRAND_LOGOS, brandFor } from "./icons";
+import { BRAND_LOGOS } from "./icons";
 import { tileStyles } from "./kit/styles";
 import { fireEvent, type HomeAssistant } from "./kit/types";
 
@@ -456,10 +458,10 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
                 (id) => html`
                   <button
                     class="chip ${app.icon === `brand:${id}` ? "accent" : ""}"
-                    title=${`Use the ${BRAND_LABELS[id]} logo`}
+                    title=${`Use the ${BRANDS[id].label} logo`}
                     @click=${() => this._updateApp(index, { icon: `brand:${id}` })}
                   >
-                    ${BRAND_LABELS[id]}
+                    ${BRANDS[id].label}
                   </button>
                 `,
               )}
@@ -618,7 +620,7 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
                           action: { action: "activity", activity: BRANDS[id].activity },
                         })}
                     >
-                      <ha-icon icon="mdi:plus"></ha-icon>${BRAND_LABELS[id]}
+                      <ha-icon icon="mdi:plus"></ha-icon>${BRANDS[id].label}
                     </button>
                   `,
                 )}

@@ -21,6 +21,12 @@ jobs:
       - run: npm test
       - run: npm run build
 
+      - name: No unreferenced exports
+        # tsc's noUnusedLocals cannot see across modules, so an export that
+        # loses its last caller stays compiling and shipping forever. This is
+        # how fireHaptic survived being replaced.
+        run: npm run lint:exports
+
       - name: Render the harness in a real browser
         # Catches what neither tsc nor node --test can: templates that parse
         # into the wrong shape, and getConfigElement returning an element that

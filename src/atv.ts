@@ -17,7 +17,7 @@
  *      the card renders a volume *bar* and not a slider.
  */
 
-import { isActionable, runAction, type ActionConfig } from "./actions";
+import { isActionable, runAction, splitService, type ActionConfig } from "./actions";
 import type { AppAction, ButtonId, ResolvedConfig, ServiceAction } from "./config";
 import type { HassEntity, HomeAssistant } from "./kit/types";
 
@@ -65,7 +65,7 @@ export const KEYS: Record<string, string> = {
 };
 
 /** Anything after this prefix is typed into the focused field on the TV. */
-export const TEXT_PREFIX = "text:";
+const TEXT_PREFIX = "text:";
 
 export interface DeviceState {
   remoteId: string;
@@ -211,13 +211,13 @@ const callService = (
   hass: HomeAssistant,
   action: ServiceAction,
 ): Promise<unknown> => {
-  const [domain, service] = action.service.split(".");
-  if (!domain || !service) {
+  const parts = splitService(action.service);
+  if (!parts) {
     return Promise.reject(
       new Error(`polr-android-tv-remote-card: invalid service "${action.service}"`),
     );
   }
-  return hass.callService(domain, service, action.data ?? {}, action.target);
+  return hass.callService(parts[0], parts[1], action.data ?? {}, action.target);
 };
 
 /** Send a raw key code to the remote entity. */

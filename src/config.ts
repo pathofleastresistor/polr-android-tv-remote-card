@@ -11,11 +11,12 @@
 import {
   isActionConfig,
   serviceAction,
+  splitService,
   type ActionConfig,
   type ButtonActions,
 } from "./actions";
 
-export const PAD_STYLES = ["buttons", "dpad", "touchpad"] as const;
+const PAD_STYLES = ["buttons", "dpad", "touchpad"] as const;
 export type PadStyle = (typeof PAD_STYLES)[number];
 
 export type BrandId =
@@ -74,10 +75,11 @@ const PRESS_SERVICE: Record<string, string> = {
 
 /** Turn a bare entity id into the service call that presses it. */
 export const entityAction = (entityId: string): ServiceAction | null => {
-  const domain = entityId.split(".")[0];
-  const service = domain ? PRESS_SERVICE[domain] : undefined;
-  if (!domain || !service) return null;
-  return { service: `${domain}.${service}`, target: { entity_id: entityId } };
+  const parts = splitService(entityId);
+  if (!parts) return null;
+  const service = PRESS_SERVICE[parts[0]];
+  if (!service) return null;
+  return { service: `${parts[0]}.${service}`, target: { entity_id: entityId } };
 };
 
 /** How an app tile launches. */
@@ -197,6 +199,26 @@ export const BRANDS: Record<BrandId, { label: string; activity: string }> = {
   netflix: { label: "Netflix", activity: "https://www.netflix.com/title" },
   prime: { label: "Prime Video", activity: "https://app.primevideo.com" },
   youtube: { label: "YouTube", activity: "https://www.youtube.com" },
+};
+
+/** Brand ids, in the order the editor offers them. */
+export const BRAND_IDS = Object.keys(BRANDS) as BrandId[];
+
+/**
+ * Match an app name reported by the TV to one of the bundled brands.
+ *
+ * Deliberately loose: `app_name` is whatever the TV feels like calling the app
+ * ("Disney+", "Prime Video"), so it is normalised to letters before comparing.
+ * Returns undefined when nothing matches, which is the common case.
+ *
+ * Lives here rather than beside the logos because it is pure string matching --
+ * keeping it out of the lit module means it can be tested without a DOM.
+ */
+export const brandFor = (name: string | undefined): BrandId | undefined => {
+  if (!name) return undefined;
+  const key = name.toLowerCase().replace(/[^a-z]/g, "");
+  if (!key) return undefined;
+  return BRAND_IDS.find((id) => key.includes(id) || id.includes(key));
 };
 
 /** v1 override key -> v2 ButtonId. Only three actually change name. */
