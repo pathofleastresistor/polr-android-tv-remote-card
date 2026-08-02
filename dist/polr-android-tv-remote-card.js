@@ -3103,7 +3103,8 @@ let z = class extends T {
                 ${e.show_text_input ? this._renderTextInput() : h}
                 ${e.show_apps ? this._renderApps() : h}
               ` : l`
-                <div class="empty-state">The TV is off.</div>
+                <!-- No "the TV is off" line: the header secondary already says
+                     Off, and the button says Turn on. -->
                 <div class="features">
                   <button
                     class="control-button accent wide"

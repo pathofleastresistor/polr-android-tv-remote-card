@@ -424,7 +424,8 @@ export class PolrAndroidTvRemoteCard extends LitElement {
           ? html`<div class="empty-state">This device is unavailable.</div>`
           : !device.on
             ? html`
-                <div class="empty-state">The TV is off.</div>
+                <!-- No "the TV is off" line: the header secondary already says
+                     Off, and the button says Turn on. -->
                 <div class="features">
                   <button
                     class="control-button accent wide"
