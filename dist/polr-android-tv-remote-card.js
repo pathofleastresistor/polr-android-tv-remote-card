@@ -2928,7 +2928,7 @@ var Ti = Object.defineProperty, Pi = Object.getOwnPropertyDescriptor, q = (e, t,
     (n = e[a]) && (r = (o ? n(t, i, r) : n(r)) || r);
   return o && r && Ti(t, i, r), r;
 };
-const Ci = "2.0.0-beta.1", at = "polr-android-tv-remote-card";
+const Ci = "2.0.0-beta.2", at = "polr-android-tv-remote-card";
 let O = class extends P {
   constructor() {
     super(...arguments), this._text = "", this._sending = !1;
