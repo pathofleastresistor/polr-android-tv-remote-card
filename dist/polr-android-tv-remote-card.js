@@ -23,11 +23,11 @@ let Xt = class {
   }
 };
 const me = (e) => new Xt(typeof e == "string" ? e : e + "", void 0, vt), _t = (e, ...t) => {
-  const o = e.length === 1 ? e[0] : t.reduce((i, r, n) => i + ((a) => {
-    if (a._$cssResult$ === !0) return a.cssText;
-    if (typeof a == "number") return a;
-    throw Error("Value passed to 'css' function must be a 'css' function result: " + a + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
-  })(r) + e[n + 1], e[0]);
+  const o = e.length === 1 ? e[0] : t.reduce((i, r, a) => i + ((n) => {
+    if (n._$cssResult$ === !0) return n.cssText;
+    if (typeof n == "number") return n;
+    throw Error("Value passed to 'css' function must be a 'css' function result: " + n + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
+  })(r) + e[a + 1], e[0]);
   return new Xt(o, e, vt);
 }, ve = (e, t) => {
   if (mt) e.adoptedStyleSheets = t.map((o) => o instanceof CSSStyleSheet ? o : o.styleSheet);
@@ -89,14 +89,14 @@ let R = class extends HTMLElement {
     }
   }
   static getPropertyDescriptor(t, o, i) {
-    const { get: r, set: n } = ge(this.prototype, t) ?? { get() {
+    const { get: r, set: a } = ge(this.prototype, t) ?? { get() {
       return this[o];
-    }, set(a) {
-      this[o] = a;
+    }, set(n) {
+      this[o] = n;
     } };
-    return { get: r, set(a) {
+    return { get: r, set(n) {
       const c = r?.call(this);
-      n?.call(this, a), this.requestUpdate(t, c, i);
+      a?.call(this, n), this.requestUpdate(t, c, i);
     }, configurable: !0, enumerable: !0 };
   }
   static getPropertyOptions(t) {
@@ -172,29 +172,29 @@ let R = class extends HTMLElement {
   _$ET(t, o) {
     const i = this.constructor.elementProperties.get(t), r = this.constructor._$Eu(t, i);
     if (r !== void 0 && i.reflect === !0) {
-      const n = (i.converter?.toAttribute !== void 0 ? i.converter : G).toAttribute(o, i.type);
-      this._$Em = t, n == null ? this.removeAttribute(r) : this.setAttribute(r, n), this._$Em = null;
+      const a = (i.converter?.toAttribute !== void 0 ? i.converter : G).toAttribute(o, i.type);
+      this._$Em = t, a == null ? this.removeAttribute(r) : this.setAttribute(r, a), this._$Em = null;
     }
   }
   _$AK(t, o) {
     const i = this.constructor, r = i._$Eh.get(t);
     if (r !== void 0 && this._$Em !== r) {
-      const n = i.getPropertyOptions(r), a = typeof n.converter == "function" ? { fromAttribute: n.converter } : n.converter?.fromAttribute !== void 0 ? n.converter : G;
+      const a = i.getPropertyOptions(r), n = typeof a.converter == "function" ? { fromAttribute: a.converter } : a.converter?.fromAttribute !== void 0 ? a.converter : G;
       this._$Em = r;
-      const c = a.fromAttribute(o, n.type);
+      const c = n.fromAttribute(o, a.type);
       this[r] = c ?? this._$Ej?.get(r) ?? c, this._$Em = null;
     }
   }
-  requestUpdate(t, o, i, r = !1, n) {
+  requestUpdate(t, o, i, r = !1, a) {
     if (t !== void 0) {
-      const a = this.constructor;
-      if (r === !1 && (n = this[t]), i ??= a.getPropertyOptions(t), !((i.hasChanged ?? ft)(n, o) || i.useDefault && i.reflect && n === this._$Ej?.get(t) && !this.hasAttribute(a._$Eu(t, i)))) return;
+      const n = this.constructor;
+      if (r === !1 && (a = this[t]), i ??= n.getPropertyOptions(t), !((i.hasChanged ?? ft)(a, o) || i.useDefault && i.reflect && a === this._$Ej?.get(t) && !this.hasAttribute(n._$Eu(t, i)))) return;
       this.C(t, o, i);
     }
     this.isUpdatePending === !1 && (this._$ES = this._$EP());
   }
-  C(t, o, { useDefault: i, reflect: r, wrapped: n }, a) {
-    i && !(this._$Ej ??= /* @__PURE__ */ new Map()).has(t) && (this._$Ej.set(t, a ?? o ?? this[t]), n !== !0 || a !== void 0) || (this._$AL.has(t) || (this.hasUpdated || i || (o = void 0), this._$AL.set(t, o)), r === !0 && this._$Em !== t && (this._$Eq ??= /* @__PURE__ */ new Set()).add(t));
+  C(t, o, { useDefault: i, reflect: r, wrapped: a }, n) {
+    i && !(this._$Ej ??= /* @__PURE__ */ new Map()).has(t) && (this._$Ej.set(t, n ?? o ?? this[t]), a !== !0 || n !== void 0) || (this._$AL.has(t) || (this.hasUpdated || i || (o = void 0), this._$AL.set(t, o)), r === !0 && this._$Em !== t && (this._$Eq ??= /* @__PURE__ */ new Set()).add(t));
   }
   async _$EP() {
     this.isUpdatePending = !0;
@@ -213,13 +213,13 @@ let R = class extends HTMLElement {
     if (!this.isUpdatePending) return;
     if (!this.hasUpdated) {
       if (this.renderRoot ??= this.createRenderRoot(), this._$Ep) {
-        for (const [r, n] of this._$Ep) this[r] = n;
+        for (const [r, a] of this._$Ep) this[r] = a;
         this._$Ep = void 0;
       }
       const i = this.constructor.elementProperties;
-      if (i.size > 0) for (const [r, n] of i) {
-        const { wrapped: a } = n, c = this[r];
-        a !== !0 || this._$AL.has(r) || c === void 0 || this.C(r, void 0, n, c);
+      if (i.size > 0) for (const [r, a] of i) {
+        const { wrapped: n } = a, c = this[r];
+        n !== !0 || this._$AL.has(r) || c === void 0 || this.C(r, void 0, a, c);
       }
     }
     let t = !1;
@@ -271,21 +271,21 @@ function te(e, t) {
 }
 const Se = (e, t) => {
   const o = e.length - 1, i = [];
-  let r, n = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", a = L;
+  let r, a = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", n = L;
   for (let c = 0; c < o; c++) {
     const s = e[c];
     let m, _, l = -1, h = 0;
-    for (; h < s.length && (a.lastIndex = h, _ = a.exec(s), _ !== null); ) h = a.lastIndex, a === L ? _[1] === "!--" ? a = Mt : _[1] !== void 0 ? a = zt : _[2] !== void 0 ? (Jt.test(_[2]) && (r = RegExp("</" + _[2], "g")), a = k) : _[3] !== void 0 && (a = k) : a === k ? _[0] === ">" ? (a = r ?? L, l = -1) : _[1] === void 0 ? l = -2 : (l = a.lastIndex - _[2].length, m = _[1], a = _[3] === void 0 ? k : _[3] === '"' ? Ut : Rt) : a === Ut || a === Rt ? a = k : a === Mt || a === zt ? a = L : (a = k, r = void 0);
-    const u = a === k && e[c + 1].startsWith("/>") ? " " : "";
-    n += a === L ? s + Ae : l >= 0 ? (i.push(m), s.slice(0, l) + Zt + s.slice(l) + A + u) : s + A + (l === -2 ? c : u);
+    for (; h < s.length && (n.lastIndex = h, _ = n.exec(s), _ !== null); ) h = n.lastIndex, n === L ? _[1] === "!--" ? n = Mt : _[1] !== void 0 ? n = zt : _[2] !== void 0 ? (Jt.test(_[2]) && (r = RegExp("</" + _[2], "g")), n = k) : _[3] !== void 0 && (n = k) : n === k ? _[0] === ">" ? (n = r ?? L, l = -1) : _[1] === void 0 ? l = -2 : (l = n.lastIndex - _[2].length, m = _[1], n = _[3] === void 0 ? k : _[3] === '"' ? Ut : Rt) : n === Ut || n === Rt ? n = k : n === Mt || n === zt ? n = L : (n = k, r = void 0);
+    const u = n === k && e[c + 1].startsWith("/>") ? " " : "";
+    a += n === L ? s + Ae : l >= 0 ? (i.push(m), s.slice(0, l) + Zt + s.slice(l) + A + u) : s + A + (l === -2 ? c : u);
   }
-  return [te(e, n + (e[o] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), i];
+  return [te(e, a + (e[o] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), i];
 };
 class Y {
   constructor({ strings: t, _$litType$: o }, i) {
     let r;
     this.parts = [];
-    let n = 0, a = 0;
+    let a = 0, n = 0;
     const c = t.length - 1, s = this.parts, [m, _] = Se(t, o);
     if (this.el = Y.createElement(m, i), T.currentNode = this.el.content, o === 2 || o === 3) {
       const l = this.el.content.firstChild;
@@ -294,23 +294,23 @@ class Y {
     for (; (r = T.nextNode()) !== null && s.length < c; ) {
       if (r.nodeType === 1) {
         if (r.hasAttributes()) for (const l of r.getAttributeNames()) if (l.endsWith(Zt)) {
-          const h = _[a++], u = r.getAttribute(l).split(A), v = /([.?@])?(.*)/.exec(h);
-          s.push({ type: 1, index: n, name: v[2], strings: u, ctor: v[1] === "." ? Pe : v[1] === "?" ? Ce : v[1] === "@" ? Oe : ot }), r.removeAttribute(l);
-        } else l.startsWith(A) && (s.push({ type: 6, index: n }), r.removeAttribute(l));
+          const h = _[n++], u = r.getAttribute(l).split(A), v = /([.?@])?(.*)/.exec(h);
+          s.push({ type: 1, index: a, name: v[2], strings: u, ctor: v[1] === "." ? Pe : v[1] === "?" ? Ce : v[1] === "@" ? Oe : ot }), r.removeAttribute(l);
+        } else l.startsWith(A) && (s.push({ type: 6, index: a }), r.removeAttribute(l));
         if (Jt.test(r.tagName)) {
           const l = r.textContent.split(A), h = l.length - 1;
           if (h > 0) {
             r.textContent = J ? J.emptyScript : "";
-            for (let u = 0; u < h; u++) r.append(l[u], W()), T.nextNode(), s.push({ type: 2, index: ++n });
+            for (let u = 0; u < h; u++) r.append(l[u], W()), T.nextNode(), s.push({ type: 2, index: ++a });
             r.append(l[h], W());
           }
         }
-      } else if (r.nodeType === 8) if (r.data === Gt) s.push({ type: 2, index: n });
+      } else if (r.nodeType === 8) if (r.data === Gt) s.push({ type: 2, index: a });
       else {
         let l = -1;
-        for (; (l = r.data.indexOf(A, l + 1)) !== -1; ) s.push({ type: 7, index: n }), l += A.length - 1;
+        for (; (l = r.data.indexOf(A, l + 1)) !== -1; ) s.push({ type: 7, index: a }), l += A.length - 1;
       }
-      n++;
+      a++;
     }
   }
   static createElement(t, o) {
@@ -321,8 +321,8 @@ class Y {
 function N(e, t, o = e, i) {
   if (t === $) return t;
   let r = i !== void 0 ? o._$Co?.[i] : o._$Cl;
-  const n = q(t) ? void 0 : t._$litDirective$;
-  return r?.constructor !== n && (r?._$AO?.(!1), n === void 0 ? r = void 0 : (r = new n(e), r._$AT(e, o, i)), i !== void 0 ? (o._$Co ??= [])[i] = r : o._$Cl = r), r !== void 0 && (t = N(e, r._$AS(e, t.values), r, i)), t;
+  const a = q(t) ? void 0 : t._$litDirective$;
+  return r?.constructor !== a && (r?._$AO?.(!1), a === void 0 ? r = void 0 : (r = new a(e), r._$AT(e, o, i)), i !== void 0 ? (o._$Co ??= [])[i] = r : o._$Cl = r), r !== void 0 && (t = N(e, r._$AS(e, t.values), r, i)), t;
 }
 class Te {
   constructor(t, o) {
@@ -337,13 +337,13 @@ class Te {
   u(t) {
     const { el: { content: o }, parts: i } = this._$AD, r = (t?.creationScope ?? C).importNode(o, !0);
     T.currentNode = r;
-    let n = T.nextNode(), a = 0, c = 0, s = i[0];
+    let a = T.nextNode(), n = 0, c = 0, s = i[0];
     for (; s !== void 0; ) {
-      if (a === s.index) {
+      if (n === s.index) {
         let m;
-        s.type === 2 ? m = new I(n, n.nextSibling, this, t) : s.type === 1 ? m = new s.ctor(n, s.name, s.strings, this, t) : s.type === 6 && (m = new Me(n, this, t)), this._$AV.push(m), s = i[++c];
+        s.type === 2 ? m = new I(a, a.nextSibling, this, t) : s.type === 1 ? m = new s.ctor(a, s.name, s.strings, this, t) : s.type === 6 && (m = new Me(a, this, t)), this._$AV.push(m), s = i[++c];
       }
-      a !== s?.index && (n = T.nextNode(), a++);
+      n !== s?.index && (a = T.nextNode(), n++);
     }
     return T.currentNode = C, r;
   }
@@ -386,8 +386,8 @@ class I {
     const { values: o, _$litType$: i } = t, r = typeof i == "number" ? this._$AC(t) : (i.el === void 0 && (i.el = Y.createElement(te(i.h, i.h[0]), this.options)), i);
     if (this._$AH?._$AD === r) this._$AH.p(o);
     else {
-      const n = new Te(r, this), a = n.u(this.options);
-      n.p(o), this.T(a), this._$AH = n;
+      const a = new Te(r, this), n = a.u(this.options);
+      a.p(o), this.T(n), this._$AH = a;
     }
   }
   _$AC(t) {
@@ -398,7 +398,7 @@ class I {
     bt(this._$AH) || (this._$AH = [], this._$AR());
     const o = this._$AH;
     let i, r = 0;
-    for (const n of t) r === o.length ? o.push(i = new I(this.O(W()), this.O(W()), this, this.options)) : i = o[r], i._$AI(n), r++;
+    for (const a of t) r === o.length ? o.push(i = new I(this.O(W()), this.O(W()), this, this.options)) : i = o[r], i._$AI(a), r++;
     r < o.length && (this._$AR(i && i._$AB.nextSibling, r), o.length = r);
   }
   _$AR(t = this._$AA.nextSibling, o) {
@@ -418,19 +418,19 @@ class ot {
   get _$AU() {
     return this._$AM._$AU;
   }
-  constructor(t, o, i, r, n) {
-    this.type = 1, this._$AH = d, this._$AN = void 0, this.element = t, this.name = o, this._$AM = r, this.options = n, i.length > 2 || i[0] !== "" || i[1] !== "" ? (this._$AH = Array(i.length - 1).fill(new String()), this.strings = i) : this._$AH = d;
+  constructor(t, o, i, r, a) {
+    this.type = 1, this._$AH = d, this._$AN = void 0, this.element = t, this.name = o, this._$AM = r, this.options = a, i.length > 2 || i[0] !== "" || i[1] !== "" ? (this._$AH = Array(i.length - 1).fill(new String()), this.strings = i) : this._$AH = d;
   }
   _$AI(t, o = this, i, r) {
-    const n = this.strings;
-    let a = !1;
-    if (n === void 0) t = N(this, t, o, 0), a = !q(t) || t !== this._$AH && t !== $, a && (this._$AH = t);
+    const a = this.strings;
+    let n = !1;
+    if (a === void 0) t = N(this, t, o, 0), n = !q(t) || t !== this._$AH && t !== $, n && (this._$AH = t);
     else {
       const c = t;
       let s, m;
-      for (t = n[0], s = 0; s < n.length - 1; s++) m = N(this, c[i + s], o, s), m === $ && (m = this._$AH[s]), a ||= !q(m) || m !== this._$AH[s], m === d ? t = d : t !== d && (t += (m ?? "") + n[s + 1]), this._$AH[s] = m;
+      for (t = a[0], s = 0; s < a.length - 1; s++) m = N(this, c[i + s], o, s), m === $ && (m = this._$AH[s]), n ||= !q(m) || m !== this._$AH[s], m === d ? t = d : t !== d && (t += (m ?? "") + a[s + 1]), this._$AH[s] = m;
     }
-    a && !r && this.j(t);
+    n && !r && this.j(t);
   }
   j(t) {
     t === d ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, t ?? "");
@@ -453,13 +453,13 @@ class Ce extends ot {
   }
 }
 class Oe extends ot {
-  constructor(t, o, i, r, n) {
-    super(t, o, i, r, n), this.type = 5;
+  constructor(t, o, i, r, a) {
+    super(t, o, i, r, a), this.type = 5;
   }
   _$AI(t, o = this) {
     if ((t = N(this, t, o, 0) ?? d) === $) return;
-    const i = this._$AH, r = t === d && i !== d || t.capture !== i.capture || t.once !== i.once || t.passive !== i.passive, n = t !== d && (i === d || r);
-    r && this.element.removeEventListener(this.name, this, i), n && this.element.addEventListener(this.name, this, t), this._$AH = t;
+    const i = this._$AH, r = t === d && i !== d || t.capture !== i.capture || t.once !== i.once || t.passive !== i.passive, a = t !== d && (i === d || r);
+    r && this.element.removeEventListener(this.name, this, i), a && this.element.addEventListener(this.name, this, t), this._$AH = t;
   }
   handleEvent(t) {
     typeof this._$AH == "function" ? this._$AH.call(this.options?.host ?? this.element, t) : this._$AH.handleEvent(t);
@@ -482,8 +482,8 @@ const Ue = (e, t, o) => {
   const i = o?.renderBefore ?? t;
   let r = i._$litPart$;
   if (r === void 0) {
-    const n = o?.renderBefore ?? null;
-    i._$litPart$ = r = new I(t.insertBefore(W(), n), n, void 0, o ?? {});
+    const a = o?.renderBefore ?? null;
+    i._$litPart$ = r = new I(t.insertBefore(W(), a), a, void 0, o ?? {});
   }
   return r._$AI(e), r;
 };
@@ -536,29 +536,29 @@ const $t = (e) => (t, o) => {
  */
 const Ne = { attribute: !0, type: String, converter: G, reflect: !1, hasChanged: ft }, Ie = (e = Ne, t, o) => {
   const { kind: i, metadata: r } = o;
-  let n = globalThis.litPropertyMetadata.get(r);
-  if (n === void 0 && globalThis.litPropertyMetadata.set(r, n = /* @__PURE__ */ new Map()), i === "setter" && ((e = Object.create(e)).wrapped = !0), n.set(o.name, e), i === "accessor") {
-    const { name: a } = o;
+  let a = globalThis.litPropertyMetadata.get(r);
+  if (a === void 0 && globalThis.litPropertyMetadata.set(r, a = /* @__PURE__ */ new Map()), i === "setter" && ((e = Object.create(e)).wrapped = !0), a.set(o.name, e), i === "accessor") {
+    const { name: n } = o;
     return { set(c) {
       const s = t.get.call(this);
-      t.set.call(this, c), this.requestUpdate(a, s, e, !0, c);
+      t.set.call(this, c), this.requestUpdate(n, s, e, !0, c);
     }, init(c) {
-      return c !== void 0 && this.C(a, void 0, e, c), c;
+      return c !== void 0 && this.C(n, void 0, e, c), c;
     } };
   }
   if (i === "setter") {
-    const { name: a } = o;
+    const { name: n } = o;
     return function(c) {
-      const s = this[a];
-      t.call(this, c), this.requestUpdate(a, s, e, !0, c);
+      const s = this[n];
+      t.call(this, c), this.requestUpdate(n, s, e, !0, c);
     };
   }
   throw Error("Unsupported decorator location: " + i);
 };
 function H(e) {
-  return (t, o) => typeof o == "object" ? Ie(e, t, o) : ((i, r, n) => {
-    const a = r.hasOwnProperty(n);
-    return r.constructor.createProperty(n, i), a ? Object.getOwnPropertyDescriptor(r, n) : void 0;
+  return (t, o) => typeof o == "object" ? Ie(e, t, o) : ((i, r, a) => {
+    const n = r.hasOwnProperty(a);
+    return r.constructor.createProperty(a, i), n ? Object.getOwnPropertyDescriptor(r, a) : void 0;
   })(e, t, o);
 }
 /**
@@ -582,9 +582,9 @@ const He = (e, t, o) => (o.configurable = !0, o.enumerable = !0, Reflect.decorat
  */
 function ee(e, t) {
   return (o, i, r) => {
-    const n = (a) => a.renderRoot?.querySelector(e) ?? null;
+    const a = (n) => n.renderRoot?.querySelector(e) ?? null;
     return He(o, i, { get() {
-      return n(this);
+      return a(this);
     } });
   };
 }
@@ -618,17 +618,17 @@ let ie = class {
 const { I: Ve } = ze, Nt = (e) => e, Le = (e) => e.strings === void 0, It = () => document.createComment(""), j = (e, t, o) => {
   const i = e._$AA.parentNode, r = t === void 0 ? e._$AB : t._$AA;
   if (o === void 0) {
-    const n = i.insertBefore(It(), r), a = i.insertBefore(It(), r);
-    o = new Ve(n, a, e, e.options);
+    const a = i.insertBefore(It(), r), n = i.insertBefore(It(), r);
+    o = new Ve(a, n, e, e.options);
   } else {
-    const n = o._$AB.nextSibling, a = o._$AM, c = a !== e;
+    const a = o._$AB.nextSibling, n = o._$AM, c = n !== e;
     if (c) {
       let s;
-      o._$AQ?.(e), o._$AM = e, o._$AP !== void 0 && (s = e._$AU) !== a._$AU && o._$AP(s);
+      o._$AQ?.(e), o._$AM = e, o._$AP !== void 0 && (s = e._$AU) !== n._$AU && o._$AP(s);
     }
-    if (n !== r || c) {
+    if (a !== r || c) {
       let s = o._$AA;
-      for (; s !== n; ) {
+      for (; s !== a; ) {
         const m = Nt(s).nextSibling;
         Nt(i).insertBefore(s, r), s = m;
       }
@@ -654,43 +654,43 @@ const Ht = (e, t, o) => {
   dt(e, t, o) {
     let i;
     o === void 0 ? o = t : t !== void 0 && (i = t);
-    const r = [], n = [];
-    let a = 0;
-    for (const c of e) r[a] = i ? i(c, a) : a, n[a] = o(c, a), a++;
-    return { values: n, keys: r };
+    const r = [], a = [];
+    let n = 0;
+    for (const c of e) r[n] = i ? i(c, n) : n, a[n] = o(c, n), n++;
+    return { values: a, keys: r };
   }
   render(e, t, o) {
     return this.dt(e, t, o).values;
   }
   update(e, [t, o, i]) {
-    const r = Ke(e), { values: n, keys: a } = this.dt(t, o, i);
-    if (!Array.isArray(r)) return this.ut = a, n;
+    const r = Ke(e), { values: a, keys: n } = this.dt(t, o, i);
+    if (!Array.isArray(r)) return this.ut = n, a;
     const c = this.ut ??= [], s = [];
-    let m, _, l = 0, h = r.length - 1, u = 0, v = n.length - 1;
+    let m, _, l = 0, h = r.length - 1, u = 0, v = a.length - 1;
     for (; l <= h && u <= v; ) if (r[l] === null) l++;
     else if (r[h] === null) h--;
-    else if (c[l] === a[u]) s[u] = E(r[l], n[u]), l++, u++;
-    else if (c[h] === a[v]) s[v] = E(r[h], n[v]), h--, v--;
-    else if (c[l] === a[v]) s[v] = E(r[l], n[v]), j(e, s[v + 1], r[l]), l++, v--;
-    else if (c[h] === a[u]) s[u] = E(r[h], n[u]), j(e, r[l], r[h]), h--, u++;
-    else if (m === void 0 && (m = Ht(a, u, v), _ = Ht(c, l, h)), m.has(c[l])) if (m.has(c[h])) {
-      const b = _.get(a[u]), at = b !== void 0 ? r[b] : null;
-      if (at === null) {
+    else if (c[l] === n[u]) s[u] = E(r[l], a[u]), l++, u++;
+    else if (c[h] === n[v]) s[v] = E(r[h], a[v]), h--, v--;
+    else if (c[l] === n[v]) s[v] = E(r[l], a[v]), j(e, s[v + 1], r[l]), l++, v--;
+    else if (c[h] === n[u]) s[u] = E(r[h], a[u]), j(e, r[l], r[h]), h--, u++;
+    else if (m === void 0 && (m = Ht(n, u, v), _ = Ht(c, l, h)), m.has(c[l])) if (m.has(c[h])) {
+      const b = _.get(n[u]), nt = b !== void 0 ? r[b] : null;
+      if (nt === null) {
         const kt = j(e, r[l]);
-        E(kt, n[u]), s[u] = kt;
-      } else s[u] = E(at, n[u]), j(e, r[l], at), r[b] = null;
+        E(kt, a[u]), s[u] = kt;
+      } else s[u] = E(nt, a[u]), j(e, r[l], nt), r[b] = null;
       u++;
     } else ct(r[h]), h--;
     else ct(r[l]), l++;
     for (; u <= v; ) {
       const b = j(e, s[v + 1]);
-      E(b, n[u]), s[u++] = b;
+      E(b, a[u]), s[u++] = b;
     }
     for (; l <= h; ) {
       const b = r[l++];
       b !== null && ct(b);
     }
-    return this.ut = a, Be(e, s), $;
+    return this.ut = n, Be(e, s), $;
   }
 }), it = (e, t, o) => {
   e.dispatchEvent(
@@ -701,7 +701,7 @@ const Ht = (e, t, o) => {
   perform_action: e,
   ...t ? { data: t } : {},
   ...o ? { target: o } : {}
-}), ne = (e, t, o, i) => {
+}), ae = (e, t, o, i) => {
   switch (o.action) {
     case "none":
       return Promise.resolve();
@@ -721,13 +721,13 @@ const Ht = (e, t, o) => {
       return window.open(o.url_path, "_blank", "noreferrer"), Promise.resolve();
     case "perform-action":
     case "call-service": {
-      const r = o.action === "perform-action" ? o.perform_action : o.service, [n, a] = (r ?? "").split(".");
-      if (!n || !a)
+      const r = o.action === "perform-action" ? o.perform_action : o.service, [a, n] = (r ?? "").split(".");
+      if (!a || !n)
         return Promise.reject(
           new Error(`polr-android-tv-remote-card: invalid action "${r}"`)
         );
       const c = o.action === "perform-action" ? o.data : o.data ?? o.service_data;
-      return t.callService(n, a, c ?? {}, o.target);
+      return t.callService(a, n, c ?? {}, o.target);
     }
   }
 }, y = {
@@ -759,7 +759,7 @@ const Ht = (e, t, o) => {
   // position, which a TV cannot report. These are always key codes.
   rewind: "MEDIA_REWIND",
   fast_forward: "MEDIA_FAST_FORWARD"
-}, Xe = "text:", ae = (e, t) => {
+}, Xe = "text:", ne = (e, t) => {
   if (t.media_player_entity) return t.media_player_entity;
   const o = e.entities?.[t.entity]?.device_id;
   if (!o) return null;
@@ -768,7 +768,7 @@ const Ht = (e, t, o) => {
       return i.entity_id;
   return null;
 }, lt = (e) => e === void 0 || e.state === "unavailable" || e.state === "unknown", Ze = (e, t) => {
-  const o = e.states?.[t.entity], i = ae(e, t), r = i ? e.states?.[i] : void 0, n = r?.attributes ?? {}, a = o?.attributes ?? {}, c = t.volume_entity ?? i, m = (t.volume_entity && t.volume_entity !== i ? e.states?.[t.volume_entity] : r)?.attributes ?? {}, _ = r && !lt(r) ? r.state !== "off" : o?.state === "on";
+  const o = e.states?.[t.entity], i = ne(e, t), r = i ? e.states?.[i] : void 0, a = r?.attributes ?? {}, n = o?.attributes ?? {}, c = t.volume_entity ?? i, m = (t.volume_entity && t.volume_entity !== i ? e.states?.[t.volume_entity] : r)?.attributes ?? {}, _ = r && !lt(r) ? r.state !== "off" : o?.state === "on";
   return {
     remoteId: t.entity,
     playerId: i,
@@ -777,16 +777,16 @@ const Ht = (e, t, o) => {
     found: o !== void 0,
     available: !lt(o) && (r === void 0 || !lt(r)),
     on: _,
-    name: t.name ?? a.friendly_name ?? t.entity,
+    name: t.name ?? n.friendly_name ?? t.entity,
     // app_name is all the real integration provides; `source` covers a player
     // from another integration pointed at by media_player_entity.
-    appName: n.app_name ?? n.source ?? a.current_activity,
-    appId: n.app_id,
+    appName: a.app_name ?? a.source ?? n.current_activity,
+    appId: a.app_id,
     // Never set by androidtv_remote. Present only for other players.
-    mediaTitle: n.media_title,
-    picture: n.entity_picture,
+    mediaTitle: a.media_title,
+    picture: a.entity_picture,
     playing: r?.state === "playing",
-    features: n.supported_features ?? 0,
+    features: a.supported_features ?? 0,
     volumeId: c,
     volumeFeatures: m.supported_features ?? 0,
     volume: typeof m.volume_level == "number" ? m.volume_level : void 0,
@@ -801,36 +801,36 @@ const Ht = (e, t, o) => {
   entity_id: t.remoteId,
   command: o
 }), Je = (e, t, o) => xt(e, t, `${Xe}${o}`), Qe = (e, t, o, i, r) => {
-  const n = t.overrides[i]?.tap_action;
-  if (dt(n) && r)
-    return ne(r, e, n, o.remoteId);
-  if (n && n.action === "none") return Promise.resolve();
-  const a = o.playerId;
+  const a = t.overrides[i]?.tap_action;
+  if (dt(a) && r)
+    return ae(r, e, a, o.remoteId);
+  if (a && a.action === "none") return Promise.resolve();
+  const n = o.playerId;
   switch (i) {
     case "power":
-      return a && U(o, o.on ? y.TURN_OFF : y.TURN_ON) ? e.callService(
+      return n && U(o, o.on ? y.TURN_OFF : y.TURN_ON) ? e.callService(
         "media_player",
         o.on ? "turn_off" : "turn_on",
-        { entity_id: a }
+        { entity_id: n }
       ) : e.callService("remote", o.on ? "turn_off" : "turn_on", {
         entity_id: o.remoteId
       });
     case "play_pause":
-      if (a && U(o, y.PAUSE))
+      if (n && U(o, y.PAUSE))
         return e.callService("media_player", "media_play_pause", {
-          entity_id: a
+          entity_id: n
         });
       break;
     case "next":
-      if (a && U(o, y.NEXT_TRACK))
+      if (n && U(o, y.NEXT_TRACK))
         return e.callService("media_player", "media_next_track", {
-          entity_id: a
+          entity_id: n
         });
       break;
     case "previous":
-      if (a && U(o, y.PREVIOUS_TRACK))
+      if (n && U(o, y.PREVIOUS_TRACK))
         return e.callService("media_player", "media_previous_track", {
-          entity_id: a
+          entity_id: n
         });
       break;
     case "volume_up":
@@ -936,7 +936,7 @@ const Ht = (e, t, o) => {
   showVolume: "show_volume",
   showMedia: "show_transport",
   showURLSearch: "show_text_input"
-}, no = {
+}, ao = {
   default: "buttons",
   touch: "touchpad",
   dpad: "dpad"
@@ -975,7 +975,7 @@ const Ht = (e, t, o) => {
 let Kt = /* @__PURE__ */ new Set();
 const D = (e) => {
   Kt.has(e) || (Kt.add(e), console.warn(`polr-android-tv-remote-card: ${e}`));
-}, ao = (e) => {
+}, no = (e) => {
   if (typeof e == "string") {
     const r = ht[e];
     return r ? {
@@ -1016,25 +1016,25 @@ const D = (e) => {
   const t = typeof e.entity == "string" ? e.entity : typeof e.entity_id == "string" ? e.entity_id : void 0;
   if (!t)
     throw new Error("polr-android-tv-remote-card: 'entity' is required");
-  const o = typeof e.remote == "string" ? no[e.remote] : void 0;
+  const o = typeof e.remote == "string" ? ao[e.remote] : void 0;
   typeof e.remote == "string" && !o && D(`unknown remote style "${e.remote}" — falling back to ${f.pad}`);
-  const i = oo.includes(e.pad) ? e.pad : o ?? f.pad, r = typeof e.volume == "boolean" ? e.volume : void 0, n = {};
+  const i = oo.includes(e.pad) ? e.pad : o ?? f.pad, r = typeof e.volume == "boolean" ? e.volume : void 0, a = {};
   if (g(e.overrides))
     for (const [h, u] of Object.entries(e.overrides)) {
       const v = Bt(u, h);
-      v && (n[h] = v);
+      v && (a[h] = v);
     }
   for (const [h, u] of Object.entries(se)) {
-    if (n[u]) continue;
+    if (a[u]) continue;
     const v = Bt(e[h], h);
-    v && (n[u] = v);
+    v && (a[u] = v);
   }
-  const a = {};
+  const n = {};
   for (const [h, u] of Object.entries(ce))
-    typeof e[h] == "boolean" && (a[u] = e[h]);
+    typeof e[h] == "boolean" && (n[u] = e[h]);
   const c = Array.isArray(e.transport_buttons) ? e.transport_buttons : Array.isArray(e.media_controls) ? e.media_controls : void 0, s = c ? c.filter(
     (h) => typeof h == "string" && f.transport_buttons.includes(h)
-  ) : f.transport_buttons, _ = (Array.isArray(e.apps) ? e.apps : []).map(ao).filter((h) => h !== null), l = (h, u) => h === void 0 ? u : h;
+  ) : f.transport_buttons, _ = (Array.isArray(e.apps) ? e.apps : []).map(no).filter((h) => h !== null), l = (h, u) => h === void 0 ? u : h;
   return {
     ...e,
     type: e.type,
@@ -1044,26 +1044,26 @@ const D = (e) => {
     ...typeof e.name == "string" ? { name: e.name } : {},
     show_header: l(e.show_header, f.show_header),
     show_power: l(e.show_power, f.show_power),
-    show_nav: l(e.show_nav, a.show_nav ?? f.show_nav),
+    show_nav: l(e.show_nav, n.show_nav ?? f.show_nav),
     pad: i,
-    show_transport: l(e.show_transport, a.show_transport ?? f.show_transport),
+    show_transport: l(e.show_transport, n.show_transport ?? f.show_transport),
     transport_buttons: s,
-    show_volume: l(e.show_volume, a.show_volume ?? r ?? f.show_volume),
+    show_volume: l(e.show_volume, n.show_volume ?? r ?? f.show_volume),
     show_text_input: l(
       e.show_text_input,
-      a.show_text_input ?? f.show_text_input
+      n.show_text_input ?? f.show_text_input
     ),
-    show_apps: l(e.show_apps, a.show_apps ?? f.show_apps),
+    show_apps: l(e.show_apps, n.show_apps ?? f.show_apps),
     show_section_labels: l(e.show_section_labels, f.show_section_labels),
     // v1 always drew a favourite button on the default pad, and threw when it
     // had no override to call. Draw it only when it does something.
-    show_favorite: n.favorite !== void 0,
+    show_favorite: a.favorite !== void 0,
     apps: _,
     // "auto" was the v2-beta spelling, before the tiles became fixed-width.
     app_columns: typeof e.app_columns == "number" && e.app_columns > 0 ? e.app_columns : f.app_columns,
     hold_repeat: l(e.hold_repeat, f.hold_repeat),
     haptics: l(e.haptics, f.haptics),
-    overrides: n
+    overrides: a
   };
 }, so = (e) => {
   const t = /* @__PURE__ */ new Set([
@@ -1146,7 +1146,7 @@ function co(e) {
 }
 function lo(e, t = !1, o = 0) {
   const i = this._$AH, r = this._$AN;
-  if (r !== void 0 && r.size !== 0) if (t) if (Array.isArray(i)) for (let n = o; n < i.length; n++) F(i[n], !1), tt(i[n]);
+  if (r !== void 0 && r.size !== 0) if (t) if (Array.isArray(i)) for (let a = o; a < i.length; a++) F(i[a], !1), tt(i[a]);
   else i != null && (F(i, !1), tt(i));
   else F(this, e);
 }
@@ -2211,8 +2211,8 @@ const S = oe(go), ue = _t`
   }
 `;
 var bo = Object.defineProperty, yo = Object.getOwnPropertyDescriptor, M = (e, t, o, i) => {
-  for (var r = i > 1 ? void 0 : i ? yo(t, o) : t, n = e.length - 1, a; n >= 0; n--)
-    (a = e[n]) && (r = (i ? a(t, o, r) : a(r)) || r);
+  for (var r = i > 1 ? void 0 : i ? yo(t, o) : t, a = e.length - 1, n; a >= 0; a--)
+    (n = e[a]) && (r = (i ? n(t, o, r) : n(r)) || r);
   return i && r && bo(t, o, r), r;
 };
 const Ft = 0.06, $o = {
@@ -2368,8 +2368,8 @@ w = M([
   $t("polr-atv-nav-pad")
 ], w);
 var wo = Object.defineProperty, xo = Object.getOwnPropertyDescriptor, rt = (e, t, o, i) => {
-  for (var r = i > 1 ? void 0 : i ? xo(t, o) : t, n = e.length - 1, a; n >= 0; n--)
-    (a = e[n]) && (r = (i ? a(t, o, r) : a(r)) || r);
+  for (var r = i > 1 ? void 0 : i ? xo(t, o) : t, a = e.length - 1, n; a >= 0; a--)
+    (n = e[a]) && (r = (i ? n(t, o, r) : n(r)) || r);
   return i && r && wo(t, o, r), r;
 };
 const Wt = [
@@ -2506,10 +2506,10 @@ let x = class extends P {
     e.stopPropagation();
     const t = { ...e.detail.value }, o = { ...this._config.overrides };
     for (const i of x.VOLUME_BUTTONS) {
-      const r = `${i}_action`, n = t[r];
+      const r = `${i}_action`, a = t[r];
       delete t[r];
-      const a = { ...this._config.overrides[i] ?? {} };
-      B(n) && n.action !== "none" ? o[i] = { ...a, tap_action: n } : (delete a.tap_action, Object.keys(a).length ? o[i] = a : delete o[i]);
+      const n = { ...this._config.overrides[i] ?? {} };
+      B(a) && a.action !== "none" ? o[i] = { ...n, tap_action: a } : (delete n.tap_action, Object.keys(n).length ? o[i] = n : delete o[i]);
     }
     this._emit({
       ...this._config,
@@ -2689,14 +2689,14 @@ let x = class extends P {
    * package id, which is otherwise tedious to find.
    */
   _renderCurrentApp() {
-    const e = this._config, t = ae(this.hass, e), o = t ? this.hass.states?.[t] : void 0, i = o?.attributes?.app_id, r = o?.attributes?.app_name;
+    const e = this._config, t = ne(this.hass, e), o = t ? this.hass.states?.[t] : void 0, i = o?.attributes?.app_id, r = o?.attributes?.app_name;
     if (!i) return d;
-    const n = e.apps.some(
-      (a) => a.action.action === "app" && a.action.app_id === i
+    const a = e.apps.some(
+      (n) => n.action.action === "app" && n.action.app_id === i
     );
     return p`
       <div class="section-head"><span class="grow">Playing right now</span></div>
-      ${n ? p`<div class="hint">${r ?? i} is already in the list.</div>` : p`
+      ${a ? p`<div class="hint">${r ?? i} is already in the list.</div>` : p`
             <div class="chips">
               <button
                 class="chip accent"
@@ -2884,17 +2884,17 @@ const qt = (e) => {
   return t ? `brand:${t}` : "mdi:application";
 };
 var To = Object.defineProperty, Po = Object.getOwnPropertyDescriptor, X = (e, t, o, i) => {
-  for (var r = i > 1 ? void 0 : i ? Po(t, o) : t, n = e.length - 1, a; n >= 0; n--)
-    (a = e[n]) && (r = (i ? a(t, o, r) : a(r)) || r);
+  for (var r = i > 1 ? void 0 : i ? Po(t, o) : t, a = e.length - 1, n; a >= 0; a--)
+    (n = e[a]) && (r = (i ? n(t, o, r) : n(r)) || r);
   return i && r && To(t, o, r), r;
 };
-const Co = "2.0.0", nt = "polr-android-tv-remote-card";
+const Co = "2.0.0-beta.1", at = "polr-android-tv-remote-card";
 let O = class extends P {
   constructor() {
     super(...arguments), this._text = "", this._sending = !1;
   }
   static getConfigElement() {
-    return document.createElement(`${nt}-editor`);
+    return document.createElement(`${at}-editor`);
   }
   /**
    * Pick a real remote off the user's system.
@@ -2941,13 +2941,13 @@ let O = class extends P {
    * handler replaces hold-to-repeat, so neither should exist by default.
    */
   _pressOptions(e, t = {}) {
-    const o = this._config, i = o.overrides[e], r = i?.hold_action, n = i?.double_tap_action, a = (c) => () => {
-      this.hass && ne(this, this.hass, c, o.entity);
+    const o = this._config, i = o.overrides[e], r = i?.hold_action, a = i?.double_tap_action, n = (c) => () => {
+      this.hass && ae(this, this.hass, c, o.entity);
     };
     return {
       onPress: () => this._press(e),
-      ...dt(r) ? { onHold: a(r) } : {},
-      ...dt(n) ? { onDoubleTap: a(n) } : {},
+      ...dt(r) ? { onHold: n(r) } : {},
+      ...dt(a) ? { onDoubleTap: n(a) } : {},
       repeat: t.repeat && o.hold_repeat,
       haptics: o.haptics
     };
@@ -3043,7 +3043,7 @@ let O = class extends P {
    * codes work regardless — it is only the *player* route that needs the bit.
    */
   _renderTransport(e) {
-    const t = e.playerId === null, o = t || U(e, y.PREVIOUS_TRACK), i = t || U(e, y.NEXT_TRACK), r = new Set(this._config.transport_buttons), n = [
+    const t = e.playerId === null, o = t || U(e, y.PREVIOUS_TRACK), i = t || U(e, y.NEXT_TRACK), r = new Set(this._config.transport_buttons), a = [
       r.has("previous") && o ? this._button("previous", "mdi:skip-previous", "Previous") : d,
       r.has("rewind") ? this._button("rewind", "mdi:rewind", "Rewind", { repeat: !0 }) : d,
       r.has("play_pause") ? this._button(
@@ -3054,7 +3054,7 @@ let O = class extends P {
       r.has("fast_forward") ? this._button("fast_forward", "mdi:fast-forward", "Fast forward", { repeat: !0 }) : d,
       r.has("next") && i ? this._button("next", "mdi:skip-next", "Next") : d
     ];
-    return p`<div class="features">${n}</div>`;
+    return p`<div class="features">${a}</div>`;
   }
   /**
    * Volume.
@@ -3222,17 +3222,17 @@ X([
   V()
 ], O.prototype, "_sending", 2);
 O = X([
-  $t(nt)
+  $t(at)
 ], O);
 window.customCards = window.customCards ?? [];
 window.customCards.push({
-  type: nt,
+  type: at,
   name: "Android TV Remote",
   description: "A remote for the Android TV Remote integration, with live state and an app launcher.",
   preview: !0,
   documentationURL: "https://github.com/pathofleastresistor/polr-android-tv-remote-card"
 });
-console.info(`%c ${nt} %c ${Co} `, "background:#555;color:#fff", "background:#3f51b5;color:#fff");
+console.info(`%c ${at} %c ${Co} `, "background:#555;color:#fff", "background:#3f51b5;color:#fff");
 export {
   Co as CARD_VERSION,
   O as PolrAndroidTvRemoteCard

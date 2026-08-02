@@ -2,7 +2,9 @@ name: Release
 
 on:
   push:
-    tags: ["v*"]
+    # This repo's existing tags are bare versions (0.0.5), not v-prefixed.
+    # Accept both so neither convention silently fails to publish.
+    tags: ["v[0-9]*", "[0-9]*"]
   workflow_dispatch:
 
 permissions:
@@ -48,3 +50,8 @@ jobs:
         with:
           files: dist/polr-android-tv-remote-card.js
           generate_release_notes: true
+          # HACS hides GitHub pre-releases unless a user opts into betas, and it
+          # keys off this flag, not the tag name. Any tag with a pre-release
+          # suffix (2.0.0-beta.1) must therefore be marked, or every existing
+          # installation is offered it as a normal update.
+          prerelease: ${{ contains(github.ref_name, '-') }}
