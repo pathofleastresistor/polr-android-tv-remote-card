@@ -364,6 +364,22 @@ export const normalizeConfig = (raw: PolrAtvRemoteCardConfig): ResolvedConfig =>
   };
 };
 
+/** Widest row the app grid will use before it wraps. */
+const MAX_APP_COLUMNS = 5;
+
+/**
+ * Choose a column count that fills every row evenly.
+ *
+ * A plain `auto-fit` packs as many tiles per row as will fit, which leaves the
+ * sixth app alone on a second row. Balancing first — 6 becomes 3x2, 8 becomes
+ * 4x2 — reads as a deliberate grid instead of an overflow.
+ */
+export const balancedColumns = (count: number): number => {
+  if (count <= 1) return 1;
+  const rows = Math.ceil(count / MAX_APP_COLUMNS);
+  return Math.ceil(count / rows);
+};
+
 /** Strip v1-only keys, for the editor's first write-back. */
 export const stripLegacyKeys = (
   config: PolrAtvRemoteCardConfig,

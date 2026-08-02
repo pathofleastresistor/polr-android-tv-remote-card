@@ -9,7 +9,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { BRANDS, DEFAULTS, normalizeConfig, stripLegacyKeys, _resetWarnings } from "./.build/config.mjs";
+import { BRANDS, DEFAULTS, balancedColumns, normalizeConfig, stripLegacyKeys, _resetWarnings } from "./.build/config.mjs";
 
 const TYPE = "custom:polr-android-tv-remote-card";
 const base = (extra) => ({ type: TYPE, ...extra });
@@ -309,4 +309,18 @@ test("the README's v1 customisation example still resolves", () => {
   assert.deepEqual(config.overrides.volume_down, ir("volumedown"));
   // volumemute was not overridden, so the card handles it itself.
   assert.equal(config.overrides.volume_mute, undefined);
+});
+
+test("app columns balance instead of stranding a tile on its own row", () => {
+  // The failure this exists to prevent: six apps laid out as five plus one.
+  assert.equal(balancedColumns(6), 3);
+  assert.equal(balancedColumns(8), 4);
+  assert.equal(balancedColumns(1), 1);
+  assert.equal(balancedColumns(4), 4);
+  assert.equal(balancedColumns(5), 5);
+  assert.equal(balancedColumns(10), 5);
+  assert.equal(balancedColumns(12), 4);
+  for (let n = 1; n <= 24; n += 1) {
+    assert.ok(balancedColumns(n) <= 5, `n=${n} exceeds the 5-column cap`);
+  }
 });

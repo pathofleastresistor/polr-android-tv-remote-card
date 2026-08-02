@@ -1,0 +1,212 @@
+<!doctype html>
+<!--
+  Renders the built bundle against a stubbed `hass`, outside Home Assistant.
+
+  The card only touches hass.states, hass.entities and hass.callService, so a
+  small double is enough to exercise every visual state — including the ones
+  that are awkward to reach in a live instance (unavailable, unpaired player,
+  reduced supported_features). `ha-card` and `ha-icon` are lazily loaded by the
+  HA frontend and do not exist here, so they are stubbed too.
+
+  Open test/harness/index.html directly, or drive it with test/harness/shoot.mjs.
+-->
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>polr-android-tv-remote-card harness</title>
+    <style>
+      :root {
+        --primary-text-color: #212121;
+        --secondary-text-color: #727272;
+        --primary-color: #03a9f4;
+        --card-background-color: #fff;
+        --ha-card-background: #fff;
+        --divider-color: #e0e0e0;
+        --disabled-color: #9e9e9e;
+        --disabled-text-color: #bdbdbd;
+        --error-color: #db4437;
+        --state-inactive-color: #9e9e9e;
+        --state-media_player-on-color: #6f42c1;
+        --rgb-primary-text-color: 33, 33, 33;
+        --rgb-primary-color: 3, 169, 244;
+      }
+      body.dark {
+        --primary-text-color: #e1e1e1;
+        --secondary-text-color: #9b9b9b;
+        --card-background-color: #1c1c1c;
+        --ha-card-background: #1c1c1c;
+        --divider-color: #474747;
+        --rgb-primary-text-color: 225, 225, 225;
+        background: #111;
+        color: #e1e1e1;
+      }
+      body {
+        margin: 0;
+        padding: 24px;
+        background: #f5f5f5;
+        font-family: Roboto, system-ui, sans-serif;
+      }
+      .grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+        align-items: flex-start;
+      }
+      .case {
+        width: 340px;
+      }
+      .case > h2 {
+        margin: 0 0 8px;
+        font-size: 12px;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        color: #888;
+      }
+      ha-card {
+        display: block;
+        background: var(--ha-card-background);
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grid" id="grid"></div>
+
+    <script type="module">
+      // --- stubs for the HA components the card relies on -------------------
+      class HaCard extends HTMLElement {
+        connectedCallback() {
+          if (!this.shadowRoot) {
+            this.attachShadow({ mode: "open" }).innerHTML =
+              "<style>:host{display:block}</style><slot></slot>";
+          }
+        }
+      }
+      customElements.define("ha-card", HaCard);
+
+      // A visible glyph stands in for the mdi icon so layout is real.
+      class HaIcon extends HTMLElement {
+        static observedAttributes = ["icon"];
+        connectedCallback() {
+          this.render();
+        }
+        attributeChangedCallback() {
+          this.render();
+        }
+        render() {
+          const size = "var(--mdc-icon-size, 24px)";
+          this.style.cssText = `display:inline-grid;place-items:center;width:${size};height:${size};`;
+          this.innerHTML = `<svg viewBox="0 0 24 24" style="width:100%;height:100%;fill:currentColor"><circle cx="12" cy="12" r="9"/></svg>`;
+          this.title = this.getAttribute("icon") ?? "";
+        }
+      }
+      customElements.define("ha-icon", HaIcon);
+
+      await import("../../dist/polr-android-tv-remote-card.js");
+
+      // --- hass double -------------------------------------------------------
+      const FEATURES = 1 | 1024 | 8 | 16 | 32 | 128 | 256 | 16384 | 4096 | 512;
+
+      const makeHass = (overrides = {}) => {
+        const {
+          playerState = "playing",
+          remoteState = "on",
+          playerAttrs = {},
+          orphan = false,
+        } = overrides;
+
+        const entities = {
+          "remote.main_tv": { entity_id: "remote.main_tv", platform: "androidtv_remote", device_id: "d1" },
+          "remote.orphan_tv": { entity_id: "remote.orphan_tv", platform: "androidtv_remote", device_id: "d2" },
+        };
+        if (!orphan) {
+          entities["media_player.main_tv"] = {
+            entity_id: "media_player.main_tv",
+            platform: "androidtv_remote",
+            device_id: "d1",
+          };
+        }
+
+        return {
+          entities,
+          devices: {},
+          language: "en",
+          locale: { language: "en" },
+          localize: (k) => k,
+          themes: {},
+          callService: (...args) => {
+            console.log("callService", args);
+            return Promise.resolve({ context: { id: "x" } });
+          },
+          states: {
+            "remote.main_tv": {
+              entity_id: "remote.main_tv",
+              state: remoteState,
+              attributes: {
+                friendly_name: "Living Room TV",
+                activity_list: ["Netflix", "YouTube"],
+                current_activity: "Netflix",
+              },
+            },
+            "remote.orphan_tv": {
+              entity_id: "remote.orphan_tv",
+              state: "on",
+              attributes: { friendly_name: "Orphan TV" },
+            },
+            "media_player.main_tv": {
+              entity_id: "media_player.main_tv",
+              state: playerState,
+              attributes: {
+                friendly_name: "Living Room TV",
+                supported_features: FEATURES,
+                app_name: "Netflix",
+                media_title: "The Diplomat — S2:E4",
+                volume_level: 0.4,
+                is_volume_muted: false,
+                ...playerAttrs,
+              },
+            },
+          },
+        };
+      };
+
+      const APPS = ["netflix", "disneyplus", "hulu", "prime", "youtube", "hbomax"];
+
+      const CASES = [
+        { title: "buttons + apps", config: { entity: "remote.main_tv", apps: APPS } },
+        { title: "d-pad", config: { entity: "remote.main_tv", pad: "dpad", apps: APPS.slice(0, 4) } },
+        { title: "touchpad + text", config: { entity: "remote.main_tv", pad: "touchpad", show_text_input: true, apps: APPS.slice(0, 3) } },
+        { title: "v1 config (touch, mixed apps)", config: { entity_id: "remote.main_tv", remote: "touch", apps: ["disneyplus", "hbomax", "netflix", "prime", { icon: "mdi:youtube", url: "https://www.youtube.com" }] } },
+        { title: "v1 default pad (inline extras)", config: { entity_id: "remote.main_tv", remote: "default", volume: false, favorite: { service: "script.fav" }, apps: APPS.slice(0, 2) } },
+        { title: "muted", config: { entity: "remote.main_tv", apps: [] }, hass: { playerAttrs: { is_volume_muted: true } } },
+        { title: "TV off", config: { entity: "remote.main_tv", apps: APPS.slice(0, 4) }, hass: { playerState: "off" } },
+        { title: "unavailable", config: { entity: "remote.main_tv" }, hass: { playerState: "unavailable", remoteState: "unavailable" } },
+        { title: "no paired player", config: { entity: "remote.orphan_tv", apps: APPS.slice(0, 3) }, hass: { orphan: true } },
+        { title: "reduced features (no next/prev)", config: { entity: "remote.main_tv" }, hass: { playerAttrs: { supported_features: 1 | 1024 | 8 | 128 | 256 } } },
+        { title: "missing entity", config: { entity: "remote.nope" } },
+        { title: "section labels + 3 columns", config: { entity: "remote.main_tv", show_section_labels: true, app_columns: 3, apps: APPS } },
+      ];
+
+      const grid = document.getElementById("grid");
+      for (const testCase of CASES) {
+        const wrap = document.createElement("div");
+        wrap.className = "case";
+        const heading = document.createElement("h2");
+        heading.textContent = testCase.title;
+        wrap.append(heading);
+
+        const card = document.createElement("polr-android-tv-remote-card");
+        card.setConfig({ type: "custom:polr-android-tv-remote-card", ...testCase.config });
+        card.hass = makeHass(testCase.hass);
+        wrap.append(card);
+        grid.append(wrap);
+      }
+
+      if (new URLSearchParams(location.search).has("dark")) {
+        document.body.classList.add("dark");
+      }
+      document.title = "ready";
+    </script>
+  </body>
+</html>
