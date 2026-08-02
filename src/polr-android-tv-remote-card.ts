@@ -170,7 +170,7 @@ export class PolrAndroidTvRemoteCard extends LitElement {
   private _launch(app: AppConfig): void {
     const device = this._device;
     if (!this.hass || !device) return;
-    this._run(runAppAction(this.hass, device, app.action));
+    this._run(runAppAction(this.hass, device, app.action, this));
   }
 
   private async _sendText(): Promise<void> {

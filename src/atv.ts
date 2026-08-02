@@ -376,6 +376,7 @@ export const runAppAction = (
   hass: HomeAssistant,
   device: DeviceState,
   action: AppAction,
+  node?: HTMLElement,
 ): Promise<unknown> => {
   switch (action.action) {
     case "activity":
@@ -401,8 +402,14 @@ export const runAppAction = (
     case "key":
       return sendKey(hass, device, action.key);
 
+    // v1's shape.
     case "service":
       return callService(hass, action);
+
+    // Everything else is a Home Assistant action, run exactly as an override
+    // would run it.
+    default:
+      return runAction(node, hass, action as ActionConfig, device.remoteId);
   }
 };
 
@@ -417,5 +424,19 @@ export const describeAction = (action: AppAction): string => {
       return `Send ${action.key}`;
     case "service":
       return `Call ${action.service}`;
+    case "perform-action":
+      return `Call ${action.perform_action}`;
+    case "call-service":
+      return `Call ${action.service}`;
+    case "navigate":
+      return `Go to ${action.navigation_path}`;
+    case "url":
+      return `Open ${action.url_path}`;
+    case "toggle":
+      return "Toggle the TV";
+    case "more-info":
+      return "Show more info";
+    case "none":
+      return "Do nothing";
   }
 };

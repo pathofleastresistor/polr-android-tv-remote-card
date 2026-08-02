@@ -17,7 +17,7 @@
 import { LitElement, css, html, nothing, type TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 
-import { isActionConfig } from "./actions";
+import { isActionConfig, serviceAction, type ActionConfig } from "./actions";
 import { describeAction, resolvePlayer } from "./atv";
 import {
   BRANDS,
@@ -37,7 +37,7 @@ import { BRAND_LOGOS } from "./icons";
 import { tileStyles } from "./kit/styles";
 import { fireEvent, type HomeAssistant } from "./kit/types";
 
-type ActionKind = AppAction["action"];
+type ActionKind = "activity" | "app" | "key" | "action";
 
 /** Which tile list a row belongs to: the app launcher, or a section index. */
 type ListPath = "apps" | number;
@@ -46,7 +46,7 @@ const ACTION_KINDS: Array<{ value: ActionKind; label: string; hint: string }> = 
   { value: "activity", label: "Launch app or link", hint: "App name from the integration, or a deep link such as https://www.netflix.com/title" },
   { value: "app", label: "Open app id", hint: "Android package id, e.g. com.netflix.ninja. Needs a paired media player." },
   { value: "key", label: "Send a key", hint: "Android key code, e.g. GUIDE or MEDIA_REWIND" },
-  { value: "service", label: "Call an action", hint: "domain.service, e.g. script.movie_night" },
+  { value: "action", label: "Call an action", hint: "" },
 ];
 
 /**
@@ -197,6 +197,11 @@ const SCHEMA = (config: ResolvedConfig) =>
       ],
     },
   ] as const;
+
+/** One ui_action field, so a tile action gets the editor an override gets. */
+const TILE_ACTION_SCHEMA = [
+  { name: "action", selector: { ui_action: {} } },
+] as const;
 
 const LABELS: Record<string, string> = {
   entity: "Remote entity",
@@ -394,7 +399,7 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
 
   private _setActionValue(path: ListPath, index: number, value: string): void {
     const current = this._tiles(path)[index]!.action;
-    this._updateTile(path, index, { action: buildAction(current.action, value) });
+    this._updateTile(path, index, { action: buildAction(actionKind(current), value) });
   }
 
   /* ---------------------------------------------------------- sections -- */
@@ -515,8 +520,9 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
   }
 
   private _renderAppForm(path: ListPath, app: TileConfig, index: number): TemplateResult {
-    const kind = app.action.action;
+    const kind = actionKind(app.action);
     const meta = ACTION_KINDS.find((entry) => entry.value === kind)!;
+    const haAction = asHaAction(app.action);
 
     return html`
       <li class="form-host">
@@ -608,22 +614,40 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
               </select>
             </label>
 
-            <label class="field wide">
-              <span>${meta.label}</span>
-              <input
-                type="text"
-                .value=${actionValue(app.action)}
-                @change=${(event: Event) =>
-                  this._setActionValue(path, index, (event.target as HTMLInputElement).value)}
-              />
-            </label>
-            <div class="hint">${meta.hint}</div>
-
-            ${kind === "service"
-              ? html`<div class="hint">
-                  Extra service data can only be set in YAML — switch to the code editor.
-                </div>`
-              : nothing}
+            ${kind === "action"
+              ? html`
+                  <!--
+                    HA's own interactions editor, the same control the button
+                    overrides use. It carries a service picker, a target and
+                    data, which the old free-text box could not — hence the
+                    note telling people to go and edit YAML instead.
+                  -->
+                  <ha-form
+                    .hass=${this.hass}
+                    .data=${{ action: haAction }}
+                    .schema=${TILE_ACTION_SCHEMA}
+                    .computeLabel=${() => "Action"}
+                    @value-changed=${(event: CustomEvent) => {
+                      event.stopPropagation();
+                      const next = event.detail?.value?.action;
+                      if (isActionConfig(next)) {
+                        this._updateTile(path, index, { action: next as AppAction });
+                      }
+                    }}
+                  ></ha-form>
+                `
+              : html`
+                  <label class="field wide">
+                    <span>${meta.label}</span>
+                    <input
+                      type="text"
+                      .value=${actionValue(app.action)}
+                      @change=${(event: Event) =>
+                        this._setActionValue(path, index, (event.target as HTMLInputElement).value)}
+                    />
+                  </label>
+                  <div class="hint">${meta.hint}</div>
+                `}
           </div>
         </div>
       </li>
@@ -961,7 +985,19 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
   ];
 }
 
-/** The single free-text value behind whichever action kind is selected. */
+/**
+ * Which control to show for a tile's action.
+ *
+ * The first three are card shorthands with a single value each, so they get a
+ * text box. Everything else is a Home Assistant action and gets HA's own
+ * interactions selector — the same one the button overrides use.
+ */
+const actionKind = (action: AppAction): ActionKind =>
+  action.action === "activity" || action.action === "app" || action.action === "key"
+    ? action.action
+    : "action";
+
+/** The single free-text value behind a shorthand kind. */
 const actionValue = (action: AppAction): string => {
   switch (action.action) {
     case "activity":
@@ -970,9 +1006,17 @@ const actionValue = (action: AppAction): string => {
       return action.app_id;
     case "key":
       return action.key;
-    case "service":
-      return action.service;
+    default:
+      return "";
   }
+};
+
+/** A tile's action as HA's selector wants it: v1's shape is translated. */
+const asHaAction = (action: AppAction): ActionConfig | undefined => {
+  if (action.action === "service") {
+    return serviceAction(action.service, action.data, action.target);
+  }
+  return actionKind(action) === "action" ? (action as ActionConfig) : undefined;
 };
 
 const buildAction = (kind: ActionKind, value: string): AppAction => {
@@ -983,8 +1027,8 @@ const buildAction = (kind: ActionKind, value: string): AppAction => {
       return { action: "app", app_id: value };
     case "key":
       return { action: "key", key: value };
-    case "service":
-      return { action: "service", service: value };
+    case "action":
+      return { action: "perform-action", perform_action: value };
   }
 };
 

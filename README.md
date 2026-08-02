@@ -99,7 +99,7 @@ apps:
 | `activity` | `activity`                  | `remote.turn_on` with an app name from the integration, or a deep link. |
 | `app`      | `app_id`                    | `media_player.play_media` with an Android package id.                   |
 | `key`      | `key`                       | `remote.send_command` with a raw key code.                              |
-| `service`  | `service`, `data`, `target` | Calls any action at all.                                                |
+| any HA action | — | `perform-action`, `navigate`, `url`, `toggle`, `more-info`, `none` — the same vocabulary as [button overrides](#pointing-buttons-elsewhere), edited with HA's own interactions control. |
 
 Buttons stay the same size whatever the app count, and wrap after
 `app_columns`.

@@ -647,3 +647,72 @@ test("a tile with no entity, or one that does not exist, is never lit", () => {
   assert.equal(isActive(hass, undefined), false);
   assert.equal(isActive(hass, "media_player.gone"), false);
 });
+
+/* ------------------------------------------------------------------------ *
+ * Tile actions are the full Home Assistant vocabulary.
+ *
+ * The three shorthands (activity, app, key) stay, but "call an action" is now
+ * a real HA action rather than a bare service name — which is what lets the
+ * editor offer the same interactions selector the button overrides use.
+ * ------------------------------------------------------------------------ */
+
+test("a tile can perform any HA action, with data and a target", async () => {
+  const hass = fixture();
+  const device = readDevice(hass, config());
+  await runAppAction(hass, device, {
+    action: "perform-action",
+    perform_action: "select.select_option",
+    target: { entity_id: "select.baton_activity" },
+    data: { option: "Google TV" },
+  }, node());
+  assert.deepEqual(hass.calls[0], {
+    domain: "select",
+    service: "select_option",
+    data: { option: "Google TV" },
+    target: { entity_id: "select.baton_activity" },
+  });
+});
+
+test("v1's bare {action: service} tiles still run", async () => {
+  const hass = fixture();
+  const device = readDevice(hass, config());
+  await runAppAction(hass, device, {
+    action: "service",
+    service: "script.movie_night",
+    data: { room: "media" },
+  }, node());
+  assert.deepEqual(hass.calls[0], {
+    domain: "script",
+    service: "movie_night",
+    data: { room: "media" },
+    target: undefined,
+  });
+});
+
+test("a tile can toggle, which needs the fallback entity", async () => {
+  const hass = fixture();
+  const device = readDevice(hass, config());
+  await runAppAction(hass, device, { action: "toggle" }, node());
+  assert.deepEqual(hass.calls[0].data, { entity_id: "remote.main_tv" });
+});
+
+test("the three shorthands are untouched", async () => {
+  const hass = fixture();
+  const device = readDevice(hass, config());
+  await runAppAction(hass, device, { action: "key", key: "GUIDE" }, node());
+  assert.equal(hass.calls[0].data.command, "GUIDE");
+
+  hass.calls.length = 0;
+  await runAppAction(hass, device, { action: "activity", activity: "HULU" }, node());
+  assert.equal(hass.calls[0].data.activity, "HULU");
+});
+
+test("describeAction summarises the new kinds for the editor list", () => {
+  assert.equal(
+    describeAction({ action: "perform-action", perform_action: "script.x" }),
+    "Call script.x",
+  );
+  assert.equal(describeAction({ action: "navigate", navigation_path: "/tv" }), "Go to /tv");
+  assert.equal(describeAction({ action: "toggle" }), "Toggle the TV");
+  assert.equal(describeAction({ action: "none" }), "Do nothing");
+});

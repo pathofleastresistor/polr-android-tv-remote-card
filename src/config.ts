@@ -90,7 +90,13 @@ export type AppAction =
   | { action: "app"; app_id: string }
   /** remote.send_command with a raw key code. */
   | { action: "key"; key: string }
-  /** Anything else at all. */
+  /**
+   * Anything Home Assistant can do — the same vocabulary the button overrides
+   * use, so the editor can offer HA's own interactions selector rather than a
+   * bare service-name box that could not express data or a target.
+   */
+  | ActionConfig
+  /** v1's shape. Still read; the editor writes `perform-action` instead. */
   | ({ action: "service" } & ServiceAction);
 
 /** One tile: an app in the launcher, or a button in a custom section. */
