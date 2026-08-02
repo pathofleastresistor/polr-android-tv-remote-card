@@ -1,2 +1,6 @@
 .DS_Store
 node_modules/
+*.log
+test/.build/
+
+# dist/ is deliberately NOT ignored — HACS ships the built bundle from the repo.

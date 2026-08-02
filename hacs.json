@@ -1,6 +1,6 @@
 {
-    "name": "Android TV Remote",
-    "filename": "polr-android-tv-remote-card.js",
-    "render_readme": true,
-    "country": ["US"]
-  }
+  "name": "Android TV Remote",
+  "filename": "polr-android-tv-remote-card.js",
+  "render_readme": true,
+  "homeassistant": "2024.8.0"
+}

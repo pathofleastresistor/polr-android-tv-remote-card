@@ -1,0 +1,50 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+
+      - name: Versions agree, and the committed bundle is current
+        run: |
+          set -euo pipefail
+          pkg=$(jq -r .version package.json)
+          const=$(grep -oP 'CARD_VERSION = "\K[^"]+' src/polr-android-tv-remote-card.ts)
+
+          echo "package.json  $pkg"
+          echo "CARD_VERSION  $const"
+
+          [[ "$const" == "$pkg" ]] \
+            || { echo "::error::CARD_VERSION ($const) does not match package.json ($pkg)"; exit 1; }
+
+          if [[ "${GITHUB_REF_TYPE:-}" == "tag" ]]; then
+            [[ "${GITHUB_REF_NAME#v}" == "$pkg" ]] \
+              || { echo "::error::tag ${GITHUB_REF_NAME} does not match version $pkg"; exit 1; }
+          fi
+
+          npm run build
+          git diff --exit-code -- dist/polr-android-tv-remote-card.js \
+            || { echo "::error::committed bundle is stale — run 'npm run build' and commit dist/"; exit 1; }
+
+      - uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
+        with:
+          files: dist/polr-android-tv-remote-card.js
+          generate_release_notes: true
