@@ -534,49 +534,62 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
               />
             </label>
 
-            <label class="field">
-              <span>Icon</span>
-              <input
-                type="text"
-                placeholder="mdi:netflix, brand:netflix, or an image URL"
-                .value=${app.icon ?? ""}
-                @change=${(event: Event) =>
-                  this._updateTile(path, index, {
-                    icon: (event.target as HTMLInputElement).value || undefined,
-                  })}
-              />
-            </label>
+            <!--
+              HA's own picker, so icons are searchable and previewed the way
+              they are everywhere else. It emits value-changed with the icon in
+              event.detail.value, matching how HA's helper dialogs consume it.
+            -->
+            <ha-icon-picker
+              .hass=${this.hass}
+              .value=${app.icon ?? ""}
+              label="Icon"
+              @value-changed=${(event: CustomEvent) => {
+                const next = event.detail?.value as string | undefined;
+                // The picker only knows mdi icons. If it reports empty while
+                // this tile holds a brand logo or an image path, that is the
+                // picker normalising a value it does not recognise, not the
+                // user clearing the field — so keep what we have. Clearing a
+                // brand logo is done with the chips or by typing a new icon.
+                if (!next && app.icon && !app.icon.startsWith("mdi:")) return;
+                this._updateTile(path, index, { icon: next || undefined });
+              }}
+            ></ha-icon-picker>
 
             ${path !== "apps"
               ? html`
-                  <label class="field">
-                    <span>Lights up when this entity is on</span>
-                    <input
-                      type="text"
-                      placeholder="media_player.projector — optional"
-                      .value=${app.entity ?? ""}
-                      @change=${(event: Event) =>
-                        this._updateTile(path, index, {
-                          entity: (event.target as HTMLInputElement).value || undefined,
-                        })}
-                    />
-                  </label>
+                  <ha-entity-picker
+                    .hass=${this.hass}
+                    .value=${app.entity ?? ""}
+                    label="Lights up when this entity is on"
+                    allow-custom-entity
+                    @value-changed=${(event: CustomEvent) =>
+                      this._updateTile(path, index, {
+                        entity: (event.detail?.value as string) || undefined,
+                      })}
+                  ></ha-entity-picker>
                 `
               : nothing}
 
-            <div class="chips">
-              ${BRAND_IDS.map(
-                (id) => html`
-                  <button
-                    class="chip ${app.icon === `brand:${id}` ? "accent" : ""}"
-                    title=${`Use the ${BRANDS[id].label} logo`}
-                    @click=${() => this._updateTile(path, index, { icon: `brand:${id}` })}
-                  >
-                    ${BRANDS[id].label}
-                  </button>
-                `,
-              )}
-            </div>
+            <!-- Streaming logos are app suggestions; a section button is a
+                 projector or a receiver, so they are only offered for apps. -->
+            ${path === "apps"
+              ? html`
+                  <div class="chips">
+                    ${BRAND_IDS.map(
+                      (id) => html`
+                        <button
+                          class="chip ${app.icon === `brand:${id}` ? "accent" : ""}"
+                          title=${`Use the ${BRANDS[id].label} logo`}
+                          @click=${() =>
+                            this._updateTile(path, index, { icon: `brand:${id}` })}
+                        >
+                          ${BRANDS[id].label}
+                        </button>
+                      `,
+                    )}
+                  </div>
+                `
+              : nothing}
 
             <label class="field">
               <span>Does what</span>
@@ -758,6 +771,7 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
 
           ${config.sections.map(
             (section, i) => html`
+              <div class="section-block">
               <div class="section-head">
                 <!--
                   A plain input, like every other field in this editor.
@@ -798,10 +812,11 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
                   <ha-icon icon="mdi:plus"></ha-icon><span>Add button</span>
                 </button>
               </div>
+              </div>
             `,
           )}
 
-          <div class="form-actions">
+          <div class="form-actions add-section">
             <button class="control-button wide" @click=${() => this._addSection()}>
               <ha-icon icon="mdi:plus"></ha-icon><span>Add section</span>
             </button>
@@ -860,6 +875,29 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
       }
       ha-expansion-panel .content {
         padding: 12px;
+      }
+      /*
+       * A section owns its name, its buttons and its "Add button" control, so
+       * they are grouped on a tinted surface. Without it "Add button" and "Add
+       * section" sat flush against each other and read as one pair of controls
+       * at the same level, which they are not.
+       */
+      ha-icon-picker,
+      ha-entity-picker {
+        display: block;
+        margin-bottom: var(--ha-space-3, 12px);
+      }
+      .section-block {
+        padding: var(--ha-space-3, 12px);
+        margin-bottom: var(--ha-space-3, 12px);
+        border-radius: var(--radius-md);
+        background-color: rgba(var(--rgb-primary-text-color, 0, 0, 0), 0.04);
+      }
+      .section-block .section-head {
+        margin-top: 0;
+      }
+      .form-actions.add-section {
+        margin-top: var(--ha-space-4, 16px);
       }
       ha-expansion-panel .content ha-form {
         display: block;
