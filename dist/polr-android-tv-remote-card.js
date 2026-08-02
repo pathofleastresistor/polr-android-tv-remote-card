@@ -2923,7 +2923,6 @@ x.styles = [
       }
       ha-form {
         display: block;
-        margin-bottom: var(--ha-space-2, 8px);
       }
       ul.list {
         padding: 0;
@@ -2939,7 +2938,14 @@ x.styles = [
        */
       ha-expansion-panel {
         display: block;
-        margin-bottom: 24px;
+        /*
+         * The gap on BOTH sides, not just below. ha-form gives its rows
+         * margin-bottom: 24px but explicitly skips the last one, so the space
+         * above this panel is whatever it supplies itself — previously nothing,
+         * plus an 8px margin of my own on ha-form, which is exactly why this
+         * one section sat tighter than the rest.
+         */
+        margin: 24px 0;
         border-radius: var(--ha-border-radius-md);
         --ha-card-border-radius: var(--ha-border-radius-md);
         --expansion-panel-content-padding: 0;
@@ -3048,7 +3054,7 @@ var Oo = Object.defineProperty, zo = Object.getOwnPropertyDescriptor, q = (e, t,
     (s = e[a]) && (r = (i ? s(t, o, r) : s(r)) || r);
   return i && r && Oo(t, o, r), r;
 };
-const Mo = "2.0.0-beta.9", at = "polr-android-tv-remote-card";
+const Mo = "2.0.0-beta.10", at = "polr-android-tv-remote-card";
 let O = class extends P {
   constructor() {
     super(...arguments), this._text = "", this._sending = !1;

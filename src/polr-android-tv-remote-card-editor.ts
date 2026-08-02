@@ -663,7 +663,6 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
       }
       ha-form {
         display: block;
-        margin-bottom: var(--ha-space-2, 8px);
       }
       ul.list {
         padding: 0;
@@ -679,7 +678,14 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
        */
       ha-expansion-panel {
         display: block;
-        margin-bottom: 24px;
+        /*
+         * The gap on BOTH sides, not just below. ha-form gives its rows
+         * margin-bottom: 24px but explicitly skips the last one, so the space
+         * above this panel is whatever it supplies itself — previously nothing,
+         * plus an 8px margin of my own on ha-form, which is exactly why this
+         * one section sat tighter than the rest.
+         */
+        margin: 24px 0;
         border-radius: var(--ha-border-radius-md);
         --ha-card-border-radius: var(--ha-border-radius-md);
         --expansion-panel-content-padding: 0;
