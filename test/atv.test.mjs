@@ -130,7 +130,7 @@ test("an empty entity registry pairs to null instead of throwing", () => {
   assert.equal(resolvePlayer(hass, config()), null);
 });
 
-test("readDevice reads state, app, volume and activities", () => {
+test("readDevice reads state, app and volume", () => {
   const device = readDevice(fixture({ playerState: "playing" }), config());
   assert.equal(device.found, true);
   assert.equal(device.available, true);
@@ -140,7 +140,14 @@ test("readDevice reads state, app, volume and activities", () => {
   assert.equal(device.volume, 0.4);
   assert.equal(device.muted, false);
   assert.equal(device.name, "Main TV");
-  assert.deepEqual(device.activities, ["Netflix", "YouTube"]);
+});
+
+test("the card exposes no list of apps on the TV, because none exists", () => {
+  // activity_list only ever holds what someone typed into the integration's
+  // options; nothing enumerates installed apps. Surfacing it in the editor read
+  // as app discovery, so it was removed rather than hidden.
+  const device = readDevice(fixture(), config());
+  assert.equal(device.activities, undefined);
 });
 
 test("a player in state off reports the TV as off", () => {

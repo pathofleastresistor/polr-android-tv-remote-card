@@ -358,11 +358,10 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
   /**
    * The app running on the TV right now.
    *
-   * This is the *only* app discovery the integration offers. It cannot
-   * enumerate what is installed — `activity_list` holds just the apps someone
-   * typed into its options dialog. But `app_id` reports whatever is on screen,
-   * so opening an app on the TV and clicking here captures its real package id,
-   * which is otherwise tedious to find.
+   * Nothing in the integration can enumerate what is installed on the TV, and
+   * the card does not pretend otherwise. `app_id` reports whatever is on
+   * screen, though — so opening an app and clicking here captures its real
+   * package id, which is otherwise tedious to find.
    */
   private _renderCurrentApp(): TemplateResult | typeof nothing {
     const config = this._config!;
@@ -399,54 +398,6 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
               to capture its package id (${appId}).
             </div>
           `}
-    `;
-  }
-
-  /**
-   * Apps configured in the integration's own options.
-   *
-   * `activity_list` is populated only from that dialog — the integration never
-   * enumerates what is installed on the TV. Worth saying out loud rather than
-   * rendering a blank space.
-   */
-  private _renderFromTv(): TemplateResult {
-    const remote = this.hass?.states?.[this._config!.entity];
-    const activities = (remote?.attributes?.["activity_list"] as string[] | undefined) ?? [];
-    const used = new Set(
-      this._config!.apps.map((app) =>
-        app.action.action === "activity" ? app.action.activity : "",
-      ),
-    );
-    const available = activities.filter((activity) => !used.has(activity));
-
-    if (!activities.length) {
-      return html`<div class="hint">
-        This TV reports no configured apps. Add them under Settings → Devices &
-        Services → Android TV Remote → Configure, and they will appear here.
-      </div>`;
-    }
-    if (!available.length) {
-      return html`<div class="hint">Every app this TV reports has been added.</div>`;
-    }
-
-    return html`
-      <div class="chips">
-        ${available.map(
-          (activity) => html`
-            <button
-              class="chip"
-              @click=${() =>
-                this._addApp({
-                  name: activity,
-                  icon: guessIcon(activity),
-                  action: { action: "activity", activity },
-                })}
-            >
-              <ha-icon icon="mdi:plus"></ha-icon>${activity}
-            </button>
-          `,
-        )}
-      </div>
     `;
   }
 
@@ -505,9 +456,6 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
             </div>
 
             ${this._renderCurrentApp()}
-
-            <div class="section-head"><span class="grow">Configured on this TV</span></div>
-            ${this._renderFromTv()}
 
             <div class="form-actions">
               <button

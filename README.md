@@ -112,9 +112,12 @@ The app row is `app_columns` columns wide, so a button is the same size whether
 you have two apps or ten, and a sixth wraps onto a second row aligned with the
 first.
 
-If you configure apps in the integration itself (Settings → Devices & Services
-→ Android TV Remote → Configure), the editor offers them as one-click tiles and
-`activity` can just be the app's name.
+Nothing can enumerate the apps installed on a TV — not this card, not the
+integration. What the TV does report is the app running *right now*, so the
+editor offers to capture that, which is the easiest way to learn a package id.
+If you have configured apps in the integration itself (Settings → Devices &
+Services → Android TV Remote → Configure), `activity` can be the app's name
+instead of a deep link.
 
 ### Overriding buttons
 

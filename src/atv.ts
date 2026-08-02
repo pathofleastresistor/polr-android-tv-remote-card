@@ -86,8 +86,6 @@ export interface DeviceState {
   /** Only meaningful for players that distinguish playing from paused. */
   playing: boolean;
   features: number;
-  /** `activity_list` — the apps configured in the integration's options. */
-  activities: string[];
 
   /** Entity the volume buttons act on: `volume_entity`, else the player. */
   volumeId: string | null;
@@ -183,9 +181,6 @@ export const readDevice = (
     picture: playerAttrs["entity_picture"] as string | undefined,
     playing: player?.state === "playing",
     features: (playerAttrs["supported_features"] as number | undefined) ?? 0,
-    activities: Array.isArray(remoteAttrs["activity_list"])
-      ? (remoteAttrs["activity_list"] as string[])
-      : [],
 
     volumeId,
     volumeFeatures: (volumeAttrs["supported_features"] as number | undefined) ?? 0,
