@@ -38,7 +38,7 @@ import { stateColor, type HomeAssistant } from "./kit/types";
 import "./nav-pad";
 import "./polr-android-tv-remote-card-editor";
 
-export const CARD_VERSION = "2.0.0-beta.7";
+export const CARD_VERSION = "2.0.0-beta.8";
 
 const CARD_TYPE = "polr-android-tv-remote-card";
 
@@ -445,7 +445,7 @@ export class PolrAndroidTvRemoteCard extends LitElement {
     const live = device.available;
 
     return html`
-      <ha-card style="--tile-color:${tile}">
+      <ha-card class=${config.show_header ? "" : "headerless"} style="--tile-color:${tile}">
         ${config.show_header ? this._renderHeader(device) : nothing}
         ${config.show_header && device.playerId === null
           ? html`<div class="notice warn">

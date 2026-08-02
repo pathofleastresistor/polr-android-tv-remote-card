@@ -13,6 +13,15 @@
 import { css } from "lit";
 
 export const remoteStyles = css`
+  /*
+   * Every section pads its own bottom and relies on the header for the top.
+   * With the header hidden the first row sat flush against the card edge, so
+   * the card supplies the padding itself in that case.
+   */
+  ha-card.headerless > *:first-child {
+    padding-top: var(--ha-space-3, 12px);
+  }
+
   /* --------------------------------------------------------- now playing -- */
   /* Brand logos are square art; match the kit's 24px --mdc-icon-size. */
   .tile-icon svg {

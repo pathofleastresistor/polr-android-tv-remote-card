@@ -54,6 +54,37 @@ const ACTION_KINDS: Array<{ value: ActionKind; label: string; hint: string }> = 
  * Helper text also stays out of grids: a grid lays cells side by side, and one
  * cell growing to fit a paragraph misaligns the whole row.
  */
+/** Apps settings, rendered inside the hand-rolled Apps panel. */
+const APPS_SCHEMA = (config: ResolvedConfig) =>
+  [
+    { name: "show_apps", selector: { boolean: {} } },
+    ...(config.show_apps
+      ? [{ name: "app_columns", selector: { number: { min: 1, max: 8, mode: "box" } } }]
+      : []),
+  ] as const;
+
+/** Everything after the Apps panel. */
+const TAIL_SCHEMA = [
+  {
+    type: "expandable",
+    name: "",
+    title: "Text input",
+    icon: "mdi:keyboard",
+    schema: [{ name: "show_text_input", selector: { boolean: {} } }],
+  },
+  {
+    type: "expandable",
+    name: "",
+    title: "Advanced",
+    icon: "mdi:tune",
+    schema: [
+      { name: "hold_repeat", selector: { boolean: {} } },
+      { name: "haptics", selector: { boolean: {} } },
+      { name: "show_section_labels", selector: { boolean: {} } },
+    ],
+  },
+] as const;
+
 const SCHEMA = (config: ResolvedConfig) =>
   [
     {
@@ -158,41 +189,6 @@ const SCHEMA = (config: ResolvedConfig) =>
         })),
       ],
     },
-    {
-      type: "expandable",
-      name: "",
-      title: "Apps",
-      icon: "mdi:apps",
-      schema: [
-        { name: "show_apps", selector: { boolean: {} } },
-        ...(config.show_apps
-          ? [
-              {
-                name: "app_columns",
-                selector: { number: { min: 1, max: 8, mode: "box" } },
-              },
-            ]
-          : []),
-      ],
-    },
-    {
-      type: "expandable",
-      name: "",
-      title: "Text input",
-      icon: "mdi:keyboard",
-      schema: [{ name: "show_text_input", selector: { boolean: {} } }],
-    },
-    {
-      type: "expandable",
-      name: "",
-      title: "Advanced",
-      icon: "mdi:tune",
-      schema: [
-        { name: "hold_repeat", selector: { boolean: {} } },
-        { name: "haptics", selector: { boolean: {} } },
-        { name: "show_section_labels", selector: { boolean: {} } },
-      ],
-    },
   ] as const;
 
 const LABELS: Record<string, string> = {
@@ -227,8 +223,9 @@ const HELPERS: Record<string, string> = {
     "Leave empty to toggle the TV itself. Set it when something else does the switching — an IR or RF blaster, or a script that also powers a receiver.",
   volume_up_action:
     "Leave empty to control the TV or the media player above. Set it for IR bridges and the like, which expose one pressable entity per command instead of a media player.",
-  show_text_input:
-    "Sends typed text to the TV. Only lands while a search field is focused, and needs “Enable IME” on the integration.",
+  // Kept short: ha-form runs a boolean's helper up against its toggle, and a
+  // long one wraps into it. The full caveats are in the README.
+  show_text_input: "Needs a focused search field on the TV, and Enable IME.",
 };
 
 @customElement("polr-android-tv-remote-card-editor")
@@ -290,6 +287,8 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
     const overrides: Record<string, unknown> = { ...this._config!.overrides };
     for (const button of PolrAndroidTvRemoteCardEditor.ACTION_BUTTONS) {
       const key = `${button}_action`;
+      // Three forms share this handler; only act on keys the emitting one had.
+      if (!(key in value)) continue;
       const action = value[key];
       delete value[key];
 
@@ -566,62 +565,92 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
         @value-changed=${this._formChanged}
       ></ha-form>
 
-      ${config.show_apps
-        ? html`
-            <div class="section-head">
-              <span class="grow">Apps</span>
-              <span class="count">${apps.length}</span>
-            </div>
+      <!--
+        Apps get a hand-rolled panel rather than an ha-form expandable: the
+        list, its ordering and the inline action editor cannot be expressed as
+        a schema, and leaving them outside meant the settings that govern the
+        list sat in a different section from the list itself.
+      -->
+      <ha-expansion-panel outlined>
+        <div slot="header" class="panel-header">
+          <ha-icon icon="mdi:apps"></ha-icon><span>Apps</span>
+        </div>
 
-            ${apps.length
-              ? html`<ul class="list">
-                  ${apps.flatMap((app, index) =>
-                    this._editing === index
-                      ? [
-                          this._renderAppRow(app, index, apps.length),
-                          this._renderAppForm(app, index),
-                        ]
-                      : [this._renderAppRow(app, index, apps.length)],
-                  )}
-                </ul>`
-              : html`<div class="empty-state">No apps yet — add one below.</div>`}
+        <ha-form
+          .hass=${this.hass}
+          .data=${this._formData}
+          .schema=${APPS_SCHEMA(config)}
+          .computeLabel=${this._computeLabel}
+          .computeHelper=${this._computeHelper}
+          @value-changed=${this._formChanged}
+        ></ha-form>
 
-            <div class="section-head"><span class="grow">Add a known app</span></div>
-            <div class="chips">
-              ${BRAND_IDS.map(
-                (id) => html`
-                  <button
-                    class="chip"
-                    @click=${() =>
-                      this._addApp({
-                        name: BRANDS[id].label,
-                        icon: `brand:${id}`,
-                        action: { action: "activity", activity: BRANDS[id].activity },
-                      })}
-                  >
-                    <ha-icon icon="mdi:plus"></ha-icon>${BRAND_LABELS[id]}
-                  </button>
-                `,
-              )}
-            </div>
+        ${config.show_apps
+          ? html`
+              <div class="section-head">
+                <span class="grow">Apps</span>
+                <span class="count">${apps.length}</span>
+              </div>
 
-            ${this._renderCurrentApp()}
+              ${apps.length
+                ? html`<ul class="list">
+                    ${apps.flatMap((app, index) =>
+                      this._editing === index
+                        ? [
+                            this._renderAppRow(app, index, apps.length),
+                            this._renderAppForm(app, index),
+                          ]
+                        : [this._renderAppRow(app, index, apps.length)],
+                    )}
+                  </ul>`
+                : html`<div class="empty-state">No apps yet — add one below.</div>`}
 
-            <div class="form-actions">
-              <button
-                class="control-button wide"
-                @click=${() =>
-                  this._addApp({
-                    name: "New app",
-                    icon: "mdi:application",
-                    action: { action: "activity", activity: "" },
-                  })}
-              >
-                <ha-icon icon="mdi:plus"></ha-icon><span>Custom app</span>
-              </button>
-            </div>
-          `
-        : nothing}
+              <div class="section-head"><span class="grow">Add a known app</span></div>
+              <div class="chips">
+                ${BRAND_IDS.map(
+                  (id) => html`
+                    <button
+                      class="chip"
+                      @click=${() =>
+                        this._addApp({
+                          name: BRANDS[id].label,
+                          icon: `brand:${id}`,
+                          action: { action: "activity", activity: BRANDS[id].activity },
+                        })}
+                    >
+                      <ha-icon icon="mdi:plus"></ha-icon>${BRAND_LABELS[id]}
+                    </button>
+                  `,
+                )}
+              </div>
+
+              ${this._renderCurrentApp()}
+
+              <div class="form-actions">
+                <button
+                  class="control-button wide"
+                  @click=${() =>
+                    this._addApp({
+                      name: "New app",
+                      icon: "mdi:application",
+                      action: { action: "activity", activity: "" },
+                    })}
+                >
+                  <ha-icon icon="mdi:plus"></ha-icon><span>Custom app</span>
+                </button>
+              </div>
+            `
+          : nothing}
+      </ha-expansion-panel>
+
+      <ha-form
+        .hass=${this.hass}
+        .data=${this._formData}
+        .schema=${TAIL_SCHEMA}
+        .computeLabel=${this._computeLabel}
+        .computeHelper=${this._computeHelper}
+        @value-changed=${this._formChanged}
+      ></ha-form>
     `;
   }
 
@@ -637,6 +666,20 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
       }
       ul.list {
         padding: 0;
+      }
+      ha-expansion-panel {
+        display: block;
+        margin-bottom: var(--ha-space-2, 8px);
+      }
+      .panel-header {
+        display: flex;
+        align-items: center;
+        gap: var(--ha-space-3, 12px);
+        font-size: var(--ha-font-size-l, 16px);
+        font-weight: var(--ha-font-weight-medium, 500);
+      }
+      .panel-header ha-icon {
+        color: var(--secondary-text-color);
       }
       /* The kit sizes icon buttons for a card; an editor row is tighter. */
       .icon-button {
