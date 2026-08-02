@@ -6,6 +6,12 @@
  * of it with one directive used everywhere, so a control cannot accidentally be
  * built without those things.
  *
+ * Taps resolve on *release*, never on pointerdown. Firing on pointerdown means
+ * that on a phone, putting a thumb on an app tile to scroll the page launches
+ * the app — the gesture has not yet declared itself as a tap or a drag. The
+ * cost is that a tap lands when the finger lifts rather than when it touches,
+ * which is how every native control behaves.
+ *
  * Repeat is deliberately *repeated discrete presses*, not Android's long-press.
  * `remote.send_command` accepts a `hold_secs`, but that maps to START_LONG /
  * END_LONG — a long press, which on a TV means "open the context menu", not
@@ -28,9 +34,17 @@ const MAX_REPEATS = 40;
 const HOLD_MS = 500;
 /** Window for a second tap. Only applied when a double-tap action exists. */
 const DOUBLE_TAP_MS = 250;
+/**
+ * How far a pointer may travel and still count as a tap.
+ *
+ * Beyond this the gesture is a scroll or a drag, and the press is abandoned.
+ * Chrome's own touch slop is 8px; a little more is forgiving of thumbs without
+ * making a deliberate tap hard to land.
+ */
+const SLOP_PX = 12;
 
 export interface PressOptions {
-  /** Runs on press, and on every repeat. */
+  /** Runs on release, and on every repeat while held. */
   onPress: () => void;
   /**
    * Runs when the press passes the hold threshold.
@@ -44,8 +58,8 @@ export interface PressOptions {
    * Runs on a second tap inside the double-tap window.
    *
    * Supplying this delays the single tap by that window, since there is no way
-   * to know a tap is single until it has passed. Left undefined, taps fire
-   * immediately — which is why it is only wired when actually configured.
+   * to know a tap is single until it has passed. Left undefined, taps fire on
+   * release — which is why it is only wired when actually configured.
    */
   onDoubleTap?: () => void;
   /** Hold to repeat. Only sensible for idempotent, directional controls. */
@@ -60,19 +74,25 @@ export interface PressOptions {
  *
  * Used as `<button ${press({onPress})}>`. A directive rather than a set of
  * `@pointerdown=` bindings because the listeners have to co-operate — the
- * repeat timer, the pointer capture and the `.pressed` class are one unit, and
+ * repeat timer, the slop threshold and the `.pressed` class are one unit, and
  * splitting them across a template is how they drift apart.
  */
 class PressDirective extends AsyncDirective {
   private _element?: HTMLElement;
   private _options?: PressOptions;
-  private _timer?: number;
+  private _repeatTimer?: number;
   private _holdTimer?: number;
   private _tapTimer?: number;
   private _repeats = 0;
   private _inFlight = false;
   private _bound = false;
-  private _held = false;
+
+  /** A press is in progress and has not yet been abandoned. */
+  private _active = false;
+  /** Something already fired for this press: hold, or a repeat. */
+  private _resolved = false;
+  private _startX = 0;
+  private _startY = 0;
   private _awaitingSecondTap = false;
 
   constructor(partInfo: PartInfo) {
@@ -94,72 +114,135 @@ class PressDirective extends AsyncDirective {
       this._bound = true;
       const el = this._element;
       el.addEventListener("pointerdown", this._onPointerDown);
-      el.addEventListener("pointerup", this._onRelease);
-      el.addEventListener("pointercancel", this._onRelease);
-      el.addEventListener("pointerleave", this._onRelease);
+      el.addEventListener("pointermove", this._onPointerMove);
+      el.addEventListener("pointerup", this._onPointerUp);
+      // The browser fires pointercancel the moment it decides the gesture is a
+      // scroll, which is exactly when the press must be abandoned.
+      el.addEventListener("pointercancel", this._abort);
+      el.addEventListener("pointerleave", this._abort);
       el.addEventListener("keydown", this._onKeyDown);
-      el.addEventListener("keyup", this._onRelease);
-      el.addEventListener("blur", this._onRelease);
-      // The browser would otherwise pop a text-selection or context menu on a
-      // long press, which is exactly the gesture hold-to-repeat needs.
+      el.addEventListener("keyup", this._onKeyUp);
+      el.addEventListener("blur", this._abort);
+      // Otherwise a long press pops a text-selection or context menu, which is
+      // exactly the gesture hold-to-repeat needs.
       el.addEventListener("contextmenu", (event) => event.preventDefault());
     }
     return noChange;
   }
 
+  /* ---------------------------------------------------------------- pointer */
+
   private _onPointerDown = (event: PointerEvent): void => {
     // Primary button only; a right-click should not drive the TV.
     if (event.button !== 0) return;
-    event.preventDefault();
-    this._element?.setPointerCapture?.(event.pointerId);
-    this._start();
-  };
-
-  private _onKeyDown = (event: KeyboardEvent): void => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    event.preventDefault();
-    // Held keys arrive as a stream of keydowns; let the repeat timer own the
-    // cadence instead of the OS key-repeat rate.
-    if (event.repeat) return;
-    this._start();
-  };
-
-  private _start(): void {
     const options = this._options;
     if (!options || options.disabled) return;
 
+    // Deliberately no preventDefault and no pointer capture: both interfere
+    // with the browser's own scroll detection, and this element wants that
+    // detection to win.
+    this._active = true;
+    this._resolved = false;
+    this._startX = event.clientX;
+    this._startY = event.clientY;
     this._element?.classList.add("pressed");
-    this._held = false;
 
-    // A hold action means the press cannot resolve until the pointer lifts or
-    // the threshold passes, so nothing fires here.
     if (options.onHold) {
       this._holdTimer = window.setTimeout(() => {
-        this._held = true;
+        if (!this._active) return;
+        this._resolved = true;
         this._fire(options.onHold!, "medium");
       }, HOLD_MS);
       return;
     }
 
-    this._tap();
-
     if (!options.repeat) return;
     this._repeats = 0;
-    this._timer = window.setTimeout(() => {
-      this._timer = window.setInterval(() => {
-        if (this._repeats >= MAX_REPEATS) {
-          this._stop();
+    this._repeatTimer = window.setTimeout(() => {
+      if (!this._active) return;
+      // Held long enough to be a repeat rather than a tap: fire the first one
+      // now, so holding feels immediate from here on.
+      this._resolved = true;
+      this._fire(options.onPress);
+      this._repeatTimer = window.setInterval(() => {
+        if (!this._active || this._repeats >= MAX_REPEATS) {
+          this._reset();
           return;
         }
         this._repeats += 1;
         this._fire(options.onPress);
       }, REPEAT_INTERVAL_MS);
     }, REPEAT_DELAY_MS);
-  }
+  };
+
+  private _onPointerMove = (event: PointerEvent): void => {
+    if (!this._active) return;
+    const dx = event.clientX - this._startX;
+    const dy = event.clientY - this._startY;
+    if (dx * dx + dy * dy > SLOP_PX * SLOP_PX) this._abort();
+  };
+
+  private _onPointerUp = (): void => {
+    if (!this._active) return;
+    const resolved = this._resolved;
+    this._reset();
+    // A hold that reached its threshold, or a press that already started
+    // repeating, has had its say.
+    if (!resolved) this._tap();
+  };
+
+  /* --------------------------------------------------------------- keyboard */
+
+  private _onKeyDown = (event: KeyboardEvent): void => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    // Held keys arrive as a stream of keydowns; let the repeat timer own the
+    // cadence instead of the OS key-repeat rate.
+    if (event.repeat || this._active) return;
+
+    const options = this._options;
+    if (!options || options.disabled) return;
+
+    // A keyboard press cannot turn into a scroll, so there is nothing to wait
+    // for: fire immediately and let hold/repeat build on top.
+    this._active = true;
+    this._resolved = true;
+    this._startX = 0;
+    this._startY = 0;
+    this._element?.classList.add("pressed");
+    this._tap();
+
+    if (options.onHold) {
+      this._holdTimer = window.setTimeout(() => {
+        if (this._active) this._fire(options.onHold!, "medium");
+      }, HOLD_MS);
+      return;
+    }
+    if (!options.repeat) return;
+    this._repeats = 0;
+    this._repeatTimer = window.setTimeout(() => {
+      this._repeatTimer = window.setInterval(() => {
+        if (!this._active || this._repeats >= MAX_REPEATS) {
+          this._reset();
+          return;
+        }
+        this._repeats += 1;
+        this._fire(options.onPress);
+      }, REPEAT_INTERVAL_MS);
+    }, REPEAT_DELAY_MS);
+  };
+
+  private _onKeyUp = (): void => {
+    this._reset();
+  };
+
+  /* ------------------------------------------------------------------ firing */
 
   /** A tap, resolving single vs double first when that distinction exists. */
   private _tap(): void {
-    const options = this._options!;
+    const options = this._options;
+    if (!options) return;
+
     if (!options.onDoubleTap) {
       this._fire(options.onPress);
       return;
@@ -199,32 +282,31 @@ class PressDirective extends AsyncDirective {
     run();
   }
 
-  private _onRelease = (): void => {
-    const options = this._options;
-    // A hold that never reached the threshold is an ordinary tap.
-    if (options?.onHold && !this._held && this._holdTimer !== undefined) {
-      this._tap();
-    }
-    this._stop();
+  /* ---------------------------------------------------------------- teardown */
+
+  /** Give up on the current press without firing anything further. */
+  private _abort = (): void => {
+    this._reset();
   };
 
-  private _stop(): void {
+  private _reset(): void {
+    this._active = false;
+    this._resolved = false;
+    this._repeats = 0;
     this._element?.classList.remove("pressed");
-    if (this._timer !== undefined) {
-      window.clearTimeout(this._timer);
-      window.clearInterval(this._timer);
-      this._timer = undefined;
+    if (this._repeatTimer !== undefined) {
+      window.clearTimeout(this._repeatTimer);
+      window.clearInterval(this._repeatTimer);
+      this._repeatTimer = undefined;
     }
     if (this._holdTimer !== undefined) {
       window.clearTimeout(this._holdTimer);
       this._holdTimer = undefined;
     }
-    this._held = false;
-    this._repeats = 0;
   }
 
   protected override disconnected(): void {
-    this._stop();
+    this._reset();
     if (this._tapTimer !== undefined) {
       window.clearTimeout(this._tapTimer);
       this._tapTimer = undefined;

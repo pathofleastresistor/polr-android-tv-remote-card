@@ -141,7 +141,8 @@
           localize: (k) => k,
           themes: {},
           callService: (...args) => {
-            console.log("callService", args);
+            // Recorded so gesture tests can assert what a touch actually sent.
+            (window.__calls ??= []).push(args);
             return Promise.resolve({ context: { id: "x" } });
           },
           states: {

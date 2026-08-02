@@ -72,6 +72,64 @@ for (const dark of [false, true]) {
     console.error(`[check] <${checks.editorTag}> is not a defined custom element`);
   }
 
+  // Gestures: a tap must fire, a scroll across a button must not. Only worth
+  // running once; the check is behavioural, not visual.
+  if (!dark) {
+    const gestures = await page.evaluate(async () => {
+      const card = document.querySelector("polr-android-tv-remote-card");
+      const tile = card.shadowRoot.querySelector(".app-tile");
+      const box = tile.getBoundingClientRect();
+      const x = box.left + box.width / 2;
+      const y = box.top + box.height / 2;
+      const send = (type, cx, cy) =>
+        tile.dispatchEvent(
+          new PointerEvent(type, {
+            bubbles: true, composed: true, cancelable: true,
+            clientX: cx, clientY: cy, button: 0, pointerId: 1, pointerType: "touch",
+          }),
+        );
+      const settle = () => new Promise((r) => setTimeout(r, 60));
+
+      window.__calls = [];
+      send("pointerdown", x, y);
+      send("pointerup", x, y);
+      await settle();
+      const onTap = window.__calls.length;
+
+      // A thumb landing on the tile and dragging up the page to scroll.
+      window.__calls = [];
+      send("pointerdown", x, y);
+      send("pointermove", x, y - 40);
+      send("pointerup", x, y - 40);
+      await settle();
+      const onScroll = window.__calls.length;
+
+      // The browser taking the gesture over for scrolling mid-press.
+      window.__calls = [];
+      send("pointerdown", x, y);
+      send("pointercancel", x, y);
+      send("pointerup", x, y);
+      await settle();
+      const onCancel = window.__calls.length;
+
+      return { onTap, onScroll, onCancel };
+    });
+
+    for (const [name, actual, want] of [
+      ["a tap", gestures.onTap, 1],
+      ["scrolling across a button", gestures.onScroll, 0],
+      ["a cancelled press", gestures.onCancel, 0],
+    ]) {
+      if (actual !== want) {
+        failed = true;
+        console.error(`[gesture] ${name} should send ${want} call(s), sent ${actual}`);
+      }
+    }
+    console.log(
+      `gestures: tap=${gestures.onTap} scroll=${gestures.onScroll} cancel=${gestures.onCancel}`,
+    );
+  }
+
   const file = resolve(outDir, dark ? "dark.png" : "light.png");
   await page.screenshot({ path: file, fullPage: true });
   console.log(`wrote ${file}`);
