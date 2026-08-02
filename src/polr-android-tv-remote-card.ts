@@ -14,6 +14,7 @@ import {
   FEATURE,
   can,
   hasVolumeState,
+  isActive,
   pressButton,
   readDevice,
   runAppAction,
@@ -24,6 +25,7 @@ import {
   brandFor,
   normalizeConfig,
   type AppConfig,
+  type TileConfig,
   type ButtonId,
   type BrandId,
   type PolrAtvRemoteCardConfig,
@@ -39,7 +41,7 @@ import { stateColor, type HomeAssistant } from "./kit/types";
 import "./nav-pad";
 import "./polr-android-tv-remote-card-editor";
 
-export const CARD_VERSION = "2.0.0";
+export const CARD_VERSION = "2.1.0";
 
 const CARD_TYPE = "polr-android-tv-remote-card";
 
@@ -402,34 +404,73 @@ export class PolrAndroidTvRemoteCard extends LitElement {
     return html`<ha-icon icon=${icon}></ha-icon>`;
   }
 
-  private _renderApps(): TemplateResult | typeof nothing {
+  /**
+   * One row of tiles.
+   *
+   * The app launcher is the built-in caller; user-defined sections are the same
+   * grid with their own name. Labels gate on `show_section_labels`, so a custom
+   * section is indistinguishable from a native one.
+   */
+  private _renderSection(
+    tiles: TileConfig[],
+    label: string,
+    columns: number,
+    key: string,
+  ): TemplateResult | typeof nothing {
     const config = this._config!;
-    if (!config.apps.length) return nothing;
+    if (!tiles.length) return nothing;
 
     return html`
-      ${config.show_section_labels
+      ${config.show_section_labels && label
         ? html`<div class="section-head">
-            Apps<span class="grow"></span><span class="count">${config.apps.length}</span>
+            ${label}<span class="grow"></span><span class="count">${tiles.length}</span>
           </div>`
         : nothing}
-      <div class="app-grid" style="--app-per-row: ${config.app_columns}">
+      <div class="app-grid" style="--app-per-row: ${columns}">
         ${repeat(
-          config.apps,
-          (app, index) => `${index}:${app.icon ?? ""}`,
-          (app) => html`
-            <button
-              class="app-tile"
-              type="button"
-              aria-label=${app.name ?? "Launch app"}
-              title=${app.name ?? ""}
-              style=${app.color ? `--app-color:${app.color}` : ""}
-              ${press({ onPress: () => this._launch(app), haptics: config.haptics })}
-            >
-              ${this._renderAppIcon(app)}
-            </button>
-          `,
+          tiles,
+          (tile, index) => `${key}:${index}:${tile.icon ?? ""}`,
+          (tile) => {
+            // A tile with no entity is never lit: an IR command has no state,
+            // and showing it as off would be a claim the card cannot make.
+            const active = this.hass ? isActive(this.hass, tile.entity) : false;
+            return html`
+              <button
+                class="app-tile ${active ? "active" : ""}"
+                type="button"
+                aria-label=${tile.name ?? "Launch app"}
+                title=${tile.name ?? ""}
+                aria-pressed=${tile.entity ? String(active) : nothing}
+                style=${tile.color ? `--app-color:${tile.color}` : ""}
+                ${press({ onPress: () => this._launch(tile), haptics: config.haptics })}
+              >
+                ${this._renderAppIcon(tile)}
+              </button>
+            `;
+          },
         )}
       </div>
+    `;
+  }
+
+  private _renderApps(): TemplateResult | typeof nothing {
+    const config = this._config!;
+    return this._renderSection(config.apps, "Apps", config.app_columns, "apps");
+  }
+
+  /** User-defined rows, in declared order, ahead of the app launcher. */
+  private _renderCustomSections(): TemplateResult | typeof nothing {
+    const config = this._config!;
+    if (!config.sections.length) return nothing;
+    return html`
+      ${config.sections.map((section, index) =>
+        this._renderSection(
+          section.buttons,
+          section.name ?? "",
+          section.columns ?? config.app_columns,
+          `s${index}`,
+        ),
+      )}
     `;
   }
 
@@ -482,6 +523,7 @@ export class PolrAndroidTvRemoteCard extends LitElement {
                     <ha-icon icon="mdi:power"></ha-icon><span>Turn on</span>
                   </button>
                 </div>
+                ${this._renderCustomSections()}
                 ${config.show_apps ? this._renderApps() : nothing}
               `
             : html`
@@ -497,6 +539,7 @@ export class PolrAndroidTvRemoteCard extends LitElement {
                 ${config.show_transport ? this._renderTransport(device) : nothing}
                 ${config.show_volume ? this._renderVolume(device) : nothing}
                 ${config.show_text_input ? this._renderTextInput() : nothing}
+                ${this._renderCustomSections()}
                 ${config.show_apps ? this._renderApps() : nothing}
               `}
       </ha-card>

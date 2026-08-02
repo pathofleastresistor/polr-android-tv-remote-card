@@ -328,6 +328,22 @@ export const remoteStyles = css`
   .app-tile:hover::before {
     opacity: 0.32;
   }
+  /*
+   * A tile bound to an entity that is on, tinted like the header pill so that
+   * "this is on" reads the same everywhere on the card. Tiles with no entity
+   * never get this class.
+   */
+  .app-tile.active {
+    color: var(--app-color, var(--tile-color));
+  }
+  .app-tile.active::before {
+    background-color: var(--app-color, var(--tile-color));
+    opacity: 0.25;
+  }
+  .app-tile.active:hover::before {
+    opacity: 0.35;
+  }
+
   .app-tile:focus-visible {
     box-shadow: 0 0 0 2px var(--app-color, var(--tile-color));
   }

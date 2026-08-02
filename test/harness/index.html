@@ -160,6 +160,16 @@
               state: "on",
               attributes: { friendly_name: "Orphan TV" },
             },
+            "select.baton_activity": {
+              entity_id: "select.baton_activity",
+              state: "Off",
+              attributes: { friendly_name: "Activity" },
+            },
+            "media_player.projector": {
+              entity_id: "media_player.projector",
+              state: "on",
+              attributes: { friendly_name: "Projector" },
+            },
             "media_player.soundbar": {
               entity_id: "media_player.soundbar",
               state: "on",
@@ -200,6 +210,14 @@
         { title: "audio on a soundbar (no volume state)", config: { entity: "remote.main_tv", apps: APPS.slice(0, 5) }, hass: { playerAttrs: { volume_level: null, is_volume_muted: null } } },
         { title: "volume_entity -> soundbar", config: { entity: "remote.main_tv", volume_entity: "media_player.soundbar", apps: APPS.slice(0, 5) }, hass: { playerAttrs: { volume_level: null, is_volume_muted: null } } },
         { title: "TV off", config: { entity: "remote.main_tv", apps: APPS.slice(0, 4) }, hass: { playerState: "off" } },
+        { title: "custom section (labels on)", config: { entity: "remote.main_tv", show_section_labels: true, show_nav: false, show_transport: false, show_volume: false, apps: APPS.slice(0, 3), sections: [{ name: "Home theater", buttons: [
+          { name: "Movie mode", icon: "mdi:theater", entity: "select.baton_activity", action: { action: "service", service: "select.select_option" } },
+          { name: "Projector", icon: "mdi:projector", entity: "media_player.projector", action: { action: "service", service: "media_player.toggle" } },
+          { name: "Soundbar", icon: "mdi:soundbar", action: { action: "service", service: "remote.send_command" } },
+          { name: "Streamer", icon: "mdi:cast-variant", entity: "remote.main_tv", action: { action: "service", service: "remote.toggle" } } ] }] } },
+        { title: "custom section (labels off)", config: { entity: "remote.main_tv", show_nav: false, show_transport: false, show_volume: false, show_apps: false, sections: [{ name: "Home theater", buttons: [
+          { name: "Movie mode", icon: "mdi:theater", entity: "select.baton_activity", action: { action: "service", service: "select.select_option" } },
+          { name: "Soundbar", icon: "mdi:soundbar", action: { action: "service", service: "remote.send_command" } } ] }] } },
         { title: "no header, power on", config: { entity: "remote.main_tv", show_header: false, show_power: true, apps: APPS.slice(0, 3) } },
         { title: "no header, no power", config: { entity: "remote.main_tv", show_header: false, show_power: false, apps: APPS.slice(0, 3) } },
         { title: "TV off + power override", config: { entity: "remote.main_tv", apps: [], overrides: { power: { service: "remote.send_command", data: { command: "power", entity_id: "remote.living_room_rf" } } } }, hass: { playerState: "off" } },

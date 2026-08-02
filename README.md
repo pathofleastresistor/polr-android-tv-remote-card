@@ -68,6 +68,7 @@ entity: remote.living_room_tv
 | `show_text_input`     | `false`  | Type on the TV. See [Text input](#text-input).                          |
 | `show_apps`           | `true`   | The app launcher.                                                       |
 | `apps`                | `[]`     | See [Apps](#apps).                                                      |
+| `sections`            | `[]`     | Your own rows of buttons. See [Sections](#sections).                    |
 | `app_columns`         | `5`      | Most app buttons on one row before wrapping.                            |
 | `show_section_labels` | `false`  | Small headings above sections.                                          |
 | `hold_repeat`         | `true`   | Hold a d-pad or volume button to repeat it.                             |
@@ -102,6 +103,61 @@ apps:
 
 Buttons stay the same size whatever the app count, and wrap after
 `app_columns`.
+
+### Sections
+
+The app launcher is built in. Beyond it you can declare your own named rows of
+buttons — for the things around the TV that the remote has no concept of.
+
+A button takes the same `name`, `icon`, `color` and `action` as an app, plus an
+optional **`entity`**: name one and the tile lights up while that entity is on,
+using the same colour the header does. Name none and the tile is simply never
+lit — the card will not claim to know a state it cannot see.
+
+A real example. Turning this home theatre on is four controls: a hub activity, a
+projector, a soundbar reachable only over IR, and the streamer itself. The
+activity fires all of them, but IR is one-way, so a device can miss the command
+or already be on and get toggled off — the tiles show which.
+
+```yaml
+show_section_labels: true
+sections:
+  - name: Home theater
+    buttons:
+      - name: Movie mode
+        icon: mdi:theater
+        entity: select.media_room_baton_activity   # lit unless the activity is "Off"
+        action:
+          action: service
+          service: select.select_option
+          target: { entity_id: select.media_room_baton_activity }
+          data: { option: Google TV }
+
+      - name: Projector
+        icon: mdi:projector
+        entity: media_player.projector_lsp9
+        action: { action: service, service: media_player.toggle, target: { entity_id: media_player.projector_lsp9 } }
+
+      - name: Soundbar          # IR only: no entity, so never lit
+        icon: mdi:soundbar
+        action:
+          action: service
+          service: remote.send_command
+          data: { entity_id: remote.media_room_baton_remote, device: "3", command: 26 }
+```
+
+| Key       | Description                                                       |
+| --------- | ----------------------------------------------------------------- |
+| `name`    | Row heading. Shown only when `show_section_labels` is on.         |
+| `columns` | Buttons per row. Defaults to `app_columns`.                       |
+| `buttons` | Tiles, each as above plus an optional `entity`.                   |
+
+A tile is lit unless its entity reads `off`, `unavailable`, `unknown`, `idle`,
+`standby` or `none` — compared case-insensitively, which is what makes a `select`
+work: its state is the literal option name, so `Off` is off and `Google TV` is on.
+
+Sections render in the order you declare them, above the app launcher. A section
+whose buttons are all malformed is dropped rather than drawn empty.
 
 ### Pointing buttons elsewhere
 

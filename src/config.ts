@@ -93,14 +93,40 @@ export type AppAction =
   /** Anything else at all. */
   | ({ action: "service" } & ServiceAction);
 
-export interface AppConfig {
+/** One tile: an app in the launcher, or a button in a custom section. */
+export interface TileConfig {
   /** Tooltip and aria-label. Falls back to the action's target. */
   name?: string;
   /** "mdi:netflix" | "brand:netflix" | "/local/foo.png" | "https://…" */
   icon?: string;
   /** Overrides --tile-color for this tile only. */
   color?: string;
+  /**
+   * Entity whose state lights the tile.
+   *
+   * Optional, and absent for anything the card cannot see — an IR command has
+   * no entity, so its tile is simply never lit rather than shown as off.
+   */
+  entity?: string;
   action: AppAction;
+}
+
+/** Apps are tiles too; the alias keeps the app-facing vocabulary intact. */
+export type AppConfig = TileConfig;
+
+/**
+ * A named row of buttons.
+ *
+ * The app launcher is the built-in one. Everything else is user-defined, which
+ * is what lets a card carry controls the remote itself has no concept of — an
+ * AV receiver, a projector, a hub activity.
+ */
+export interface SectionConfig {
+  /** Shown only when `show_section_labels` is on, like the built-in sections. */
+  name?: string;
+  /** Buttons per row. Falls back to `app_columns`. */
+  columns?: number;
+  buttons: TileConfig[];
 }
 
 export interface PolrAtvRemoteCardConfig {
@@ -129,6 +155,8 @@ export interface PolrAtvRemoteCardConfig {
   show_section_labels?: boolean;
 
   apps?: AppConfig[];
+  /** User-defined rows of buttons, drawn before the app launcher. */
+  sections?: SectionConfig[];
   /** Most app buttons on one row before wrapping. */
   app_columns?: number;
 
@@ -161,6 +189,7 @@ export interface ResolvedConfig extends PolrAtvRemoteCardConfig {
   show_section_labels: boolean;
   show_favorite: boolean;
   apps: AppConfig[];
+  sections: SectionConfig[];
   app_columns: number;
   hold_repeat: boolean;
   haptics: boolean;
@@ -364,12 +393,13 @@ const normalizeApp = (entry: unknown): AppConfig | null => {
 
   // v2: already has an action object.
   if (isRecord(entry["action"])) {
-    return entry as unknown as AppConfig;
+    return entry as unknown as TileConfig;
   }
 
   const icon = typeof entry["icon"] === "string" ? entry["icon"] : undefined;
   const name = typeof entry["name"] === "string" ? entry["name"] : undefined;
   const color = typeof entry["color"] === "string" ? entry["color"] : undefined;
+  const entity = typeof entry["entity"] === "string" ? entry["entity"] : undefined;
 
   // v1: {icon, service, data} — an arbitrary service call.
   if (isServiceAction(entry)) {
@@ -377,6 +407,7 @@ const normalizeApp = (entry: unknown): AppConfig | null => {
       ...(name ? { name } : {}),
       ...(icon ? { icon } : {}),
       ...(color ? { color } : {}),
+      ...(entity ? { entity } : {}),
       action: {
         action: "service",
         service: entry.service,
@@ -392,6 +423,7 @@ const normalizeApp = (entry: unknown): AppConfig | null => {
       ...(name ? { name } : {}),
       ...(icon ? { icon } : {}),
       ...(color ? { color } : {}),
+      ...(entity ? { entity } : {}),
       action: { action: "activity", activity: entry["url"] },
     };
   }
@@ -478,6 +510,34 @@ export const normalizeConfig = (raw: PolrAtvRemoteCardConfig): ResolvedConfig =>
       ))
     : DEFAULTS.transport_buttons;
 
+  /**
+   * A section is dropped when nothing in it survived normalisation, matching
+   * the app list's rule: one malformed entry must not take the card down, and
+   * an empty labelled row is worse than no row.
+   */
+  const sections = (Array.isArray(raw.sections) ? raw.sections : [])
+    .map((entry): SectionConfig | null => {
+      if (!isRecord(entry)) {
+        warnOnce(`section is not an object and was skipped: ${JSON.stringify(entry)}`);
+        return null;
+      }
+      const buttons = (Array.isArray(entry["buttons"]) ? entry["buttons"] : [])
+        .map(normalizeApp)
+        .filter((button): button is TileConfig => button !== null);
+      if (!buttons.length) {
+        warnOnce(`section "${String(entry["name"] ?? "")}" has no usable buttons and was skipped`);
+        return null;
+      }
+      return {
+        ...(typeof entry["name"] === "string" ? { name: entry["name"] } : {}),
+        ...(typeof entry["columns"] === "number" && entry["columns"] > 0
+          ? { columns: entry["columns"] }
+          : {}),
+        buttons,
+      };
+    })
+    .filter((section): section is SectionConfig => section !== null);
+
   const rawApps = Array.isArray(raw.apps) ? raw.apps : [];
   const apps = rawApps
     .map(normalizeApp)
@@ -514,6 +574,7 @@ export const normalizeConfig = (raw: PolrAtvRemoteCardConfig): ResolvedConfig =>
     show_favorite: overrides.favorite !== undefined,
 
     apps,
+    sections,
     // "auto" was the v2-beta spelling, before the tiles became fixed-width.
     app_columns:
       typeof raw.app_columns === "number" && raw.app_columns > 0

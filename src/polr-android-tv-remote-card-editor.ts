@@ -28,6 +28,8 @@ import {
   type AppAction,
   type AppConfig,
   type BrandId,
+  type SectionConfig,
+  type TileConfig,
   type PolrAtvRemoteCardConfig,
   type ResolvedConfig,
 } from "./config";
@@ -36,6 +38,9 @@ import { tileStyles } from "./kit/styles";
 import { fireEvent, type HomeAssistant } from "./kit/types";
 
 type ActionKind = AppAction["action"];
+
+/** Which tile list a row belongs to: the app launcher, or a section index. */
+type ListPath = "apps" | number;
 
 const ACTION_KINDS: Array<{ value: ActionKind; label: string; hint: string }> = [
   { value: "activity", label: "Launch app or link", hint: "App name from the integration, or a deep link such as https://www.netflix.com/title" },
@@ -235,8 +240,14 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
 
   @state() private _config?: ResolvedConfig;
-  /** Index of the app whose inline form is open, or null. */
-  @state() private _editing: number | null = null;
+  /**
+   * Which inline edit form is open.
+   *
+   * Carries the list as well as the index: apps and every custom section share
+   * this machinery, and an index alone would let two lists fight over which row
+   * is expanded.
+   */
+  @state() private _editing: { path: ListPath; index: number } | null = null;
 
   public setConfig(config: PolrAtvRemoteCardConfig): void {
     this._config = normalizeConfig(config);
@@ -315,47 +326,101 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
     });
   }
 
-  private _setApps(apps: AppConfig[]): void {
-    this._emit({ ...this._config!, apps });
+  /* --------------------------------------------------------- tile lists -- */
+  /*
+   * Apps and every custom section are the same list of tiles, so the list
+   * machinery is addressed by path rather than duplicated per list. `"apps"` is
+   * the built-in launcher; a number is an index into `sections`.
+   */
+
+  private _tiles(path: ListPath): TileConfig[] {
+    return path === "apps"
+      ? this._config!.apps
+      : (this._config!.sections[path]?.buttons ?? []);
   }
 
-  private _addApp(app: AppConfig): void {
-    const apps = [...this._config!.apps, app];
-    this._setApps(apps);
-    this._editing = apps.length - 1;
-  }
-
-  private _updateApp(index: number, patch: Partial<AppConfig>): void {
-    const apps = this._config!.apps.map((app, i) =>
-      i === index ? { ...app, ...patch } : app,
+  private _setTiles(path: ListPath, tiles: TileConfig[]): void {
+    if (path === "apps") {
+      this._emit({ ...this._config!, apps: tiles });
+      return;
+    }
+    const sections = this._config!.sections.map((section, i) =>
+      i === path ? { ...section, buttons: tiles } : section,
     );
-    this._setApps(apps);
+    this._emit({ ...this._config!, sections });
   }
 
-  private _removeApp(index: number): void {
-    this._setApps(this._config!.apps.filter((_, i) => i !== index));
+  private _addTile(path: ListPath, tile: TileConfig): void {
+    const tiles = [...this._tiles(path), tile];
+    this._setTiles(path, tiles);
+    this._editing = { path, index: tiles.length - 1 };
+  }
+
+  private _updateTile(path: ListPath, index: number, patch: Partial<TileConfig>): void {
+    this._setTiles(
+      path,
+      this._tiles(path).map((tile, i) => (i === index ? { ...tile, ...patch } : tile)),
+    );
+  }
+
+  private _removeTile(path: ListPath, index: number): void {
+    this._setTiles(
+      path,
+      this._tiles(path).filter((_, i) => i !== index),
+    );
     this._editing = null;
   }
 
-  private _moveApp(index: number, delta: number): void {
-    const apps = [...this._config!.apps];
+  private _moveTile(path: ListPath, index: number, delta: number): void {
+    const tiles = [...this._tiles(path)];
     const target = index + delta;
-    if (target < 0 || target >= apps.length) return;
-    [apps[index], apps[target]] = [apps[target]!, apps[index]!];
-    this._setApps(apps);
-    if (this._editing === index) this._editing = target;
+    if (target < 0 || target >= tiles.length) return;
+    [tiles[index], tiles[target]] = [tiles[target]!, tiles[index]!];
+    this._setTiles(path, tiles);
+    if (this._isEditing(path, index)) this._editing = { path, index: target };
+  }
+
+  private _isEditing(path: ListPath, index: number): boolean {
+    return this._editing?.path === path && this._editing.index === index;
   }
 
   /** Change the action kind, carrying the old value across where it makes sense. */
-  private _setActionKind(index: number, kind: ActionKind): void {
-    const current = this._config!.apps[index]!.action;
-    const value = actionValue(current);
-    this._updateApp(index, { action: buildAction(kind, value) });
+  private _setActionKind(path: ListPath, index: number, kind: ActionKind): void {
+    const current = this._tiles(path)[index]!.action;
+    this._updateTile(path, index, {
+      action: buildAction(kind, actionValue(current)),
+    });
   }
 
-  private _setActionValue(index: number, value: string): void {
-    const current = this._config!.apps[index]!.action;
-    this._updateApp(index, { action: buildAction(current.action, value) });
+  private _setActionValue(path: ListPath, index: number, value: string): void {
+    const current = this._tiles(path)[index]!.action;
+    this._updateTile(path, index, { action: buildAction(current.action, value) });
+  }
+
+  /* ---------------------------------------------------------- sections -- */
+
+  private _setSections(sections: SectionConfig[]): void {
+    this._emit({ ...this._config!, sections });
+  }
+
+  private _addSection(): void {
+    this._setSections([
+      ...this._config!.sections,
+      { name: "New section", buttons: [] },
+    ]);
+  }
+
+  private _renameSection(index: number, name: string): void {
+    this._setSections(
+      this._config!.sections.map((section, i) =>
+        i === index ? { ...section, name } : section,
+      ),
+    );
+  }
+
+  private _removeSection(index: number): void {
+    this._setSections(this._config!.sections.filter((_, i) => i !== index));
+    this._editing = null;
   }
 
   private _renderIcon(app: AppConfig): TemplateResult {
@@ -378,8 +443,37 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
    * gets mis-parsed — the second ends up nested inside the first, and the form
    * renders half-width, floating out of the row.
    */
-  private _renderAppRow(app: AppConfig, index: number, total: number): TemplateResult {
-    const open = this._editing === index;
+  /**
+   * A tile list, with the open row's form appended after it.
+   *
+   * The form is a *sibling* `<li>`, which is why rows and forms are flattened
+   * here rather than returned together — see _renderAppRow.
+   */
+  private _renderTileList(
+    path: ListPath,
+    tiles: TileConfig[],
+    empty: string,
+  ): TemplateResult {
+    if (!tiles.length) return html`<div class="empty-state">${empty}</div>`;
+    return html`<ul class="list">
+      ${tiles.flatMap((tile, index) =>
+        this._isEditing(path, index)
+          ? [
+              this._renderAppRow(path, tile, index, tiles.length),
+              this._renderAppForm(path, tile, index),
+            ]
+          : [this._renderAppRow(path, tile, index, tiles.length)],
+      )}
+    </ul>`;
+  }
+
+  private _renderAppRow(
+    path: ListPath,
+    app: TileConfig,
+    index: number,
+    total: number,
+  ): TemplateResult {
+    const open = this._isEditing(path, index);
 
     return html`
       <li class="row">
@@ -392,7 +486,7 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
           class="icon-button"
           title="Move up"
           .disabled=${index === 0}
-          @click=${() => this._moveApp(index, -1)}
+          @click=${() => this._moveTile(path, index, -1)}
         >
           <ha-icon icon="mdi:arrow-up"></ha-icon>
         </button>
@@ -400,7 +494,7 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
           class="icon-button"
           title="Move down"
           .disabled=${index === total - 1}
-          @click=${() => this._moveApp(index, 1)}
+          @click=${() => this._moveTile(path, index, 1)}
         >
           <ha-icon icon="mdi:arrow-down"></ha-icon>
         </button>
@@ -408,19 +502,19 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
           class="icon-button"
           title=${open ? "Done" : "Edit"}
           @click=${() => {
-            this._editing = open ? null : index;
+            this._editing = open ? null : { path, index };
           }}
         >
           <ha-icon icon=${open ? "mdi:check" : "mdi:pencil"}></ha-icon>
         </button>
-        <button class="icon-button danger" title="Remove" @click=${() => this._removeApp(index)}>
+        <button class="icon-button danger" title="Remove" @click=${() => this._removeTile(path, index)}>
           <ha-icon icon="mdi:close"></ha-icon>
         </button>
       </li>
     `;
   }
 
-  private _renderAppForm(app: AppConfig, index: number): TemplateResult {
+  private _renderAppForm(path: ListPath, app: TileConfig, index: number): TemplateResult {
     const kind = app.action.action;
     const meta = ACTION_KINDS.find((entry) => entry.value === kind)!;
 
@@ -434,7 +528,7 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
                 type="text"
                 .value=${app.name ?? ""}
                 @change=${(event: Event) =>
-                  this._updateApp(index, {
+                  this._updateTile(path, index, {
                     name: (event.target as HTMLInputElement).value || undefined,
                   })}
               />
@@ -447,11 +541,28 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
                 placeholder="mdi:netflix, brand:netflix, or an image URL"
                 .value=${app.icon ?? ""}
                 @change=${(event: Event) =>
-                  this._updateApp(index, {
+                  this._updateTile(path, index, {
                     icon: (event.target as HTMLInputElement).value || undefined,
                   })}
               />
             </label>
+
+            ${path !== "apps"
+              ? html`
+                  <label class="field">
+                    <span>Lights up when this entity is on</span>
+                    <input
+                      type="text"
+                      placeholder="media_player.projector — optional"
+                      .value=${app.entity ?? ""}
+                      @change=${(event: Event) =>
+                        this._updateTile(path, index, {
+                          entity: (event.target as HTMLInputElement).value || undefined,
+                        })}
+                    />
+                  </label>
+                `
+              : nothing}
 
             <div class="chips">
               ${BRAND_IDS.map(
@@ -459,7 +570,7 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
                   <button
                     class="chip ${app.icon === `brand:${id}` ? "accent" : ""}"
                     title=${`Use the ${BRANDS[id].label} logo`}
-                    @click=${() => this._updateApp(index, { icon: `brand:${id}` })}
+                    @click=${() => this._updateTile(path, index, { icon: `brand:${id}` })}
                   >
                     ${BRANDS[id].label}
                   </button>
@@ -472,7 +583,7 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
               <select
                 .value=${kind}
                 @change=${(event: Event) =>
-                  this._setActionKind(index, (event.target as HTMLSelectElement).value as ActionKind)}
+                  this._setActionKind(path, index, (event.target as HTMLSelectElement).value as ActionKind)}
               >
                 ${ACTION_KINDS.map(
                   (entry) => html`
@@ -490,7 +601,7 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
                 type="text"
                 .value=${actionValue(app.action)}
                 @change=${(event: Event) =>
-                  this._setActionValue(index, (event.target as HTMLInputElement).value)}
+                  this._setActionValue(path, index, (event.target as HTMLInputElement).value)}
               />
             </label>
             <div class="hint">${meta.hint}</div>
@@ -535,7 +646,7 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
               <button
                 class="chip accent"
                 @click=${() =>
-                  this._addApp({
+                  this._addTile("apps", {
                     name: appName ?? appId,
                     icon: guessIcon(appName ?? appId),
                     action: { action: "app", app_id: appId },
@@ -594,18 +705,7 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
                 <span class="count">${apps.length}</span>
               </div>
 
-              ${apps.length
-                ? html`<ul class="list">
-                    ${apps.flatMap((app, index) =>
-                      this._editing === index
-                        ? [
-                            this._renderAppRow(app, index, apps.length),
-                            this._renderAppForm(app, index),
-                          ]
-                        : [this._renderAppRow(app, index, apps.length)],
-                    )}
-                  </ul>`
-                : html`<div class="empty-state">No apps yet — add one below.</div>`}
+              ${this._renderTileList("apps", apps, "No apps yet — add one below.")}
 
               <div class="section-head"><span class="grow">Add a known app</span></div>
               <div class="chips">
@@ -614,7 +714,7 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
                     <button
                       class="chip"
                       @click=${() =>
-                        this._addApp({
+                        this._addTile("apps", {
                           name: BRANDS[id].label,
                           icon: `brand:${id}`,
                           action: { action: "activity", activity: BRANDS[id].activity },
@@ -632,7 +732,7 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
                 <button
                   class="control-button wide"
                   @click=${() =>
-                    this._addApp({
+                    this._addTile("apps", {
                       name: "New app",
                       icon: "mdi:application",
                       action: { action: "activity", activity: "" },
@@ -643,6 +743,61 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
               </div>
             `
           : nothing}
+        </div>
+      </ha-expansion-panel>
+
+      <ha-expansion-panel outlined>
+        <ha-icon slot="leading-icon" icon="mdi:view-dashboard-outline"></ha-icon>
+        <div slot="header" role="heading" aria-level="3">Sections</div>
+
+        <div class="content">
+          <div class="hint">
+            Extra rows of buttons, drawn above the app launcher. Names show only
+            when “Section labels” is on, under Advanced.
+          </div>
+
+          ${config.sections.map(
+            (section, i) => html`
+              <div class="section-head">
+                <ha-textfield
+                  class="grow"
+                  label="Section name"
+                  .value=${section.name ?? ""}
+                  @change=${(event: Event) =>
+                    this._renameSection(i, (event.target as HTMLInputElement).value)}
+                ></ha-textfield>
+                <button
+                  class="icon-button"
+                  title="Remove section"
+                  @click=${() => this._removeSection(i)}
+                >
+                  <ha-icon icon="mdi:close"></ha-icon>
+                </button>
+              </div>
+
+              ${this._renderTileList(i, section.buttons, "No buttons yet.")}
+
+              <div class="form-actions">
+                <button
+                  class="control-button wide"
+                  @click=${() =>
+                    this._addTile(i, {
+                      name: "New button",
+                      icon: "mdi:power",
+                      action: { action: "service", service: "" },
+                    })}
+                >
+                  <ha-icon icon="mdi:plus"></ha-icon><span>Add button</span>
+                </button>
+              </div>
+            `,
+          )}
+
+          <div class="form-actions">
+            <button class="control-button wide" @click=${() => this._addSection()}>
+              <ha-icon icon="mdi:plus"></ha-icon><span>Add section</span>
+            </button>
+          </div>
         </div>
       </ha-expansion-panel>
 

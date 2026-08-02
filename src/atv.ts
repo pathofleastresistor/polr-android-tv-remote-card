@@ -189,6 +189,37 @@ export const readDevice = (
   };
 };
 
+/**
+ * States that mean "this thing is not on".
+ *
+ * Everything else counts as on, which is what lets a tile track any domain
+ * without being taught about it. Compared case-insensitively, and that matters:
+ * a `select`'s state is the literal option name, so a Sofabaton activity sitting
+ * on "Off" has to read as off while "Google TV" reads as on.
+ */
+const INACTIVE_STATES = new Set([
+  "off",
+  "unavailable",
+  "unknown",
+  "idle",
+  "standby",
+  "none",
+]);
+
+/**
+ * Is the entity behind a tile currently on?
+ *
+ * False for a missing entity id, so a tile with nothing to track is never lit
+ * rather than being shown as off — an IR command has no entity, and claiming to
+ * know its state would be a lie.
+ */
+export const isActive = (hass: HomeAssistant, entity: string | undefined): boolean => {
+  if (!entity) return false;
+  const state = hass.states?.[entity]?.state;
+  if (state === undefined) return false;
+  return !INACTIVE_STATES.has(state.toLowerCase());
+};
+
 /** Does the paired player advertise this capability? */
 export const can = (device: DeviceState, feature: number): boolean =>
   (device.features & feature) !== 0;

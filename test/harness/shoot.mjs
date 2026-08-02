@@ -220,6 +220,64 @@ for (const dark of [false, true]) {
     );
   }
 
+  // The editor's tile-list machinery is shared by the app launcher and every
+  // custom section. Nothing but this proves a section survives being edited:
+  // the lists were one hardcoded `apps` list until sections arrived.
+  if (!dark) {
+    const roundTrip = await page.evaluate(async () => {
+      const editor = document.createElement("polr-android-tv-remote-card-editor");
+      const source = {
+        type: "custom:polr-android-tv-remote-card",
+        entity: "remote.main_tv",
+        apps: [{ name: "Netflix", icon: "brand:netflix",
+          action: { action: "activity", activity: "https://www.netflix.com/title" } }],
+        sections: [{ name: "Home theater", buttons: [
+          { name: "Projector", icon: "mdi:projector", entity: "media_player.projector",
+            action: { action: "service", service: "media_player.toggle" } },
+          { name: "Soundbar", icon: "mdi:soundbar",
+            action: { action: "service", service: "remote.send_command" } },
+        ] }],
+      };
+      editor.hass = document.querySelector("polr-android-tv-remote-card").hass;
+      editor.setConfig(source);
+      document.body.appendChild(editor);
+      await editor.updateComplete;
+
+      let emitted;
+      editor.addEventListener("config-changed", (e) => { emitted = e.detail.config; });
+
+      // Rename the section: a change owned by the sections UI, not by ha-form.
+      editor._renameSection(0, "Theater");
+      await editor.updateComplete;
+
+      const section = emitted?.sections?.[0];
+      return {
+        renamed: section?.name,
+        buttonCount: section?.buttons?.length,
+        entityKept: section?.buttons?.[0]?.entity,
+        blindButtonStaysBlind: section?.buttons?.[1]?.entity ?? null,
+        appsUntouched: emitted?.apps?.[0]?.icon,
+      };
+    });
+
+    const expected = {
+      renamed: "Theater",
+      buttonCount: 2,
+      entityKept: "media_player.projector",
+      blindButtonStaysBlind: null,
+      appsUntouched: "brand:netflix",
+    };
+    for (const [key, want] of Object.entries(expected)) {
+      if (roundTrip[key] !== want) {
+        failed = true;
+        console.error(
+          `[editor] ${key}: expected ${JSON.stringify(want)}, got ${JSON.stringify(roundTrip[key])}`,
+        );
+      }
+    }
+    console.log("editor round-trip: sections survive an edit, apps untouched");
+  }
+
   const file = resolve(outDir, dark ? "dark.png" : "light.png");
   await page.screenshot({ path: file, fullPage: true });
   console.log(`wrote ${file}`);

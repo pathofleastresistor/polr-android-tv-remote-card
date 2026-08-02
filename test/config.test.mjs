@@ -667,3 +667,90 @@ test("every brand id has a label and an activity", () => {
     assert.ok(BRANDS[id]?.activity, `${id} has no activity`);
   }
 });
+
+/* ------------------------------------------------------------------------ *
+ * Custom sections.
+ *
+ * The app launcher is the built-in one; these are user-defined rows of the same
+ * tiles. Motivated by a home theatre whose power is four separate controls, one
+ * of which (an IR-only soundbar) has no entity at all.
+ * ------------------------------------------------------------------------ */
+
+test("a section normalises its buttons like apps, keeping entity", () => {
+  const config = normalizeConfig(
+    base({
+      entity: "remote.media_room_tv",
+      sections: [
+        {
+          name: "Home theater",
+          buttons: [
+            {
+              name: "Movie mode",
+              icon: "mdi:theater",
+              entity: "select.media_room_baton_activity",
+              action: {
+                action: "service",
+                service: "select.select_option",
+                target: { entity_id: "select.media_room_baton_activity" },
+                data: { option: "Google TV" },
+              },
+            },
+            // No entity: an IR command has no state to read.
+            { name: "Soundbar", icon: "mdi:soundbar", url: "IR" },
+          ],
+        },
+      ],
+    }),
+  );
+
+  assert.equal(config.sections.length, 1);
+  assert.equal(config.sections[0].name, "Home theater");
+  assert.equal(config.sections[0].buttons.length, 2);
+  assert.equal(config.sections[0].buttons[0].entity, "select.media_room_baton_activity");
+  assert.equal(config.sections[0].buttons[1].entity, undefined);
+  assert.equal(config.sections[0].buttons[1].action.activity, "IR");
+});
+
+test("a section with no usable buttons is dropped, not rendered empty", () => {
+  _resetWarnings();
+  const config = normalizeConfig(
+    base({
+      entity: "remote.atv",
+      sections: [
+        { name: "Broken", buttons: [{ name: "nope" }] },
+        { name: "Empty", buttons: [] },
+        "not an object",
+      ],
+    }),
+  );
+  assert.deepEqual(config.sections, []);
+});
+
+test("absent sections yield an empty list", () => {
+  assert.deepEqual(normalizeConfig(base({ entity: "remote.atv" })).sections, []);
+});
+
+test("a section may override columns, otherwise it inherits app_columns", () => {
+  const config = normalizeConfig(
+    base({
+      entity: "remote.atv",
+      app_columns: 4,
+      sections: [
+        { name: "A", columns: 2, buttons: [{ icon: "mdi:power", url: "x" }] },
+        { name: "B", buttons: [{ icon: "mdi:power", url: "x" }] },
+      ],
+    }),
+  );
+  assert.equal(config.sections[0].columns, 2);
+  assert.equal(config.sections[1].columns, undefined, "falls back at render time");
+  assert.equal(config.app_columns, 4);
+});
+
+test("sections survive stripLegacyKeys", () => {
+  const stripped = stripLegacyKeys(
+    normalizeConfig(
+      base({ entity: "remote.atv", sections: [{ name: "A", buttons: [{ icon: "mdi:power", url: "x" }] }] }),
+    ),
+  );
+  assert.equal(stripped.sections.length, 1);
+});

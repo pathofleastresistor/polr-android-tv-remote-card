@@ -15,6 +15,7 @@ import {
   can,
   canVolume,
   hasVolumeState,
+  isActive,
   describeAction,
   pressButton,
   readDevice,
@@ -593,4 +594,56 @@ test("sendKey targets the remote entity", async () => {
   const hass = fixture();
   await sendKey(hass, readDevice(hass, config()), "GUIDE");
   assert.deepEqual(hass.calls[0].data, { entity_id: "remote.main_tv", command: "GUIDE" });
+});
+
+/* ------------------------------------------------------------------------ *
+ * Tile state.
+ * ------------------------------------------------------------------------ */
+
+test("isActive treats the usual off-ish states as off", () => {
+  const hass = makeHass({
+    states: Object.fromEntries(
+      ["off", "unavailable", "unknown", "idle", "standby", "none"].map((state) => [
+        `x.${state}`,
+        { entity_id: `x.${state}`, state, attributes: {} },
+      ]),
+    ),
+  });
+  for (const state of ["off", "unavailable", "unknown", "idle", "standby", "none"]) {
+    assert.equal(isActive(hass, `x.${state}`), false, state);
+  }
+});
+
+test("isActive treats anything else as on, whatever the domain", () => {
+  const hass = makeHass({
+    states: {
+      "switch.a": { entity_id: "switch.a", state: "on", attributes: {} },
+      "media_player.a": { entity_id: "media_player.a", state: "playing", attributes: {} },
+      "cover.a": { entity_id: "cover.a", state: "open", attributes: {} },
+    },
+  });
+  for (const id of ["switch.a", "media_player.a", "cover.a"]) {
+    assert.equal(isActive(hass, id), true, id);
+  }
+});
+
+test("isActive compares case-insensitively, which is what a select needs", () => {
+  // A select's state is the literal option name. The Sofabaton activity reads
+  // "Off" or "Google TV", so a case-sensitive check would call "Off" active.
+  const hass = makeHass({
+    states: {
+      "select.activity": { entity_id: "select.activity", state: "Off", attributes: {} },
+    },
+  });
+  assert.equal(isActive(hass, "select.activity"), false);
+
+  hass.states["select.activity"].state = "Google TV";
+  assert.equal(isActive(hass, "select.activity"), true);
+});
+
+test("a tile with no entity, or one that does not exist, is never lit", () => {
+  // Not "off" — the card genuinely cannot know, and an IR button has no entity.
+  const hass = makeHass();
+  assert.equal(isActive(hass, undefined), false);
+  assert.equal(isActive(hass, "media_player.gone"), false);
 });
