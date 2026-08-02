@@ -121,6 +121,8 @@ export interface PolrAtvRemoteCardConfig {
   show_nav?: boolean;
   pad?: PadStyle;
   show_transport?: boolean;
+  /** Which transport buttons to draw, in order. */
+  transport_buttons?: ButtonId[];
   show_volume?: boolean;
   show_text_input?: boolean;
   show_apps?: boolean;
@@ -152,6 +154,7 @@ export interface ResolvedConfig extends PolrAtvRemoteCardConfig {
   show_nav: boolean;
   pad: PadStyle;
   show_transport: boolean;
+  transport_buttons: ButtonId[];
   show_volume: boolean;
   show_text_input: boolean;
   show_apps: boolean;
@@ -170,6 +173,7 @@ export const DEFAULTS = {
   show_nav: true,
   pad: "buttons" as PadStyle,
   show_transport: true,
+  transport_buttons: ["previous", "rewind", "play_pause", "fast_forward", "next"] as ButtonId[],
   show_volume: true,
   // Off by default: sending text needs a focused input on the TV *and*
   // `enable_ime` on the config entry, neither of which the card can detect.
@@ -211,6 +215,21 @@ const V1_OVERRIDE_KEYS: Record<string, ButtonId> = {
   volumeup: "volume_up",
   volumedown: "volume_down",
   volumemute: "volume_mute",
+};
+
+/**
+ * Keys from the unreleased `general-improvements` branch.
+ *
+ * That branch never shipped to HACS, but it was built and run locally -- the
+ * author's own three dashboards are configured with these, not with v1's keys.
+ * Anyone else who built from it is in the same position, so they migrate too.
+ */
+const BRANCH_KEYS: Record<string, keyof PolrAtvRemoteCardConfig> = {
+  showRemote: "show_nav",
+  showApps: "show_apps",
+  showVolume: "show_volume",
+  showMedia: "show_transport",
+  showURLSearch: "show_text_input",
 };
 
 /** v1 `remote:` -> the v2 pad. */
@@ -417,6 +436,29 @@ export const normalizeConfig = (raw: PolrAtvRemoteCardConfig): ResolvedConfig =>
     if (actions) overrides[buttonId] = actions;
   }
 
+  // Branch-era booleans, applied only where the v2 key is absent.
+  const branch: Partial<Record<keyof PolrAtvRemoteCardConfig, boolean>> = {};
+  for (const [branchKey, v2Key] of Object.entries(BRANCH_KEYS)) {
+    if (typeof raw[branchKey] === "boolean") {
+      branch[v2Key] = raw[branchKey] as boolean;
+    }
+  }
+  // showBasic drove the back/home row, which is now unconditional. Nothing to
+  // map it to, and nothing lost: the row is always drawn.
+
+  const rawTransport = Array.isArray(raw.transport_buttons)
+    ? raw.transport_buttons
+    : Array.isArray(raw["media_controls"])
+      ? (raw["media_controls"] as unknown[])
+      : undefined;
+  const transportButtons = rawTransport
+    ? (rawTransport.filter(
+        (button): button is ButtonId =>
+          typeof button === "string" &&
+          DEFAULTS.transport_buttons.includes(button as ButtonId),
+      ))
+    : DEFAULTS.transport_buttons;
+
   const rawApps = Array.isArray(raw.apps) ? raw.apps : [];
   const apps = rawApps
     .map(normalizeApp)
@@ -439,12 +481,16 @@ export const normalizeConfig = (raw: PolrAtvRemoteCardConfig): ResolvedConfig =>
 
     show_header: pick(raw.show_header, DEFAULTS.show_header),
     show_power: pick(raw.show_power, DEFAULTS.show_power),
-    show_nav: pick(raw.show_nav, DEFAULTS.show_nav),
+    show_nav: pick(raw.show_nav, branch.show_nav ?? DEFAULTS.show_nav),
     pad,
-    show_transport: pick(raw.show_transport, DEFAULTS.show_transport),
-    show_volume: pick(raw.show_volume, legacyVolume ?? DEFAULTS.show_volume),
-    show_text_input: pick(raw.show_text_input, DEFAULTS.show_text_input),
-    show_apps: pick(raw.show_apps, DEFAULTS.show_apps),
+    show_transport: pick(raw.show_transport, branch.show_transport ?? DEFAULTS.show_transport),
+    transport_buttons: transportButtons,
+    show_volume: pick(raw.show_volume, branch.show_volume ?? legacyVolume ?? DEFAULTS.show_volume),
+    show_text_input: pick(
+      raw.show_text_input,
+      branch.show_text_input ?? DEFAULTS.show_text_input,
+    ),
+    show_apps: pick(raw.show_apps, branch.show_apps ?? DEFAULTS.show_apps),
     show_section_labels: pick(raw.show_section_labels, DEFAULTS.show_section_labels),
 
     // v1 always drew a favourite button on the default pad, and threw when it
@@ -478,6 +524,9 @@ export const stripLegacyKeys = (
     "show_favorite",
     // Removed in v2: back/home/menu is always there.
     "show_navigation_row",
+    "showBasic",
+    "media_controls",
+    ...Object.keys(BRANCH_KEYS),
     ...Object.keys(V1_OVERRIDE_KEYS),
   ]);
   const out: Record<string, unknown> = {};

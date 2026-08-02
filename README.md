@@ -76,6 +76,7 @@ apps:
 | `show_power`          | `true`   | Power button in the header.                                                  |
 | `show_nav`            | `true`   | The pad itself.                                                              |
 | `show_transport`      | `true`   | Previous, rewind, play-pause, fast-forward, next.                            |
+| `transport_buttons`   | all five | Which transport buttons to draw, in order.                                   |
 | `show_volume`         | `true`   | Volume down / mute / up, plus a level bar where there is one.                |
 | `show_text_input`     | `false`  | Type text on the TV. See [Text input](#text-input).                          |
 | `show_apps`           | `true`   | The app launcher.                                                            |
@@ -246,7 +247,24 @@ Worth knowing, because it shapes the card:
   you point `media_player_entity` at a different player on the same TV, such as
   a Chromecast.
 
-## Migrating from v1
+## Migrating
+
+### From a build of the `general-improvements` branch
+
+That branch never reached HACS, but it was buildable, so some configs use its
+keys. They are translated on load:
+
+| Branch key      | v2                                                     |
+| --------------- | ------------------------------------------------------ |
+| `showRemote`    | `show_nav`                                             |
+| `showApps`      | `show_apps`                                            |
+| `showVolume`    | `show_volume`                                          |
+| `showMedia`     | `show_transport`                                       |
+| `showURLSearch` | `show_text_input`                                      |
+| `media_controls`| `transport_buttons`                                    |
+| `showBasic`     | dropped — back/home/menu is always drawn               |
+
+### From v1
 
 **Nothing to do.** v1 configs are translated on load, and the six brand
 shortcuts launch exactly what they launched before. Opening the visual editor

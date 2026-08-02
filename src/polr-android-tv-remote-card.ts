@@ -280,19 +280,28 @@ export class PolrAndroidTvRemoteCard extends LitElement {
     const showPrev = unpaired || can(device, FEATURE.PREVIOUS_TRACK);
     const showNext = unpaired || can(device, FEATURE.NEXT_TRACK);
 
-    return html`
-      <div class="features">
-        ${showPrev ? this._button("previous", "mdi:skip-previous", "Previous") : nothing}
-        ${this._button("rewind", "mdi:rewind", "Rewind", { repeat: true })}
-        ${this._button(
-          "play_pause",
-          device.playing ? "mdi:pause" : "mdi:play",
-          device.playing ? "Pause" : "Play",
-        )}
-        ${this._button("fast_forward", "mdi:fast-forward", "Fast forward", { repeat: true })}
-        ${showNext ? this._button("next", "mdi:skip-next", "Next") : nothing}
-      </div>
-    `;
+    const wanted = new Set(this._config!.transport_buttons);
+    const buttons: Array<TemplateResult | typeof nothing> = [
+      wanted.has("previous") && showPrev
+        ? this._button("previous", "mdi:skip-previous", "Previous")
+        : nothing,
+      wanted.has("rewind")
+        ? this._button("rewind", "mdi:rewind", "Rewind", { repeat: true })
+        : nothing,
+      wanted.has("play_pause")
+        ? this._button(
+            "play_pause",
+            device.playing ? "mdi:pause" : "mdi:play",
+            device.playing ? "Pause" : "Play",
+          )
+        : nothing,
+      wanted.has("fast_forward")
+        ? this._button("fast_forward", "mdi:fast-forward", "Fast forward", { repeat: true })
+        : nothing,
+      wanted.has("next") && showNext ? this._button("next", "mdi:skip-next", "Next") : nothing,
+    ];
+
+    return html`<div class="features">${buttons}</div>`;
   }
 
   /**

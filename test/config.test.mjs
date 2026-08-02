@@ -484,3 +484,150 @@ test("a garbage override is dropped rather than half-applied", () => {
   );
   assert.equal(config.overrides.menu, undefined);
 });
+
+/* ------------------------------------------------------------------------ *
+ * The unreleased `general-improvements` branch.
+ *
+ * It never shipped to HACS, but it was built and run locally — the author's
+ * own three dashboards are configured with these keys, not v1's. The configs
+ * below are copied verbatim out of a live .storage/lovelace.lovelace, which is
+ * the only migration that actually has to be right.
+ * ------------------------------------------------------------------------ */
+
+const IR = (command, entity = "remote.living_room_rf") => ({
+  service: "remote.send_command",
+  data: { command, device: "livingroomtv", entity_id: entity },
+});
+
+test("branch booleans map onto their v2 equivalents", () => {
+  const config = normalizeConfig(
+    base({
+      entity_id: "remote.main_tv",
+      showRemote: false,
+      showApps: false,
+      showVolume: false,
+      showMedia: false,
+      showURLSearch: true,
+    }),
+  );
+  assert.equal(config.show_nav, false);
+  assert.equal(config.show_apps, false);
+  assert.equal(config.show_volume, false);
+  assert.equal(config.show_transport, false);
+  assert.equal(config.show_text_input, true, "showURLSearch became the text field");
+});
+
+test("media_controls picks which transport buttons are drawn", () => {
+  const config = normalizeConfig(
+    base({ entity: "remote.atv", media_controls: ["play_pause", "next"] }),
+  );
+  assert.deepEqual(config.transport_buttons, ["play_pause", "next"]);
+});
+
+test("an unknown media_control is dropped rather than rendered blank", () => {
+  const config = normalizeConfig(
+    base({ entity: "remote.atv", media_controls: ["play_pause", "record"] }),
+  );
+  assert.deepEqual(config.transport_buttons, ["play_pause"]);
+});
+
+test("the author's live Main TV card migrates intact", () => {
+  const config = normalizeConfig({
+    type: TYPE,
+    entity_id: "remote.main_tv",
+    remote: "default",
+    apps: [
+      { icon: "mdi:apple", url: "https://tv.apple.com" },
+      "netflix",
+      { icon: "mdi:youtube", url: "https://www.youtube.com" },
+      { icon: "mdi:movie", url: "https://play.max.com" },
+      "disneyplus",
+    ],
+    power: IR("power"),
+    volumedown: IR("volumedown"),
+    volumeup: IR("volumeup"),
+    volumemute: IR("mute"),
+    showRemote: true,
+    showBasic: true,
+    showApps: true,
+    showVolume: true,
+    showMedia: true,
+    media_controls: ["previous", "rewind", "play_pause", "fast_forward", "next"],
+    showURLSearch: false,
+  });
+
+  assert.equal(config.entity, "remote.main_tv");
+  assert.equal(config.pad, "buttons");
+  assert.equal(config.show_apps, true);
+  assert.equal(config.show_volume, true);
+  assert.equal(config.show_transport, true);
+  assert.equal(config.show_text_input, false);
+  assert.deepEqual(config.transport_buttons, [
+    "previous",
+    "rewind",
+    "play_pause",
+    "fast_forward",
+    "next",
+  ]);
+
+  // Five apps, in order, with the two brands resolved and three custom URLs.
+  assert.equal(config.apps.length, 5);
+  assert.equal(config.apps[0].action.activity, "https://tv.apple.com");
+  assert.equal(config.apps[1].icon, "brand:netflix");
+  assert.equal(config.apps[3].action.activity, "https://play.max.com");
+  assert.equal(config.apps[4].icon, "brand:disneyplus");
+
+  // The RF repeater keeps driving power and volume.
+  assert.deepEqual(config.overrides.power, tap(IR("power")));
+  assert.deepEqual(config.overrides.volume_up, tap(IR("volumeup")));
+  assert.deepEqual(config.overrides.volume_down, tap(IR("volumedown")));
+  assert.deepEqual(config.overrides.volume_mute, tap(IR("mute")));
+});
+
+test("the author's live Gym TV card keeps its URL search as a text field", () => {
+  const config = normalizeConfig({
+    type: TYPE,
+    entity_id: "remote.gym_tv",
+    remote: "default",
+    apps: ["netflix"],
+    showBasic: true,
+    showRemote: true,
+    showApps: true,
+    showVolume: true,
+    showMedia: true,
+    media_controls: ["previous", "rewind", "play_pause", "fast_forward", "next"],
+    showURLSearch: true,
+  });
+  assert.equal(config.show_text_input, true);
+  // Gym TV has no volume override: it falls through to the TV itself.
+  assert.equal(config.overrides.volume_up, undefined);
+});
+
+test("the author's live Media Room card keeps its Sofabaton volume codes", () => {
+  const baton = (command) => ({
+    service: "remote.send_command",
+    data: { entity_id: "remote.media_room_baton_remote", device: "3", command },
+  });
+  const config = normalizeConfig({
+    type: TYPE,
+    entity_id: "remote.media_room_tv",
+    remote: "default",
+    apps: ["netflix"],
+    volumeup: baton(32),
+    volumedown: baton(31),
+    volumemute: baton(28),
+  });
+  assert.deepEqual(config.overrides.volume_up, tap(baton(32)));
+  assert.deepEqual(config.overrides.volume_down, tap(baton(31)));
+  assert.deepEqual(config.overrides.volume_mute, tap(baton(28)));
+});
+
+test("branch keys are stripped when the editor writes back", () => {
+  const stripped = stripLegacyKeys(
+    normalizeConfig(base({ entity: "remote.atv", showURLSearch: true, showBasic: true })),
+  );
+  for (const key of ["showRemote", "showApps", "showVolume", "showMedia", "showURLSearch", "showBasic", "media_controls"]) {
+    assert.equal(stripped[key], undefined, `${key} should not survive`);
+  }
+  assert.equal(stripped.show_text_input, true);
+});
