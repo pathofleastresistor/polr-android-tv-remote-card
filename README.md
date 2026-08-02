@@ -69,14 +69,14 @@ apps:
 | --------------------- | -------- | --------------------------------------------------------------------------- |
 | `entity`              | required | A `remote` entity from the Android TV Remote integration.                    |
 | `media_player_entity` | auto     | Its paired media player. Found automatically; set it only to override.       |
+| `volume_entity`       | player   | What the volume buttons drive. See [Volume](#volume).                        |
 | `name`                | entity   | Header title.                                                                |
 | `pad`                 | buttons  | `buttons`, `dpad` or `touchpad`.                                             |
 | `show_header`         | `true`   | Now-playing tile with power.                                                 |
 | `show_power`          | `true`   | Power button in the header.                                                  |
 | `show_nav`            | `true`   | The pad itself.                                                              |
-| `show_navigation_row` | `true`   | Back / home / menu row.                                                      |
 | `show_transport`      | `true`   | Play-pause, previous, next.                                                  |
-| `show_volume`         | `true`   | Volume down / mute / up, plus a level bar.                                   |
+| `show_volume`         | `true`   | Volume down / mute / up, plus a level bar where there is one.                |
 | `show_text_input`     | `false`  | Type text on the TV. See [Text input](#text-input).                          |
 | `show_apps`           | `true`   | The app launcher.                                                            |
 | `show_section_labels` | `false`  | Small headings above sections.                                               |
@@ -130,6 +130,26 @@ Valid buttons: `up`, `down`, `left`, `right`, `center`, `power`, `home`, `back`,
 `menu`, `favorite`, `volume_up`, `volume_down`, `volume_mute`, `play_pause`,
 `next`, `previous`. The `favorite` button appears only when it has an override.
 
+### Volume
+
+Volume buttons always work — worst case they send key codes. Whether you can
+*see* the volume is another matter: `androidtv_remote` only reports a level when
+the TV itself handles audio. Hand the sound to a soundbar over ARC and there is
+no level and no mute flag, so the card shows the three buttons and nothing else
+rather than inventing a bar. Mute falls back to the `MUTE` key, which is a real
+toggle, instead of `media_player.volume_mute`, which is absolute and would mute
+every time.
+
+If a soundbar or receiver is what actually changes the volume, point the card at
+it:
+
+```yaml
+volume_entity: media_player.living_room_soundbar
+```
+
+The buttons then drive that entity, and its level and mute state come back —
+soundbars usually do report them. Everything else still follows the TV.
+
 ### Text input
 
 `show_text_input: true` adds a field that types on the TV, which beats entering
@@ -151,11 +171,15 @@ data: { command: "text:the bear" }
 
 Worth knowing, because it shapes the card:
 
-- **No app list.** The media player has no `source_list` and no
-  `select_source`, so apps must be configured — in this card or in the
-  integration's options.
+- **No app discovery.** The media player has no `source_list` and no
+  `select_source`, and nothing enumerates what is installed on the TV.
+  `activity_list` contains only the apps someone typed into the integration's
+  Configure dialog. The one runtime signal is `app_id` for whatever is on
+  screen — the editor offers to capture that, which is the easiest way to learn
+  an app's package id.
 - **No volume setting.** It supports volume *steps* but not `volume_set`, so
-  the volume bar shows the level and is not draggable.
+  the level bar is read-only — and often absent entirely, see
+  [Volume](#volume).
 - **No media title or artwork.** Only the app name is reported. Both appear if
   you point `media_player_entity` at a different player on the same TV, such as
   a Chromecast.
@@ -170,7 +194,7 @@ keeps working.
 | v1                                      | v2                                              |
 | --------------------------------------- | ----------------------------------------------- |
 | `entity_id:`                            | `entity:`                                       |
-| `remote: default`                       | `pad: buttons` (power/home/back stay in the pad) |
+| `remote: default`                       | `pad: buttons`                                  |
 | `remote: touch`                         | `pad: touchpad`                                 |
 | `remote: dpad`                          | `pad: dpad`                                     |
 | `volume: false`                         | `show_volume: false`                            |
@@ -179,6 +203,10 @@ keeps working.
 | `apps: [{icon, service, data}]`         | `action: {action: service, …}`                  |
 | `up:`, `down:`, `power:`, `favorite:` … | `overrides: {up: …}`                            |
 | `volumeup:`, `volumedown:`, `volumemute:` | `overrides: {volume_up: …}` etc.              |
+
+The pad is now purely directional. v1's default layout packed power, home,
+back and favourite into the corners of the 3x3 grid; those live in the header
+and the back/home/menu row instead, which is always shown.
 
 Three v1 bugs are fixed rather than reproduced, so behaviour differs slightly:
 

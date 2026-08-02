@@ -240,25 +240,26 @@ export const remoteStyles = css`
   /* ------------------------------------------------------------ app grid -- */
   .app-grid {
     display: grid;
-    gap: var(--ha-space-2, 8px);
+    /* Matches the kit's .features gap, so the app row lines up with the
+       navigation, transport and volume rows above it. */
+    gap: 12px;
     padding: 0 var(--ha-space-3, 12px) var(--ha-space-3, 12px);
-    justify-items: center;
   }
   .app-tile {
-    /* Capped so two apps do not become two enormous logos filling the card.
-       v1 had the opposite failure: a hardcoded repeat(4, 1fr) that stranded
-       app five on a row of its own. */
+    /* Same 40px height as every other control row, rather than a big square.
+       Square tiles scale their logo with the card, so two apps in a wide card
+       became two enormous logos; a fixed height keeps the app row reading as a
+       row of buttons, which is what it is. */
     width: 100%;
-    max-width: 88px;
     position: relative;
     overflow: hidden;
     display: grid;
     place-items: center;
-    aspect-ratio: 1;
+    height: 40px;
     margin: 0;
-    padding: 18%;
+    padding: 8px;
     border: none;
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-md);
     background: none;
     outline: none;
     cursor: pointer;
@@ -285,16 +286,17 @@ export const remoteStyles = css`
   .app-tile > * {
     position: relative;
   }
-  .app-tile svg {
-    width: 100%;
-    height: 100%;
-    fill: currentColor;
-  }
+  /* Logos are square art in a wider button, so height is the constraint. */
+  .app-tile svg,
   .app-tile img {
-    width: 100%;
+    width: auto;
     height: 100%;
+    max-width: 100%;
+    max-height: 24px;
     object-fit: contain;
-    border-radius: var(--radius-md);
+  }
+  .app-tile svg {
+    fill: currentColor;
   }
 
   /* ---------------------------------------------------------- text input -- */

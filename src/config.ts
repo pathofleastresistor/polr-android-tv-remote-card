@@ -73,6 +73,12 @@ export interface PolrAtvRemoteCardConfig {
   entity: string;
   /** Paired media_player. Derived from the remote's device when omitted. */
   media_player_entity?: string;
+  /**
+   * Entity the volume buttons drive. Point this at a soundbar or receiver when
+   * the TV only passes audio through -- which is also the case where the TV
+   * itself reports no volume level to display.
+   */
+  volume_entity?: string;
   /** Header title. Defaults to the entity's friendly name. */
   name?: string;
 
@@ -80,7 +86,6 @@ export interface PolrAtvRemoteCardConfig {
   show_power?: boolean;
   show_nav?: boolean;
   pad?: PadStyle;
-  show_navigation_row?: boolean;
   show_transport?: boolean;
   show_volume?: boolean;
   show_text_input?: boolean;
@@ -104,7 +109,6 @@ export interface ResolvedConfig extends PolrAtvRemoteCardConfig {
   show_power: boolean;
   show_nav: boolean;
   pad: PadStyle;
-  show_navigation_row: boolean;
   show_transport: boolean;
   show_volume: boolean;
   show_text_input: boolean;
@@ -123,7 +127,6 @@ export const DEFAULTS = {
   show_power: true,
   show_nav: true,
   pad: "buttons" as PadStyle,
-  show_navigation_row: true,
   show_transport: true,
   show_volume: true,
   // Off by default: sending text needs a focused input on the TV *and*
@@ -168,13 +171,11 @@ const V1_OVERRIDE_KEYS: Record<string, ButtonId> = {
   volumemute: "volume_mute",
 };
 
-/** v1 `remote:` -> the v2 pad plus the section layout it implied. */
-const V1_PAD: Record<string, { pad: PadStyle; navigation_row: boolean }> = {
-  // v1's default pad inlined power/home/back/favorite into the 3x3 grid, so a
-  // separate navigation row would duplicate them.
-  default: { pad: "buttons", navigation_row: false },
-  touch: { pad: "touchpad", navigation_row: true },
-  dpad: { pad: "dpad", navigation_row: true },
+/** v1 `remote:` -> the v2 pad. */
+const V1_PAD: Record<string, PadStyle> = {
+  default: "buttons",
+  touch: "touchpad",
+  dpad: "dpad",
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -298,7 +299,7 @@ export const normalizeConfig = (raw: PolrAtvRemoteCardConfig): ResolvedConfig =>
 
   const pad: PadStyle = PAD_STYLES.includes(raw.pad as PadStyle)
     ? (raw.pad as PadStyle)
-    : (legacyPad?.pad ?? DEFAULTS.pad);
+    : (legacyPad ?? DEFAULTS.pad);
 
   // v1's `volume` boolean, defaulted to true when absent.
   const legacyVolume =
@@ -336,16 +337,15 @@ export const normalizeConfig = (raw: PolrAtvRemoteCardConfig): ResolvedConfig =>
     ...(typeof raw.media_player_entity === "string"
       ? { media_player_entity: raw.media_player_entity }
       : {}),
+    ...(typeof raw.volume_entity === "string"
+      ? { volume_entity: raw.volume_entity }
+      : {}),
     ...(typeof raw.name === "string" ? { name: raw.name } : {}),
 
     show_header: pick(raw.show_header, DEFAULTS.show_header),
     show_power: pick(raw.show_power, DEFAULTS.show_power),
     show_nav: pick(raw.show_nav, DEFAULTS.show_nav),
     pad,
-    show_navigation_row: pick(
-      raw.show_navigation_row,
-      legacyPad ? legacyPad.navigation_row : DEFAULTS.show_navigation_row,
-    ),
     show_transport: pick(raw.show_transport, DEFAULTS.show_transport),
     show_volume: pick(raw.show_volume, legacyVolume ?? DEFAULTS.show_volume),
     show_text_input: pick(raw.show_text_input, DEFAULTS.show_text_input),
@@ -393,6 +393,8 @@ export const stripLegacyKeys = (
     "remote",
     "volume",
     "show_favorite",
+    // Removed in v2: back/home/menu is always there.
+    "show_navigation_row",
     ...Object.keys(V1_OVERRIDE_KEYS),
   ]);
   const out: Record<string, unknown> = {};

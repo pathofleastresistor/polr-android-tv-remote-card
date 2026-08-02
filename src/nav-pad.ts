@@ -41,9 +41,6 @@ export class PolrAtvNavPad extends LitElement {
   @property({ type: String }) public pad: PadStyle = "buttons";
   @property({ type: Boolean }) public repeat = true;
   @property({ type: Boolean }) public haptics = true;
-  /** Draw power / home / back / favourite inside the 3x3 grid, as v1 did. */
-  @property({ type: Boolean, attribute: "inline-extras" }) public inlineExtras = false;
-  @property({ type: Boolean }) public showFavorite = false;
 
   @query(".touchpad") private _touchpad?: HTMLElement;
   @query(".touchpad-dot") private _dot?: HTMLElement;
@@ -55,10 +52,6 @@ export class PolrAtvNavPad extends LitElement {
 
   private _emit(direction: NavDirection): void {
     fireEvent(this, "atv-nav", { direction });
-  }
-
-  private _emitButton(button: string): void {
-    fireEvent(this, "atv-button", { button });
   }
 
   private _key(
@@ -83,42 +76,26 @@ export class PolrAtvNavPad extends LitElement {
     `;
   }
 
-  private _extra(button: string, icon: string, label: string): TemplateResult {
-    return html`
-      <button
-        class="pad-key"
-        type="button"
-        aria-label=${label}
-        ${press({ onPress: () => this._emitButton(button), haptics: this.haptics })}
-      >
-        <ha-icon icon=${icon}></ha-icon>
-      </button>
-    `;
-  }
-
   private _blank(): TemplateResult {
     return html`<span class="pad-key blank" aria-hidden="true"></span>`;
   }
 
-  /** v1's "default" 3x3 grid. */
+  /**
+   * A plus-shaped button pad.
+   *
+   * v1 packed power, home, back and favourite into the four corners of this
+   * grid, which is why it had to suppress the separate navigation row. Keeping
+   * the pad purely directional means one obvious home for each control, and no
+   * setting to reconcile the two.
+   */
   private _renderButtons(): TemplateResult {
     return html`
       <div class="button-pad" role="group" aria-label="Directional pad">
-        ${this.inlineExtras
-          ? this._extra("power", "mdi:power", "Power")
-          : this._blank()}
-        ${this._key("up", "mdi:chevron-up", "Up")}
-        ${this.inlineExtras ? this._extra("home", "mdi:home", "Home") : this._blank()}
+        ${this._blank()} ${this._key("up", "mdi:chevron-up", "Up")} ${this._blank()}
         ${this._key("left", "mdi:chevron-left", "Left")}
         ${this._key("center", "mdi:circle", "Select", "ok")}
         ${this._key("right", "mdi:chevron-right", "Right")}
-        ${this.inlineExtras
-          ? this._extra("back", "mdi:arrow-u-left-top", "Back")
-          : this._blank()}
-        ${this._key("down", "mdi:chevron-down", "Down")}
-        ${this.inlineExtras && this.showFavorite
-          ? this._extra("favorite", "mdi:star", "Favourite")
-          : this._blank()}
+        ${this._blank()} ${this._key("down", "mdi:chevron-down", "Down")} ${this._blank()}
       </div>
     `;
   }

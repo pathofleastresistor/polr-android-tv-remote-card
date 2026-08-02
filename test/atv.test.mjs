@@ -13,6 +13,7 @@ import {
   FEATURE,
   KEYS,
   can,
+  hasVolumeState,
   describeAction,
   pressButton,
   readDevice,
@@ -368,4 +369,101 @@ test("describeAction summarises every action kind", () => {
   assert.equal(describeAction({ action: "app", app_id: "com.x" }), "Open app com.x");
   assert.equal(describeAction({ action: "key", key: "GUIDE" }), "Send GUIDE");
   assert.equal(describeAction({ action: "service", service: "script.x" }), "Call script.x");
+});
+
+
+/* ------------------------------------------------------------------------ *
+ * Volume state, and the soundbar case.
+ *
+ * androidtv_remote only sets volume_level when the TV reports a non-zero max
+ * in its volume info. A TV handing audio to a soundbar over ARC reports none,
+ * so there is no level and no mute flag to read -- and the card must neither
+ * display a level it does not have nor assume an unmuted state.
+ * ------------------------------------------------------------------------ */
+
+test("a TV that reports no volume info has no volume state to show", () => {
+  const hass = fixture({ playerAttrs: { volume_level: null, is_volume_muted: null } });
+  const device = readDevice(hass, config());
+  assert.equal(device.volume, undefined);
+  assert.equal(device.muted, undefined, "unknown, which is not the same as unmuted");
+  assert.equal(hasVolumeState(device), false);
+});
+
+test("mute falls back to the toggle key when the mute state is unknown", async () => {
+  // media_player.volume_mute is absolute. Guessing "not muted" would mean every
+  // press mutes and none ever unmutes.
+  const hass = fixture({ playerAttrs: { volume_level: null, is_volume_muted: null } });
+  const device = readDevice(hass, config());
+  await pressButton(hass, config(), device, "volume_mute");
+  assert.deepEqual(hass.calls[0], {
+    domain: "remote",
+    service: "send_command",
+    data: { entity_id: "remote.main_tv", command: "MUTE" },
+    target: undefined,
+  });
+});
+
+test("volume_entity redirects the volume buttons to a soundbar", async () => {
+  const hass = fixture();
+  hass.states["media_player.soundbar"] = {
+    entity_id: "media_player.soundbar",
+    state: "on",
+    attributes: {
+      supported_features: FEATURE.VOLUME_STEP | FEATURE.VOLUME_MUTE | FEATURE.VOLUME_SET,
+      volume_level: 0.62,
+      is_volume_muted: false,
+    },
+  };
+  const cfg = config({ volume_entity: "media_player.soundbar" });
+  const device = readDevice(hass, cfg);
+
+  assert.equal(device.volumeId, "media_player.soundbar");
+  assert.equal(device.volume, 0.62, "level comes from the soundbar, not the TV");
+
+  await pressButton(hass, cfg, device, "volume_up");
+  assert.deepEqual(hass.calls[0], {
+    domain: "media_player",
+    service: "volume_up",
+    data: { entity_id: "media_player.soundbar" },
+    target: undefined,
+  });
+
+  hass.calls.length = 0;
+  await pressButton(hass, cfg, device, "volume_mute");
+  assert.deepEqual(hass.calls[0].data, {
+    entity_id: "media_player.soundbar",
+    is_volume_muted: true,
+  });
+});
+
+test("volume_entity does not disturb the rest of the card", async () => {
+  const hass = fixture();
+  hass.states["media_player.soundbar"] = {
+    entity_id: "media_player.soundbar",
+    state: "on",
+    attributes: { supported_features: FEATURE.VOLUME_STEP },
+  };
+  const cfg = config({ volume_entity: "media_player.soundbar" });
+  const device = readDevice(hass, cfg);
+
+  assert.equal(device.playerId, "media_player.main_tv");
+  await pressButton(hass, cfg, device, "play_pause");
+  assert.equal(hass.calls[0].data.entity_id, "media_player.main_tv");
+});
+
+test("a volume override still beats volume_entity", async () => {
+  const hass = fixture();
+  const cfg = config({
+    volume_entity: "media_player.soundbar",
+    volumeup: { service: "script.louder" },
+  });
+  await pressButton(hass, cfg, readDevice(hass, cfg), "volume_up");
+  assert.deepEqual(hass.calls, [
+    { domain: "script", service: "louder", data: {}, target: undefined },
+  ]);
+});
+
+test("app_id is exposed so the editor can capture the running app", () => {
+  const hass = fixture({ playerAttrs: { app_id: "com.netflix.ninja" } });
+  assert.equal(readDevice(hass, config()).appId, "com.netflix.ninja");
 });

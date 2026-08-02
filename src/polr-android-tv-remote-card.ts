@@ -10,7 +10,16 @@ import { LitElement, html, nothing, type TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { repeat } from "lit/directives/repeat.js";
 
-import { FEATURE, can, pressButton, readDevice, runAppAction, sendText, type DeviceState } from "./atv";
+import {
+  FEATURE,
+  can,
+  hasVolumeState,
+  pressButton,
+  readDevice,
+  runAppAction,
+  sendText,
+  type DeviceState,
+} from "./atv";
 import {
   balancedColumns,
   normalizeConfig,
@@ -70,7 +79,7 @@ export class PolrAndroidTvRemoteCard extends LitElement {
     if (!config) return 6;
     let size = config.show_header ? 2 : 0;
     if (config.show_nav) size += config.pad === "buttons" ? 5 : 6;
-    if (config.show_navigation_row) size += 1;
+    size += 1; // back / home / menu
     if (config.show_transport) size += 1;
     if (config.show_volume) size += 1;
     if (config.show_text_input) size += 1;
@@ -103,10 +112,6 @@ export class PolrAndroidTvRemoteCard extends LitElement {
 
   private _navigate(event: CustomEvent<{ direction: string }>): void {
     this._press(event.detail.direction as ButtonId);
-  }
-
-  private _navButton(event: CustomEvent<{ button: string }>): void {
-    this._press(event.detail.button as ButtonId);
   }
 
   private _launch(app: AppConfig): void {
@@ -179,11 +184,13 @@ export class PolrAndroidTvRemoteCard extends LitElement {
   private _renderChips(device: DeviceState): TemplateResult | typeof nothing {
     if (!device.on || !device.available) return nothing;
 
+    // Nothing here is invented: each chip needs state the device actually
+    // reports. A TV feeding a soundbar reports neither, and shows no chips.
     const chips: TemplateResult[] = [];
-    if (device.muted) {
+    if (device.muted === true) {
       chips.push(html`<span class="chip warn"><ha-icon icon="mdi:volume-off"></ha-icon>Muted</span>`);
-    } else if (device.volume !== undefined) {
-      chips.push(html`<span class="chip accent">${Math.round(device.volume * 100)}%</span>`);
+    } else if (hasVolumeState(device)) {
+      chips.push(html`<span class="chip accent">${Math.round(device.volume! * 100)}%</span>`);
     }
     if (!chips.length) return nothing;
 
@@ -255,28 +262,40 @@ export class PolrAndroidTvRemoteCard extends LitElement {
     `;
   }
 
+  /**
+   * Volume.
+   *
+   * The buttons always work -- worst case they send key codes. The *state* is
+   * another matter: androidtv_remote only reports a level when the TV itself
+   * handles audio. Hand the sound to a soundbar over ARC and there is no level
+   * and no mute flag, so the bar, the percentage chip and the muted icon would
+   * all be invented. When that is the case the row is just three buttons.
+   */
   private _renderVolume(device: DeviceState): TemplateResult {
+    const known = hasVolumeState(device);
+    const muted = device.muted === true;
+
     return html`
       <div class="features">
         ${this._button("volume_down", "mdi:volume-minus", "Volume down", { repeat: true })}
         <button
           class="control-button"
           type="button"
-          aria-label=${device.muted ? "Unmute" : "Mute"}
-          aria-pressed=${device.muted ? "true" : "false"}
+          aria-label=${muted ? "Unmute" : "Mute"}
+          aria-pressed=${device.muted === undefined ? "undefined" : muted ? "true" : "false"}
           ${press({
             onPress: () => this._press("volume_mute"),
             haptics: this._config!.haptics,
           })}
         >
-          <ha-icon icon=${device.muted ? "mdi:volume-off" : "mdi:volume-high"}></ha-icon>
+          <ha-icon icon=${muted ? "mdi:volume-off" : "mdi:volume-high"}></ha-icon>
         </button>
         ${this._button("volume_up", "mdi:volume-plus", "Volume up", { repeat: true })}
       </div>
-      ${device.volume !== undefined
+      ${known
         ? html`
-            <div class="volume-bar ${device.muted ? "muted" : ""}">
-              <span style="width:${Math.round(device.volume * 100)}%"></span>
+            <div class="volume-bar ${muted ? "muted" : ""}">
+              <span style="width:${Math.round(device.volume! * 100)}%"></span>
             </div>
           `
         : nothing}
@@ -422,13 +441,10 @@ export class PolrAndroidTvRemoteCard extends LitElement {
                       .pad=${config.pad}
                       .repeat=${config.hold_repeat}
                       .haptics=${config.haptics}
-                      .inlineExtras=${!config.show_navigation_row}
-                      .showFavorite=${config.show_favorite}
                       @atv-nav=${this._navigate}
-                      @atv-button=${this._navButton}
                     ></polr-atv-nav-pad>`
                   : nothing}
-                ${config.show_navigation_row ? this._renderNavigationRow() : nothing}
+                ${this._renderNavigationRow()}
                 ${config.show_transport ? this._renderTransport(device) : nothing}
                 ${config.show_volume ? this._renderVolume(device) : nothing}
                 ${config.show_text_input ? this._renderTextInput() : nothing}

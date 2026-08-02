@@ -30,30 +30,31 @@ test("a config with neither entity nor entity_id throws", () => {
   assert.throws(() => normalizeConfig(base({})), /'entity' is required/);
 });
 
-test("remote: default maps to the buttons pad with no separate nav row", () => {
-  // v1's default pad already inlined power/home/back/favorite, so adding a
-  // navigation row would duplicate them.
+test("remote: default maps to the buttons pad", () => {
   const config = normalizeConfig(base({ entity_id: "remote.atv", remote: "default" }));
   assert.equal(config.pad, "buttons");
-  assert.equal(config.show_navigation_row, false);
 });
 
 test("an absent remote key is treated as default", () => {
   const config = normalizeConfig(base({ entity_id: "remote.atv" }));
   assert.equal(config.pad, DEFAULTS.pad);
-  assert.equal(config.show_navigation_row, true);
 });
 
-test("remote: touch maps to the touchpad, with the nav row v1 drew", () => {
+test("remote: touch maps to the touchpad", () => {
   const config = normalizeConfig(base({ entity_id: "remote.atv", remote: "touch" }));
   assert.equal(config.pad, "touchpad");
-  assert.equal(config.show_navigation_row, true);
 });
 
 test("remote: dpad maps to the dpad", () => {
   const config = normalizeConfig(base({ entity_id: "remote.atv", remote: "dpad" }));
   assert.equal(config.pad, "dpad");
-  assert.equal(config.show_navigation_row, true);
+});
+
+test("show_navigation_row is dropped: the row is always drawn", () => {
+  const stripped = stripLegacyKeys(
+    normalizeConfig(base({ entity: "remote.atv", show_navigation_row: false })),
+  );
+  assert.equal(stripped.show_navigation_row, undefined);
 });
 
 test("an unknown remote style falls back to the default pad", () => {

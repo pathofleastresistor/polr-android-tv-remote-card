@@ -75,16 +75,30 @@ export interface DeviceState {
   on: boolean;
   name: string;
   appName?: string;
+  /** Android package id of the running app, e.g. com.netflix.ninja. */
+  appId?: string;
   mediaTitle?: string;
   picture?: string;
-  /** 0..1, or undefined when the device does not report it. */
-  volume?: number;
-  muted: boolean;
   /** Only meaningful for players that distinguish playing from paused. */
   playing: boolean;
   features: number;
   /** `activity_list` — the apps configured in the integration's options. */
   activities: string[];
+
+  /** Entity the volume buttons act on: `volume_entity`, else the player. */
+  volumeId: string | null;
+  volumeFeatures: number;
+  /**
+   * 0..1, or undefined when nothing reports a level.
+   *
+   * androidtv_remote only sets volume_level when the TV reports a non-zero
+   * `max` in its volume info. A TV passing audio to a soundbar over ARC
+   * typically reports max 0, so there is no level and no mute state to read —
+   * the card must not invent one.
+   */
+  volume?: number;
+  /** undefined means "nobody knows", which is different from "not muted". */
+  muted?: boolean;
 }
 
 /**
@@ -126,6 +140,15 @@ export const readDevice = (
   const playerAttrs = player?.attributes ?? {};
   const remoteAttrs = remote?.attributes ?? {};
 
+  // Volume often lives somewhere else entirely: a soundbar or receiver on ARC,
+  // which is also the case where the TV itself reports no volume info at all.
+  const volumeId = config.volume_entity ?? playerId;
+  const volumeEntity =
+    config.volume_entity && config.volume_entity !== playerId
+      ? hass.states?.[config.volume_entity]
+      : player;
+  const volumeAttrs = volumeEntity?.attributes ?? {};
+
   // The remote entity is the source of truth for power: it is the one the card
   // always has. The player is only consulted when it exists and is live.
   const on = player && !isUnavailable(player)
@@ -150,25 +173,46 @@ export const readDevice = (
       (playerAttrs["app_name"] as string | undefined) ??
       (playerAttrs["source"] as string | undefined) ??
       (remoteAttrs["current_activity"] as string | undefined),
+    appId: playerAttrs["app_id"] as string | undefined,
     // Never set by androidtv_remote. Present only for other players.
     mediaTitle: playerAttrs["media_title"] as string | undefined,
     picture: playerAttrs["entity_picture"] as string | undefined,
-    volume:
-      typeof playerAttrs["volume_level"] === "number"
-        ? (playerAttrs["volume_level"] as number)
-        : undefined,
-    muted: playerAttrs["is_volume_muted"] === true,
     playing: player?.state === "playing",
     features: (playerAttrs["supported_features"] as number | undefined) ?? 0,
     activities: Array.isArray(remoteAttrs["activity_list"])
       ? (remoteAttrs["activity_list"] as string[])
       : [],
+
+    volumeId,
+    volumeFeatures: (volumeAttrs["supported_features"] as number | undefined) ?? 0,
+    volume:
+      typeof volumeAttrs["volume_level"] === "number"
+        ? (volumeAttrs["volume_level"] as number)
+        : undefined,
+    muted:
+      typeof volumeAttrs["is_volume_muted"] === "boolean"
+        ? (volumeAttrs["is_volume_muted"] as boolean)
+        : undefined,
   };
 };
 
 /** Does the paired player advertise this capability? */
 export const can = (device: DeviceState, feature: number): boolean =>
   (device.features & feature) !== 0;
+
+/** Same, for whatever entity the volume buttons act on. */
+export const canVolume = (device: DeviceState, feature: number): boolean =>
+  (device.volumeFeatures & feature) !== 0;
+
+/**
+ * Is there a real volume level to display?
+ *
+ * False for a TV that hands audio to a soundbar: it reports no level and no
+ * mute state, so a bar or a percentage chip would be fiction. The buttons still
+ * work — they send key codes — you just cannot see where the volume is.
+ */
+export const hasVolumeState = (device: DeviceState): boolean =>
+  device.volume !== undefined;
 
 const callService = (
   hass: HomeAssistant,
@@ -266,19 +310,24 @@ export const pressButton = (
 
     case "volume_up":
     case "volume_down":
-      if (player && can(device, FEATURE.VOLUME_STEP)) {
+      if (device.volumeId && canVolume(device, FEATURE.VOLUME_STEP)) {
         return hass.callService(
           "media_player",
           button === "volume_up" ? "volume_up" : "volume_down",
-          { entity_id: player },
+          { entity_id: device.volumeId },
         );
       }
       break;
 
     case "volume_mute":
-      if (player && can(device, FEATURE.VOLUME_MUTE)) {
+      // media_player.volume_mute is absolute, not a toggle, so it can only be
+      // used when the current mute state is actually known. A TV routing audio
+      // to a soundbar reports none, and guessing "not muted" would mean every
+      // press mutes and none ever unmutes. Fall through to the MUTE key, which
+      // really is a toggle.
+      if (device.volumeId && device.muted !== undefined && canVolume(device, FEATURE.VOLUME_MUTE)) {
         return hass.callService("media_player", "volume_mute", {
-          entity_id: player,
+          entity_id: device.volumeId,
           is_volume_muted: !device.muted,
         });
       }

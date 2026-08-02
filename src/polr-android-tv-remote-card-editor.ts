@@ -17,7 +17,7 @@
 import { LitElement, css, html, nothing, type TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 
-import { describeAction } from "./atv";
+import { describeAction, resolvePlayer } from "./atv";
 import {
   BRANDS,
   normalizeConfig,
@@ -65,7 +65,6 @@ const SCHEMA = (config: ResolvedConfig) =>
         { name: "show_header", selector: { boolean: {} } },
         { name: "show_power", selector: { boolean: {} } },
         { name: "show_nav", selector: { boolean: {} } },
-        { name: "show_navigation_row", selector: { boolean: {} } },
         { name: "show_transport", selector: { boolean: {} } },
         { name: "show_volume", selector: { boolean: {} } },
         { name: "show_apps", selector: { boolean: {} } },
@@ -98,6 +97,10 @@ const SCHEMA = (config: ResolvedConfig) =>
           name: "media_player_entity",
           selector: { entity: { filter: [{ domain: "media_player" }] } },
         },
+        {
+          name: "volume_entity",
+          selector: { entity: { filter: [{ domain: "media_player" }] } },
+        },
         { name: "hold_repeat", selector: { boolean: {} } },
         { name: "haptics", selector: { boolean: {} } },
         { name: "show_section_labels", selector: { boolean: {} } },
@@ -108,12 +111,12 @@ const SCHEMA = (config: ResolvedConfig) =>
 const LABELS: Record<string, string> = {
   entity: "Remote entity",
   media_player_entity: "Paired media player (auto-detected)",
+  volume_entity: "Volume controls",
   name: "Title",
   pad: "Pad style",
   show_header: "Show header",
   show_power: "Show power",
   show_nav: "Show pad",
-  show_navigation_row: "Back / home / menu row",
   show_transport: "Transport controls",
   show_volume: "Volume controls",
   show_apps: "App launcher",
@@ -126,6 +129,8 @@ const LABELS: Record<string, string> = {
 const HELPERS: Record<string, string> = {
   media_player_entity:
     "Only needed if the card cannot find the player itself, or to point it at a different player on the same TV.",
+  volume_entity:
+    "Point this at a soundbar or receiver if that is what actually changes the volume. A TV passing audio through reports no volume level, so the card shows no level bar for it.",
   show_text_input:
     "Sends typed text to the TV. Only lands while a search field is focused, and needs “Enable IME” on the integration.",
 };
@@ -351,11 +356,58 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
   }
 
   /**
-   * Apps the TV itself knows about.
+   * The app running on the TV right now.
    *
-   * `activity_list` is populated from the integration's own "configure apps"
-   * options. It is empty until the user sets those up, which is worth saying
-   * out loud rather than showing a blank space.
+   * This is the *only* app discovery the integration offers. It cannot
+   * enumerate what is installed — `activity_list` holds just the apps someone
+   * typed into its options dialog. But `app_id` reports whatever is on screen,
+   * so opening an app on the TV and clicking here captures its real package id,
+   * which is otherwise tedious to find.
+   */
+  private _renderCurrentApp(): TemplateResult | typeof nothing {
+    const config = this._config!;
+    const playerId = resolvePlayer(this.hass!, config);
+    const player = playerId ? this.hass!.states?.[playerId] : undefined;
+    const appId = player?.attributes?.["app_id"] as string | undefined;
+    const appName = player?.attributes?.["app_name"] as string | undefined;
+    if (!appId) return nothing;
+
+    const already = config.apps.some(
+      (app) => app.action.action === "app" && app.action.app_id === appId,
+    );
+
+    return html`
+      <div class="section-head"><span class="grow">Playing right now</span></div>
+      ${already
+        ? html`<div class="hint">${appName ?? appId} is already in the list.</div>`
+        : html`
+            <div class="chips">
+              <button
+                class="chip accent"
+                @click=${() =>
+                  this._addApp({
+                    name: appName ?? appId,
+                    icon: guessIcon(appName ?? appId),
+                    action: { action: "app", app_id: appId },
+                  })}
+              >
+                <ha-icon icon="mdi:plus"></ha-icon>${appName ?? appId}
+              </button>
+            </div>
+            <div class="hint">
+              Open an app on the TV and it appears here, which is the easiest way
+              to capture its package id (${appId}).
+            </div>
+          `}
+    `;
+  }
+
+  /**
+   * Apps configured in the integration's own options.
+   *
+   * `activity_list` is populated only from that dialog — the integration never
+   * enumerates what is installed on the TV. Worth saying out loud rather than
+   * rendering a blank space.
    */
   private _renderFromTv(): TemplateResult {
     const remote = this.hass?.states?.[this._config!.entity];
@@ -452,7 +504,9 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
               )}
             </div>
 
-            <div class="section-head"><span class="grow">Add from this TV</span></div>
+            ${this._renderCurrentApp()}
+
+            <div class="section-head"><span class="grow">Configured on this TV</span></div>
             ${this._renderFromTv()}
 
             <div class="form-actions">

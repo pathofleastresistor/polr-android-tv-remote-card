@@ -121,6 +121,7 @@
         } = overrides;
 
         const entities = {
+          "media_player.soundbar": { entity_id: "media_player.soundbar", platform: "sonos", device_id: "d3" },
           "remote.main_tv": { entity_id: "remote.main_tv", platform: "androidtv_remote", device_id: "d1" },
           "remote.orphan_tv": { entity_id: "remote.orphan_tv", platform: "androidtv_remote", device_id: "d2" },
         };
@@ -158,6 +159,16 @@
               state: "on",
               attributes: { friendly_name: "Orphan TV" },
             },
+            "media_player.soundbar": {
+              entity_id: "media_player.soundbar",
+              state: "on",
+              attributes: {
+                friendly_name: "Soundbar",
+                supported_features: 4 | 8 | 1024,
+                volume_level: 0.62,
+                is_volume_muted: false,
+              },
+            },
             "media_player.main_tv": {
               entity_id: "media_player.main_tv",
               state: playerState,
@@ -182,8 +193,12 @@
         { title: "d-pad", config: { entity: "remote.main_tv", pad: "dpad", apps: APPS.slice(0, 4) } },
         { title: "touchpad + text", config: { entity: "remote.main_tv", pad: "touchpad", show_text_input: true, apps: APPS.slice(0, 3) } },
         { title: "v1 config (touch, mixed apps)", config: { entity_id: "remote.main_tv", remote: "touch", apps: ["disneyplus", "hbomax", "netflix", "prime", { icon: "mdi:youtube", url: "https://www.youtube.com" }] } },
-        { title: "v1 default pad (inline extras)", config: { entity_id: "remote.main_tv", remote: "default", volume: false, favorite: { service: "script.fav" }, apps: APPS.slice(0, 2) } },
+        { title: "v1 default pad + favourite", config: { entity_id: "remote.main_tv", remote: "default", volume: false, favorite: { service: "script.fav" }, apps: APPS.slice(0, 2) } },
         { title: "muted", config: { entity: "remote.main_tv", apps: [] }, hass: { playerAttrs: { is_volume_muted: true } } },
+        // The real-world case: the TV passes audio to a soundbar, so it reports
+        // no volume level and no mute state. No bar, no percentage chip.
+        { title: "audio on a soundbar (no volume state)", config: { entity: "remote.main_tv", apps: APPS.slice(0, 5) }, hass: { playerAttrs: { volume_level: null, is_volume_muted: null } } },
+        { title: "volume_entity -> soundbar", config: { entity: "remote.main_tv", volume_entity: "media_player.soundbar", apps: APPS.slice(0, 5) }, hass: { playerAttrs: { volume_level: null, is_volume_muted: null } } },
         { title: "TV off", config: { entity: "remote.main_tv", apps: APPS.slice(0, 4) }, hass: { playerState: "off" } },
         { title: "unavailable", config: { entity: "remote.main_tv" }, hass: { playerState: "unavailable", remoteState: "unavailable" } },
         { title: "no paired player", config: { entity: "remote.orphan_tv", apps: APPS.slice(0, 3) }, hass: { orphan: true } },
