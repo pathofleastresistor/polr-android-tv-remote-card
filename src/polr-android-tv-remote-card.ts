@@ -33,12 +33,12 @@ import { isActionable, runAction, type ActionConfig } from "./actions";
 import { press, type PressOptions } from "./press";
 import { remoteStyles } from "./styles";
 import { tileStyles } from "./kit/styles";
-import { showMoreInfo, stateColor, type HomeAssistant } from "./kit/types";
+import { stateColor, type HomeAssistant } from "./kit/types";
 
 import "./nav-pad";
 import "./polr-android-tv-remote-card-editor";
 
-export const CARD_VERSION = "2.0.0-beta.4";
+export const CARD_VERSION = "2.0.0-beta.5";
 
 const CARD_TYPE = "polr-android-tv-remote-card";
 
@@ -179,7 +179,7 @@ export class PolrAndroidTvRemoteCard extends LitElement {
     const config = this._config!;
     const secondary = device.available
       ? device.on
-        ? [device.appName, device.mediaTitle].filter(Boolean).join(" · ") || "On"
+        ? (device.appName ?? "On")
         : "Off"
       : "Unavailable";
 
@@ -188,20 +188,11 @@ export class PolrAndroidTvRemoteCard extends LitElement {
 
     return html`
       <div class="tile">
-        ${device.picture
-          ? html`<img class="now-playing-art" src=${device.picture} alt="" />`
-          : html`
-              <button
-                class="tile-icon interactive"
-                type="button"
-                aria-label="More information"
-                @click=${() => showMoreInfo(this, device.playerId ?? device.remoteId)}
-              >
-                ${brand
-                  ? BRAND_LOGOS[brand]
-                  : html`<ha-icon icon="mdi:television"></ha-icon>`}
-              </button>
-            `}
+        <!-- Not interactive: the icon shows what is playing, and tapping it
+             opened a more-info dialog nobody wanted from a remote. -->
+        <div class="tile-icon">
+          ${brand ? BRAND_LOGOS[brand] : html`<ha-icon icon="mdi:television"></ha-icon>`}
+        </div>
         <div class="tile-info">
           <div class="primary"><span>${device.name}</span></div>
           <div class="secondary" aria-live="polite"><span>${secondary}</span></div>
@@ -451,8 +442,8 @@ export class PolrAndroidTvRemoteCard extends LitElement {
           ? html`<div class="notice warn">
               <ha-icon icon="mdi:information-outline"></ha-icon>
               <span class="grow">
-                No paired media player, so state, transport and volume level are
-                unavailable. Set media_player_entity to fix it.
+                This device has no media player, so power state, transport and
+                volume level are unavailable.
               </span>
             </div>`
           : nothing}

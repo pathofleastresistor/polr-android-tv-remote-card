@@ -7,8 +7,9 @@ A Lovelace remote for the
 integration — with live state, an app launcher, and a visual editor.
 
 The integration gives every TV two entities: a `remote` and a `media_player`.
-This card uses both, so it can show whether the set is on, what app is running
-and whether it is muted, rather than firing commands blind.
+This card uses both — pairing them automatically by device — so it can show
+whether the set is on, what app is running and whether it is muted, rather than
+firing commands blind.
 
 - Three pad styles — buttons, d-pad, touchpad
 - Now-playing header, power, transport, volume and mute, all reflecting real
@@ -70,7 +71,6 @@ apps:
 | Option                | Default  | Description                                                                 |
 | --------------------- | -------- | --------------------------------------------------------------------------- |
 | `entity`              | required | A `remote` entity from the Android TV Remote integration.                    |
-| `media_player_entity` | auto     | Its paired media player. Found automatically; set it only to override.       |
 | `volume_entity`       | player   | What the volume buttons drive. See [Volume](#volume).                        |
 | `name`                | entity   | Header title.                                                                |
 | `pad`                 | buttons  | `buttons`, `dpad` or `touchpad`.                                             |
@@ -262,9 +262,8 @@ Worth knowing, because it shapes the card:
 - **No volume setting.** It supports volume *steps* but not `volume_set`, so
   the level bar is read-only — and often absent entirely, see
   [Volume](#volume).
-- **No media title or artwork.** Only the app name is reported. Both appear if
-  you point `media_player_entity` at a different player on the same TV, such as
-  a Chromecast.
+- **No media title or artwork.** Only the app name is reported, so the header
+  shows the running app and nothing else.
 
 ## Migrating
 

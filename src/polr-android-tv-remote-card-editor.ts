@@ -118,10 +118,6 @@ const SCHEMA = (config: ResolvedConfig) =>
       name: "",
       title: "Advanced",
       schema: [
-        {
-          name: "media_player_entity",
-          selector: { entity: { filter: [{ domain: "media_player" }] } },
-        },
         { name: "hold_repeat", selector: { boolean: {} } },
         { name: "haptics", selector: { boolean: {} } },
         { name: "show_section_labels", selector: { boolean: {} } },
@@ -131,7 +127,6 @@ const SCHEMA = (config: ResolvedConfig) =>
 
 const LABELS: Record<string, string> = {
   entity: "Remote entity",
-  media_player_entity: "Paired media player (auto-detected)",
   volume_entity: "Volume on another media player",
   power_action: "Power",
   volume_up_action: "Volume up",
@@ -152,8 +147,6 @@ const LABELS: Record<string, string> = {
 };
 
 const HELPERS: Record<string, string> = {
-  media_player_entity:
-    "Only needed if the card cannot find the player itself, or to point it at a different player on the same TV.",
   volume_entity:
     "Point this at a soundbar or receiver that exposes a media player. A TV passing audio through reports no volume level, so the card shows no level bar for it.",
   power_action:

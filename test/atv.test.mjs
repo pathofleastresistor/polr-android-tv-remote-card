@@ -119,12 +119,23 @@ test("pairing survives mismatched entity ids", () => {
   );
 });
 
-test("an explicit media_player_entity wins over the device lookup", () => {
+test("the pairing cannot be overridden, and ignores a stale config key", () => {
+  // media_player_entity was dropped: the integration puts both entities on one
+  // device, so there is nothing ambiguous to override.
   const hass = fixture();
   assert.equal(
     resolvePlayer(hass, config({ media_player_entity: "media_player.chromecast" })),
-    "media_player.chromecast",
+    "media_player.main_tv",
   );
+});
+
+test("no media title or artwork is read, because the integration sets neither", () => {
+  const hass = fixture({
+    playerAttrs: { media_title: "The Diplomat", entity_picture: "/art.png" },
+  });
+  const device = readDevice(hass, config());
+  assert.equal(device.mediaTitle, undefined);
+  assert.equal(device.picture, undefined);
 });
 
 test("a device with no media_player pairs to null rather than guessing", () => {

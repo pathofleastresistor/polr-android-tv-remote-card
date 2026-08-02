@@ -82,8 +82,6 @@ export interface DeviceState {
   appName?: string;
   /** Android package id of the running app, e.g. com.netflix.ninja. */
   appId?: string;
-  mediaTitle?: string;
-  picture?: string;
   /** Only meaningful for players that distinguish playing from paused. */
   playing: boolean;
   features: number;
@@ -107,16 +105,15 @@ export interface DeviceState {
 /**
  * Find the media_player that belongs to the same device as the remote.
  *
- * Explicit config wins; otherwise match on device_id. Deliberately does NOT
- * fall back to guessing from the entity id — a wrong guess would silently point
- * the card at another room's TV, which is worse than the degraded path.
+ * Matched on device_id, and deliberately never guessed from the entity id — a
+ * wrong guess would silently point the card at another room's TV, which is
+ * worse than the degraded path. There is no override: the integration puts both
+ * entities on one device, so the pairing is not ambiguous.
  */
 export const resolvePlayer = (
   hass: HomeAssistant,
   config: ResolvedConfig,
 ): string | null => {
-  if (config.media_player_entity) return config.media_player_entity;
-
   const deviceId = hass.entities?.[config.entity]?.device_id;
   if (!deviceId) return null;
 
@@ -170,16 +167,12 @@ export const readDevice = (
       config.name ??
       (remoteAttrs["friendly_name"] as string | undefined) ??
       config.entity,
-    // app_name is all the real integration provides; `source` covers a player
-    // from another integration pointed at by media_player_entity.
+    // app_name is all the integration provides. It never sets media_title or
+    // entity_picture, so there is no now-playing text or artwork to read.
     appName:
       (playerAttrs["app_name"] as string | undefined) ??
-      (playerAttrs["source"] as string | undefined) ??
       (remoteAttrs["current_activity"] as string | undefined),
     appId: playerAttrs["app_id"] as string | undefined,
-    // Never set by androidtv_remote. Present only for other players.
-    mediaTitle: playerAttrs["media_title"] as string | undefined,
-    picture: playerAttrs["entity_picture"] as string | undefined,
     playing: player?.state === "playing",
     features: (playerAttrs["supported_features"] as number | undefined) ?? 0,
 
@@ -364,7 +357,7 @@ export const runAppAction = (
       if (!device.playerId) {
         return Promise.reject(
           new Error(
-            "polr-android-tv-remote-card: launching by app id needs a media_player; set media_player_entity",
+            "polr-android-tv-remote-card: launching by app id needs the device's media_player, which was not found",
           ),
         );
       }

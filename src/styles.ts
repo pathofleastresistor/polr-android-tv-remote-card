@@ -21,15 +21,6 @@ export const remoteStyles = css`
     fill: currentColor;
   }
 
-  .now-playing-art {
-    flex: 0 0 auto;
-    width: 40px;
-    height: 40px;
-    border-radius: var(--radius-md);
-    object-fit: cover;
-    background-color: rgba(var(--rgb-primary-text-color, 0, 0, 0), 0.08);
-  }
-
   /* ---------------------------------------------------------- nav region -- */
   .pad {
     /* Container queries, so the pad tracks the card and not the viewport. */

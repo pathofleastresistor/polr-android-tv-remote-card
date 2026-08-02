@@ -128,6 +128,44 @@ for (const dark of [false, true]) {
     console.log(
       `gestures: tap=${gestures.onTap} scroll=${gestures.onScroll} cancel=${gestures.onCancel}`,
     );
+
+    // The off-state "Turn on" button is a second entry point to power, and must
+    // honour a power override exactly as the header button does — otherwise a
+    // blaster-driven TV turns on through the wrong path.
+    const power = await page.evaluate(async () => {
+      const kase = [...document.querySelectorAll(".case")].find(
+        (c) => c.querySelector("h2")?.textContent === "TV off + power override",
+      );
+      const card = kase.querySelector("polr-android-tv-remote-card");
+      const btn = [...card.shadowRoot.querySelectorAll(".control-button")].find((b) =>
+        b.textContent.includes("Turn on"),
+      );
+      if (!btn) return { error: "no Turn on button" };
+      const box = btn.getBoundingClientRect();
+      const send = (type) =>
+        btn.dispatchEvent(
+          new PointerEvent(type, {
+            bubbles: true, composed: true, cancelable: true,
+            clientX: box.left + 5, clientY: box.top + 5,
+            button: 0, pointerId: 1, pointerType: "touch",
+          }),
+        );
+      window.__calls = [];
+      send("pointerdown");
+      send("pointerup");
+      await new Promise((r) => setTimeout(r, 60));
+      return { calls: window.__calls };
+    });
+
+    const call = power.calls?.[0];
+    const usedOverride = call?.[0] === "remote" && call?.[1] === "send_command";
+    if (!usedOverride) {
+      failed = true;
+      console.error(
+        `[power] "Turn on" ignored the override, called ${JSON.stringify(call ?? power)}`,
+      );
+    }
+    console.log(`power override via "Turn on": ${usedOverride ? "ok" : "FAILED"}`);
   }
 
   const file = resolve(outDir, dark ? "dark.png" : "light.png");

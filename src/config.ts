@@ -105,8 +105,6 @@ export interface PolrAtvRemoteCardConfig {
   type: string;
   /** The androidtv_remote `remote` entity. Required. */
   entity: string;
-  /** Paired media_player. Derived from the remote's device when omitted. */
-  media_player_entity?: string;
   /**
    * Entity the volume buttons drive. Point this at a soundbar or receiver when
    * the TV only passes audio through -- which is also the case where the TV
@@ -471,9 +469,6 @@ export const normalizeConfig = (raw: PolrAtvRemoteCardConfig): ResolvedConfig =>
     ...raw,
     type: raw.type,
     entity,
-    ...(typeof raw.media_player_entity === "string"
-      ? { media_player_entity: raw.media_player_entity }
-      : {}),
     ...(typeof raw.volume_entity === "string"
       ? { volume_entity: raw.volume_entity }
       : {}),
@@ -524,6 +519,8 @@ export const stripLegacyKeys = (
     "show_favorite",
     // Removed in v2: back/home/menu is always there.
     "show_navigation_row",
+    // Removed: the player is always the one on the remote's own device.
+    "media_player_entity",
     "showBasic",
     "media_controls",
     ...Object.keys(BRANCH_KEYS),
