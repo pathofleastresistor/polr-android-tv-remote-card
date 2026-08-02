@@ -19,13 +19,15 @@
     "dev": "npm run watch",
     "typecheck": "tsc --noEmit",
     "pretest": "esbuild src/config.ts src/atv.ts --bundle --format=esm --outdir=test/.build --out-extension:.js=.mjs",
-    "test": "node --test \"test/*.test.mjs\""
+    "test": "node --test \"test/*.test.mjs\"",
+    "shots": "node test/harness/shoot.mjs"
   },
   "dependencies": {
     "lit": "^3.2.1"
   },
   "devDependencies": {
     "esbuild": "^0.25.12",
+    "puppeteer": "^25.4.0",
     "typescript": "^5.7.2",
     "vite": "^6.0.5"
   }

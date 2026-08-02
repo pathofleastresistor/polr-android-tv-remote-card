@@ -46,6 +46,32 @@ for (const dark of [false, true]) {
   await page.goto(page_url(dark), { waitUntil: "networkidle0" });
   await page.waitForFunction(() => document.title === "ready", { timeout: 10_000 });
 
+  // The v1 bug this guards against: getConfigElement() returned an element
+  // that was never defined, so HA's editor rendered an empty box. Nothing in
+  // the type system catches it — the tag name is a string.
+  const checks = await page.evaluate(() => {
+    const card = customElements.get("polr-android-tv-remote-card");
+    const editorTag = card
+      .getConfigElement()
+      .tagName.toLowerCase();
+    return {
+      cardDefined: Boolean(card),
+      editorTag,
+      editorDefined: Boolean(customElements.get(editorTag)),
+      stubHasEntity: Boolean(card.getStubConfig({ states: { "remote.a": {} } }).entity),
+      padDefined: Boolean(customElements.get("polr-atv-nav-pad")),
+    };
+  });
+  for (const [name, ok] of Object.entries(checks)) {
+    if (ok === false) {
+      failed = true;
+      console.error(`[check] ${name} failed`);
+    }
+  }
+  if (!checks.editorDefined) {
+    console.error(`[check] <${checks.editorTag}> is not a defined custom element`);
+  }
+
   const file = resolve(outDir, dark ? "dark.png" : "light.png");
   await page.screenshot({ path: file, fullPage: true });
   console.log(`wrote ${file}`);
