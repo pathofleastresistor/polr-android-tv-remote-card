@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 const Y = globalThis, dt = Y.ShadowRoot && (Y.ShadyCSS === void 0 || Y.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, ht = Symbol(), At = /* @__PURE__ */ new WeakMap();
-let Kt = class {
+let Wt = class {
   constructor(t, i, o) {
     if (this._$cssResult$ = !0, o !== ht) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
     this.cssText = t, this.t = i;
@@ -22,13 +22,13 @@ let Kt = class {
     return this.cssText;
   }
 };
-const ce = (e) => new Kt(typeof e == "string" ? e : e + "", void 0, ht), ut = (e, ...t) => {
+const ce = (e) => new Wt(typeof e == "string" ? e : e + "", void 0, ht), ut = (e, ...t) => {
   const i = e.length === 1 ? e[0] : t.reduce((o, r, a) => o + ((s) => {
     if (s._$cssResult$ === !0) return s.cssText;
     if (typeof s == "number") return s;
     throw Error("Value passed to 'css' function must be a 'css' function result: " + s + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
   })(r) + e[a + 1], e[0]);
-  return new Kt(i, e, ht);
+  return new Wt(i, e, ht);
 }, le = (e, t) => {
   if (dt) e.adoptedStyleSheets = t.map((i) => i instanceof CSSStyleSheet ? i : i.styleSheet);
   else for (const i of t) {
@@ -262,7 +262,7 @@ O.elementStyles = [], O.shadowRootOptions = { mode: "open" }, O[j("elementProper
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const mt = globalThis, Pt = (e) => e, Z = mt.trustedTypes, Tt = Z ? Z.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, qt = "$lit$", x = `lit$${Math.random().toFixed(9).slice(2)}$`, Yt = "?" + x, ge = `<${Yt}>`, T = document, F = () => T.createComment(""), W = (e) => e === null || typeof e != "object" && typeof e != "function", ft = Array.isArray, be = (e) => ft(e) || typeof e?.[Symbol.iterator] == "function", at = `[ 	
+const mt = globalThis, Pt = (e) => e, Z = mt.trustedTypes, Tt = Z ? Z.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, qt = "$lit$", x = `lit$${Math.random().toFixed(9).slice(2)}$`, Yt = "?" + x, ge = `<${Yt}>`, T = document, F = () => T.createComment(""), K = (e) => e === null || typeof e != "object" && typeof e != "function", ft = Array.isArray, be = (e) => ft(e) || typeof e?.[Symbol.iterator] == "function", at = `[ 	
 \f\r]`, V = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Ct = /-->/g, zt = />/g, A = RegExp(`>|${at}(?:([^\\s"'>=/]+)(${at}*=${at}*(?:[^ 	
 \f\r"'\`<>=]|("|')|))|$)`, "g"), Mt = /'/g, Ot = /"/g, Xt = /^(?:script|style|textarea|title)$/i, Zt = (e) => (t, ...i) => ({ _$litType$: e, strings: t, values: i }), l = Zt(1), ye = Zt(2), $ = Symbol.for("lit-noChange"), d = Symbol.for("lit-nothing"), Rt = /* @__PURE__ */ new WeakMap(), S = T.createTreeWalker(T, 129);
 function Gt(e, t) {
@@ -281,13 +281,13 @@ const $e = (e, t) => {
   }
   return [Gt(e, a + (e[i] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), o];
 };
-class K {
+class W {
   constructor({ strings: t, _$litType$: i }, o) {
     let r;
     this.parts = [];
     let a = 0, s = 0;
     const p = t.length - 1, n = this.parts, [h, v] = $e(t, i);
-    if (this.el = K.createElement(h, o), S.currentNode = this.el.content, i === 2 || i === 3) {
+    if (this.el = W.createElement(h, o), S.currentNode = this.el.content, i === 2 || i === 3) {
       const c = this.el.content.firstChild;
       c.replaceWith(...c.childNodes);
     }
@@ -321,7 +321,7 @@ class K {
 function D(e, t, i = e, o) {
   if (t === $) return t;
   let r = o !== void 0 ? i._$Co?.[o] : i._$Cl;
-  const a = W(t) ? void 0 : t._$litDirective$;
+  const a = K(t) ? void 0 : t._$litDirective$;
   return r?.constructor !== a && (r?._$AO?.(!1), a === void 0 ? r = void 0 : (r = new a(e), r._$AT(e, i, o)), o !== void 0 ? (i._$Co ??= [])[o] = r : i._$Cl = r), r !== void 0 && (t = D(e, r._$AS(e, t.values), r, o)), t;
 }
 class we {
@@ -371,7 +371,7 @@ class N {
     return this._$AB;
   }
   _$AI(t, i = this) {
-    t = D(this, t, i), W(t) ? t === d || t == null || t === "" ? (this._$AH !== d && this._$AR(), this._$AH = d) : t !== this._$AH && t !== $ && this._(t) : t._$litType$ !== void 0 ? this.$(t) : t.nodeType !== void 0 ? this.T(t) : be(t) ? this.k(t) : this._(t);
+    t = D(this, t, i), K(t) ? t === d || t == null || t === "" ? (this._$AH !== d && this._$AR(), this._$AH = d) : t !== this._$AH && t !== $ && this._(t) : t._$litType$ !== void 0 ? this.$(t) : t.nodeType !== void 0 ? this.T(t) : be(t) ? this.k(t) : this._(t);
   }
   O(t) {
     return this._$AA.parentNode.insertBefore(t, this._$AB);
@@ -380,10 +380,10 @@ class N {
     this._$AH !== t && (this._$AR(), this._$AH = this.O(t));
   }
   _(t) {
-    this._$AH !== d && W(this._$AH) ? this._$AA.nextSibling.data = t : this.T(T.createTextNode(t)), this._$AH = t;
+    this._$AH !== d && K(this._$AH) ? this._$AA.nextSibling.data = t : this.T(T.createTextNode(t)), this._$AH = t;
   }
   $(t) {
-    const { values: i, _$litType$: o } = t, r = typeof o == "number" ? this._$AC(t) : (o.el === void 0 && (o.el = K.createElement(Gt(o.h, o.h[0]), this.options)), o);
+    const { values: i, _$litType$: o } = t, r = typeof o == "number" ? this._$AC(t) : (o.el === void 0 && (o.el = W.createElement(Gt(o.h, o.h[0]), this.options)), o);
     if (this._$AH?._$AD === r) this._$AH.p(i);
     else {
       const a = new we(r, this), s = a.u(this.options);
@@ -392,7 +392,7 @@ class N {
   }
   _$AC(t) {
     let i = Rt.get(t.strings);
-    return i === void 0 && Rt.set(t.strings, i = new K(t)), i;
+    return i === void 0 && Rt.set(t.strings, i = new W(t)), i;
   }
   k(t) {
     ft(this._$AH) || (this._$AH = [], this._$AR());
@@ -424,11 +424,11 @@ class tt {
   _$AI(t, i = this, o, r) {
     const a = this.strings;
     let s = !1;
-    if (a === void 0) t = D(this, t, i, 0), s = !W(t) || t !== this._$AH && t !== $, s && (this._$AH = t);
+    if (a === void 0) t = D(this, t, i, 0), s = !K(t) || t !== this._$AH && t !== $, s && (this._$AH = t);
     else {
       const p = t;
       let n, h;
-      for (t = a[0], n = 0; n < a.length - 1; n++) h = D(this, p[o + n], i, n), h === $ && (h = this._$AH[n]), s ||= !W(h) || h !== this._$AH[n], h === d ? t = d : t !== d && (t += (h ?? "") + a[n + 1]), this._$AH[n] = h;
+      for (t = a[0], n = 0; n < a.length - 1; n++) h = D(this, p[o + n], i, n), h === $ && (h = this._$AH[n]), s ||= !K(h) || h !== this._$AH[n], h === d ? t = d : t !== d && (t += (h ?? "") + a[n + 1]), this._$AH[n] = h;
     }
     s && !r && this.j(t);
   }
@@ -477,7 +477,7 @@ class Ee {
   }
 }
 const Se = { I: N }, Pe = mt.litHtmlPolyfillSupport;
-Pe?.(K, N), (mt.litHtmlVersions ??= []).push("3.3.3");
+Pe?.(W, N), (mt.litHtmlVersions ??= []).push("3.3.3");
 const Te = (e, t, i) => {
   const o = i?.renderBefore ?? t;
   let r = o._$litPart$;
@@ -813,7 +813,7 @@ const Nt = (e, t, i) => {
   }
   const s = Ve[o];
   return s ? yt(e, i, s) : Promise.resolve();
-}, We = (e, t, i) => {
+}, Ke = (e, t, i) => {
   switch (i.action) {
     case "activity":
       return e.callService("remote", "turn_on", {
@@ -835,7 +835,7 @@ const Nt = (e, t, i) => {
     case "service":
       return ie(e, i);
   }
-}, Ke = (e) => {
+}, We = (e) => {
   switch (e.action) {
     case "activity":
       return `Launch ${e.activity}`;
@@ -1143,20 +1143,31 @@ const E = Qt(si), ne = ut`
     padding: var(--ha-space-2, 8px) var(--ha-space-3, 12px) var(--ha-space-3, 12px);
   }
 
-  /* 3x3 button grid — v1's "default" layout, rebuilt as real buttons. */
+  /*
+   * The plus-shaped button pad.
+   *
+   * Keys are wide and short rather than square. A square key in a 3-column grid
+   * is as tall as a third of the card is wide -- around 90px against the 40px
+   * control buttons below it, which made the pad tower over everything else.
+   * 52px is generous for a thumb, comfortably past the 44px touch-target
+   * minimum, without that.
+   *
+   * Columns stretch to fill the card, so the pad lines up with the navigation,
+   * transport, volume and app rows instead of floating in a centred 320px box.
+   */
   .button-pad {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--ha-space-2, 8px);
-    max-width: 320px;
-    margin: 0 auto;
+    gap: 12px;
+  }
+  .button-pad .pad-key {
+    height: 52px;
   }
   .pad-key {
     position: relative;
     overflow: hidden;
     display: grid;
     place-items: center;
-    aspect-ratio: 1;
     margin: 0;
     padding: 0;
     border: none;
@@ -1221,7 +1232,7 @@ const E = Qt(si), ne = ut`
     background-color: rgba(var(--rgb-primary-text-color, 0, 0, 0), 0.06);
   }
   .dpad .pad-key {
-    aspect-ratio: auto;
+    height: 100%;
     border-radius: 0;
   }
   .dpad .pad-key::before {
@@ -2364,7 +2375,7 @@ let U = class extends P {
         <div class="tile-icon">${this._renderIcon(e)}</div>
         <div class="tile-info">
           <div class="primary"><span>${e.name ?? "Untitled app"}</span></div>
-          <div class="secondary"><span>${Ke(e.action)}</span></div>
+          <div class="secondary"><span>${We(e.action)}</span></div>
         </div>
         <button
           class="icon-button"
@@ -2497,7 +2508,7 @@ let U = class extends P {
                 class="chip accent"
                 @click=${() => this._addApp({
       name: r ?? o,
-      icon: Wt(r ?? o),
+      icon: Kt(r ?? o),
       action: { action: "app", app_id: o }
     })}
               >
@@ -2532,7 +2543,7 @@ let U = class extends P {
               class="chip"
               @click=${() => this._addApp({
         name: r,
-        icon: Wt(r),
+        icon: Kt(r),
         action: { action: "activity", activity: r }
       })}
             >
@@ -2711,7 +2722,7 @@ const Bt = (e) => {
     case "service":
       return { action: "service", service: t };
   }
-}, Wt = (e) => {
+}, Kt = (e) => {
   const t = e.toLowerCase().replace(/[^a-z]/g, ""), i = pt.find((o) => t.includes(o) || o.includes(t));
   return i ? `brand:${i}` : "mdi:application";
 };
@@ -2770,7 +2781,7 @@ let C = class extends P {
   }
   _launch(e) {
     const t = this._device;
-    !this.hass || !t || We(this.hass, t, e.action).catch((i) => {
+    !this.hass || !t || Ke(this.hass, t, e.action).catch((i) => {
       console.error(i);
     });
   }

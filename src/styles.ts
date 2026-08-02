@@ -30,20 +30,31 @@ export const remoteStyles = css`
     padding: var(--ha-space-2, 8px) var(--ha-space-3, 12px) var(--ha-space-3, 12px);
   }
 
-  /* 3x3 button grid — v1's "default" layout, rebuilt as real buttons. */
+  /*
+   * The plus-shaped button pad.
+   *
+   * Keys are wide and short rather than square. A square key in a 3-column grid
+   * is as tall as a third of the card is wide -- around 90px against the 40px
+   * control buttons below it, which made the pad tower over everything else.
+   * 52px is generous for a thumb, comfortably past the 44px touch-target
+   * minimum, without that.
+   *
+   * Columns stretch to fill the card, so the pad lines up with the navigation,
+   * transport, volume and app rows instead of floating in a centred 320px box.
+   */
   .button-pad {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--ha-space-2, 8px);
-    max-width: 320px;
-    margin: 0 auto;
+    gap: 12px;
+  }
+  .button-pad .pad-key {
+    height: 52px;
   }
   .pad-key {
     position: relative;
     overflow: hidden;
     display: grid;
     place-items: center;
-    aspect-ratio: 1;
     margin: 0;
     padding: 0;
     border: none;
@@ -108,7 +119,7 @@ export const remoteStyles = css`
     background-color: rgba(var(--rgb-primary-text-color, 0, 0, 0), 0.06);
   }
   .dpad .pad-key {
-    aspect-ratio: auto;
+    height: 100%;
     border-radius: 0;
   }
   .dpad .pad-key::before {
