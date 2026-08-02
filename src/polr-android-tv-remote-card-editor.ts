@@ -572,10 +572,10 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
         list sat in a different section from the list itself.
       -->
       <ha-expansion-panel outlined>
-        <div slot="header" class="panel-header">
-          <ha-icon icon="mdi:apps"></ha-icon><span>Apps</span>
-        </div>
+        <ha-icon slot="leading-icon" icon="mdi:apps"></ha-icon>
+        <div slot="header" role="heading" aria-level="3">Apps</div>
 
+        <div class="content">
         <ha-form
           .hass=${this.hass}
           .data=${this._formData}
@@ -641,6 +641,7 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
               </div>
             `
           : nothing}
+        </div>
       </ha-expansion-panel>
 
       <ha-form
@@ -667,19 +668,31 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
       ul.list {
         padding: 0;
       }
+      /*
+       * Copied from HA's own ha-form-expandable so the Apps panel is
+       * indistinguishable from the ones ha-form renders: the icon goes in the
+       * leading-icon slot rather than inside the header (which is what was
+       * indenting the label differently), the content gets its own 12px
+       * padding, and the 24px gap matches ha-form's spacing between rows —
+       * this panel sits between two ha-forms and would otherwise sit tighter
+       * than its neighbours.
+       */
       ha-expansion-panel {
         display: block;
-        margin-bottom: var(--ha-space-2, 8px);
+        margin-bottom: 24px;
+        border-radius: var(--ha-border-radius-md);
+        --ha-card-border-radius: var(--ha-border-radius-md);
+        --expansion-panel-content-padding: 0;
       }
-      .panel-header {
-        display: flex;
-        align-items: center;
-        gap: var(--ha-space-3, 12px);
-        font-size: var(--ha-font-size-l, 16px);
-        font-weight: var(--ha-font-weight-medium, 500);
-      }
-      .panel-header ha-icon {
+      ha-expansion-panel > ha-icon[slot="leading-icon"] {
         color: var(--secondary-text-color);
+      }
+      ha-expansion-panel .content {
+        padding: 12px;
+      }
+      ha-expansion-panel .content ha-form {
+        display: block;
+        margin-bottom: 0;
       }
       /* The kit sizes icon buttons for a card; an editor row is tighter. */
       .icon-button {
