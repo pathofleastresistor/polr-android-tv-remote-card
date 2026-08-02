@@ -87,15 +87,23 @@ export class PolrAndroidTvRemoteCard extends LitElement {
     return Math.max(size, 3);
   }
 
-  /** Sections view sizing. Without this HA guesses, usually badly. */
-  public getGridOptions(): Record<string, number> {
-    const config = this._config;
-    const rows = Math.max(this.getCardSize(), 4);
+  /**
+   * Sections view sizing.
+   *
+   * `rows: "auto"` rather than a count, because this card's height genuinely
+   * depends on its width: the touchpad and the button pad are sized by
+   * aspect-ratio, so any fixed number of rows is wrong at every width but one.
+   * Reporting a count over-allocated the grid slot and left a band of empty
+   * space under the card. HA's own graph card does the same thing.
+   *
+   * min_rows still applies if a user turns auto height off in the layout editor.
+   */
+  public getGridOptions(): Record<string, number | string> {
     return {
       columns: 12,
       min_columns: 6,
-      rows,
-      min_rows: config?.show_nav ? 6 : 2,
+      rows: "auto",
+      min_rows: this._config?.show_nav ? 6 : 2,
     };
   }
 

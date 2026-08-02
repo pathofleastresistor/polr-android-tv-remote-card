@@ -2915,14 +2915,23 @@ let O = class extends P {
     let t = e.show_header ? 2 : 0;
     return e.show_nav && (t += e.pad === "buttons" ? 5 : 6), t += 1, e.show_transport && (t += 1), e.show_volume && (t += 1), e.show_text_input && (t += 1), e.show_apps && e.apps.length && (t += 2), Math.max(t, 3);
   }
-  /** Sections view sizing. Without this HA guesses, usually badly. */
+  /**
+   * Sections view sizing.
+   *
+   * `rows: "auto"` rather than a count, because this card's height genuinely
+   * depends on its width: the touchpad and the button pad are sized by
+   * aspect-ratio, so any fixed number of rows is wrong at every width but one.
+   * Reporting a count over-allocated the grid slot and left a band of empty
+   * space under the card. HA's own graph card does the same thing.
+   *
+   * min_rows still applies if a user turns auto height off in the layout editor.
+   */
   getGridOptions() {
-    const e = this._config;
     return {
       columns: 12,
       min_columns: 6,
-      rows: Math.max(this.getCardSize(), 4),
-      min_rows: e?.show_nav ? 6 : 2
+      rows: "auto",
+      min_rows: this._config?.show_nav ? 6 : 2
     };
   }
   get _device() {
