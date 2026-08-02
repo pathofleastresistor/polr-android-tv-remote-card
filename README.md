@@ -75,7 +75,7 @@ apps:
 | `show_header`         | `true`   | Now-playing tile with power.                                                 |
 | `show_power`          | `true`   | Power button in the header.                                                  |
 | `show_nav`            | `true`   | The pad itself.                                                              |
-| `show_transport`      | `true`   | Play-pause, previous, next.                                                  |
+| `show_transport`      | `true`   | Previous, rewind, play-pause, fast-forward, next.                            |
 | `show_volume`         | `true`   | Volume down / mute / up, plus a level bar where there is one.                |
 | `show_text_input`     | `false`  | Type text on the TV. See [Text input](#text-input).                          |
 | `show_apps`           | `true`   | The app launcher.                                                            |
@@ -128,7 +128,12 @@ overrides:
 
 Valid buttons: `up`, `down`, `left`, `right`, `center`, `power`, `home`, `back`,
 `menu`, `favorite`, `volume_up`, `volume_down`, `volume_mute`, `play_pause`,
-`next`, `previous`. The `favorite` button appears only when it has an override.
+`next`, `previous`, `rewind`, `fast_forward`. The `favorite` button appears only
+when it has an override.
+
+Skip previous and next are hidden when the paired player does not advertise
+them. Rewind, fast-forward and play/pause are key codes, so they are always
+shown — hold rewind or fast-forward to seek continuously.
 
 ### Volume
 

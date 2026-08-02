@@ -57,6 +57,10 @@ export const KEYS: Record<string, string> = {
   play_pause: "MEDIA_PLAY_PAUSE",
   next: "MEDIA_NEXT",
   previous: "MEDIA_PREVIOUS",
+  // No media_player equivalent: its only seek service takes an absolute
+  // position, which a TV cannot report. These are always key codes.
+  rewind: "MEDIA_REWIND",
+  fast_forward: "MEDIA_FAST_FORWARD",
 };
 
 /** Anything after this prefix is typed into the focused field on the TV. */

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 const Y = globalThis, dt = Y.ShadowRoot && (Y.ShadyCSS === void 0 || Y.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, ht = Symbol(), At = /* @__PURE__ */ new WeakMap();
-let Ft = class {
+let Kt = class {
   constructor(t, i, o) {
     if (this._$cssResult$ = !0, o !== ht) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
     this.cssText = t, this.t = i;
@@ -22,13 +22,13 @@ let Ft = class {
     return this.cssText;
   }
 };
-const ce = (e) => new Ft(typeof e == "string" ? e : e + "", void 0, ht), ut = (e, ...t) => {
+const ce = (e) => new Kt(typeof e == "string" ? e : e + "", void 0, ht), ut = (e, ...t) => {
   const i = e.length === 1 ? e[0] : t.reduce((o, r, a) => o + ((s) => {
     if (s._$cssResult$ === !0) return s.cssText;
     if (typeof s == "number") return s;
     throw Error("Value passed to 'css' function must be a 'css' function result: " + s + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
   })(r) + e[a + 1], e[0]);
-  return new Ft(i, e, ht);
+  return new Kt(i, e, ht);
 }, le = (e, t) => {
   if (dt) e.adoptedStyleSheets = t.map((i) => i instanceof CSSStyleSheet ? i : i.styleSheet);
   else for (const i of t) {
@@ -75,7 +75,7 @@ const { is: pe, defineProperty: de, getOwnPropertyDescriptor: he, getOwnProperty
   return i;
 } }, vt = (e, t) => !pe(e, t), St = { attribute: !0, type: String, converter: X, reflect: !1, useDefault: !1, hasChanged: vt };
 Symbol.metadata ??= Symbol("metadata"), Q.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
-let R = class extends HTMLElement {
+let O = class extends HTMLElement {
   static addInitializer(t) {
     this._$Ei(), (this.l ??= []).push(t);
   }
@@ -256,15 +256,15 @@ let R = class extends HTMLElement {
   firstUpdated(t) {
   }
 };
-R.elementStyles = [], R.shadowRootOptions = { mode: "open" }, R[j("elementProperties")] = /* @__PURE__ */ new Map(), R[j("finalized")] = /* @__PURE__ */ new Map(), _e?.({ ReactiveElement: R }), (Q.reactiveElementVersions ??= []).push("2.1.2");
+O.elementStyles = [], O.shadowRootOptions = { mode: "open" }, O[j("elementProperties")] = /* @__PURE__ */ new Map(), O[j("finalized")] = /* @__PURE__ */ new Map(), _e?.({ ReactiveElement: O }), (Q.reactiveElementVersions ??= []).push("2.1.2");
 /**
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const mt = globalThis, Pt = (e) => e, Z = mt.trustedTypes, Tt = Z ? Z.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, qt = "$lit$", x = `lit$${Math.random().toFixed(9).slice(2)}$`, Yt = "?" + x, ge = `<${Yt}>`, C = document, K = () => C.createComment(""), W = (e) => e === null || typeof e != "object" && typeof e != "function", ft = Array.isArray, be = (e) => ft(e) || typeof e?.[Symbol.iterator] == "function", at = `[ 	
-\f\r]`, V = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Ct = /-->/g, zt = />/g, A = RegExp(`>|${at}(?:([^\\s"'>=/]+)(${at}*=${at}*(?:[^ 	
-\f\r"'\`<>=]|("|')|))|$)`, "g"), Mt = /'/g, Ot = /"/g, Xt = /^(?:script|style|textarea|title)$/i, Zt = (e) => (t, ...i) => ({ _$litType$: e, strings: t, values: i }), l = Zt(1), ye = Zt(2), $ = Symbol.for("lit-noChange"), d = Symbol.for("lit-nothing"), Rt = /* @__PURE__ */ new WeakMap(), S = C.createTreeWalker(C, 129);
+const mt = globalThis, Pt = (e) => e, Z = mt.trustedTypes, Tt = Z ? Z.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, qt = "$lit$", x = `lit$${Math.random().toFixed(9).slice(2)}$`, Yt = "?" + x, ge = `<${Yt}>`, T = document, F = () => T.createComment(""), W = (e) => e === null || typeof e != "object" && typeof e != "function", ft = Array.isArray, be = (e) => ft(e) || typeof e?.[Symbol.iterator] == "function", at = `[ 	
+\f\r]`, V = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Ct = /-->/g, Mt = />/g, A = RegExp(`>|${at}(?:([^\\s"'>=/]+)(${at}*=${at}*(?:[^ 	
+\f\r"'\`<>=]|("|')|))|$)`, "g"), zt = /'/g, Ot = /"/g, Xt = /^(?:script|style|textarea|title)$/i, Zt = (e) => (t, ...i) => ({ _$litType$: e, strings: t, values: i }), l = Zt(1), ye = Zt(2), $ = Symbol.for("lit-noChange"), d = Symbol.for("lit-nothing"), Rt = /* @__PURE__ */ new WeakMap(), S = T.createTreeWalker(T, 129);
 function Gt(e, t) {
   if (!ft(e) || !e.hasOwnProperty("raw")) throw Error("invalid template strings array");
   return Tt !== void 0 ? Tt.createHTML(t) : t;
@@ -275,19 +275,19 @@ const $e = (e, t) => {
   for (let p = 0; p < i; p++) {
     const n = e[p];
     let h, v, c = -1, m = 0;
-    for (; m < n.length && (s.lastIndex = m, v = s.exec(n), v !== null); ) m = s.lastIndex, s === V ? v[1] === "!--" ? s = Ct : v[1] !== void 0 ? s = zt : v[2] !== void 0 ? (Xt.test(v[2]) && (r = RegExp("</" + v[2], "g")), s = A) : v[3] !== void 0 && (s = A) : s === A ? v[0] === ">" ? (s = r ?? V, c = -1) : v[1] === void 0 ? c = -2 : (c = s.lastIndex - v[2].length, h = v[1], s = v[3] === void 0 ? A : v[3] === '"' ? Ot : Mt) : s === Ot || s === Mt ? s = A : s === Ct || s === zt ? s = V : (s = A, r = void 0);
+    for (; m < n.length && (s.lastIndex = m, v = s.exec(n), v !== null); ) m = s.lastIndex, s === V ? v[1] === "!--" ? s = Ct : v[1] !== void 0 ? s = Mt : v[2] !== void 0 ? (Xt.test(v[2]) && (r = RegExp("</" + v[2], "g")), s = A) : v[3] !== void 0 && (s = A) : s === A ? v[0] === ">" ? (s = r ?? V, c = -1) : v[1] === void 0 ? c = -2 : (c = s.lastIndex - v[2].length, h = v[1], s = v[3] === void 0 ? A : v[3] === '"' ? Ot : zt) : s === Ot || s === zt ? s = A : s === Ct || s === Mt ? s = V : (s = A, r = void 0);
     const u = s === A && e[p + 1].startsWith("/>") ? " " : "";
     a += s === V ? n + ge : c >= 0 ? (o.push(h), n.slice(0, c) + qt + n.slice(c) + x + u) : n + x + (c === -2 ? p : u);
   }
   return [Gt(e, a + (e[i] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), o];
 };
-class F {
+class K {
   constructor({ strings: t, _$litType$: i }, o) {
     let r;
     this.parts = [];
     let a = 0, s = 0;
     const p = t.length - 1, n = this.parts, [h, v] = $e(t, i);
-    if (this.el = F.createElement(h, o), S.currentNode = this.el.content, i === 2 || i === 3) {
+    if (this.el = K.createElement(h, o), S.currentNode = this.el.content, i === 2 || i === 3) {
       const c = this.el.content.firstChild;
       c.replaceWith(...c.childNodes);
     }
@@ -301,8 +301,8 @@ class F {
           const c = r.textContent.split(x), m = c.length - 1;
           if (m > 0) {
             r.textContent = Z ? Z.emptyScript : "";
-            for (let u = 0; u < m; u++) r.append(c[u], K()), S.nextNode(), n.push({ type: 2, index: ++a });
-            r.append(c[m], K());
+            for (let u = 0; u < m; u++) r.append(c[u], F()), S.nextNode(), n.push({ type: 2, index: ++a });
+            r.append(c[m], F());
           }
         }
       } else if (r.nodeType === 8) if (r.data === Yt) n.push({ type: 2, index: a });
@@ -314,15 +314,15 @@ class F {
     }
   }
   static createElement(t, i) {
-    const o = C.createElement("template");
+    const o = T.createElement("template");
     return o.innerHTML = t, o;
   }
 }
-function U(e, t, i = e, o) {
+function D(e, t, i = e, o) {
   if (t === $) return t;
   let r = o !== void 0 ? i._$Co?.[o] : i._$Cl;
   const a = W(t) ? void 0 : t._$litDirective$;
-  return r?.constructor !== a && (r?._$AO?.(!1), a === void 0 ? r = void 0 : (r = new a(e), r._$AT(e, i, o)), o !== void 0 ? (i._$Co ??= [])[o] = r : i._$Cl = r), r !== void 0 && (t = U(e, r._$AS(e, t.values), r, o)), t;
+  return r?.constructor !== a && (r?._$AO?.(!1), a === void 0 ? r = void 0 : (r = new a(e), r._$AT(e, i, o)), o !== void 0 ? (i._$Co ??= [])[o] = r : i._$Cl = r), r !== void 0 && (t = D(e, r._$AS(e, t.values), r, o)), t;
 }
 class we {
   constructor(t, i) {
@@ -335,7 +335,7 @@ class we {
     return this._$AM._$AU;
   }
   u(t) {
-    const { el: { content: i }, parts: o } = this._$AD, r = (t?.creationScope ?? C).importNode(i, !0);
+    const { el: { content: i }, parts: o } = this._$AD, r = (t?.creationScope ?? T).importNode(i, !0);
     S.currentNode = r;
     let a = S.nextNode(), s = 0, p = 0, n = o[0];
     for (; n !== void 0; ) {
@@ -345,7 +345,7 @@ class we {
       }
       s !== n?.index && (a = S.nextNode(), s++);
     }
-    return S.currentNode = C, r;
+    return S.currentNode = T, r;
   }
   p(t) {
     let i = 0;
@@ -371,7 +371,7 @@ class N {
     return this._$AB;
   }
   _$AI(t, i = this) {
-    t = U(this, t, i), W(t) ? t === d || t == null || t === "" ? (this._$AH !== d && this._$AR(), this._$AH = d) : t !== this._$AH && t !== $ && this._(t) : t._$litType$ !== void 0 ? this.$(t) : t.nodeType !== void 0 ? this.T(t) : be(t) ? this.k(t) : this._(t);
+    t = D(this, t, i), W(t) ? t === d || t == null || t === "" ? (this._$AH !== d && this._$AR(), this._$AH = d) : t !== this._$AH && t !== $ && this._(t) : t._$litType$ !== void 0 ? this.$(t) : t.nodeType !== void 0 ? this.T(t) : be(t) ? this.k(t) : this._(t);
   }
   O(t) {
     return this._$AA.parentNode.insertBefore(t, this._$AB);
@@ -380,10 +380,10 @@ class N {
     this._$AH !== t && (this._$AR(), this._$AH = this.O(t));
   }
   _(t) {
-    this._$AH !== d && W(this._$AH) ? this._$AA.nextSibling.data = t : this.T(C.createTextNode(t)), this._$AH = t;
+    this._$AH !== d && W(this._$AH) ? this._$AA.nextSibling.data = t : this.T(T.createTextNode(t)), this._$AH = t;
   }
   $(t) {
-    const { values: i, _$litType$: o } = t, r = typeof o == "number" ? this._$AC(t) : (o.el === void 0 && (o.el = F.createElement(Gt(o.h, o.h[0]), this.options)), o);
+    const { values: i, _$litType$: o } = t, r = typeof o == "number" ? this._$AC(t) : (o.el === void 0 && (o.el = K.createElement(Gt(o.h, o.h[0]), this.options)), o);
     if (this._$AH?._$AD === r) this._$AH.p(i);
     else {
       const a = new we(r, this), s = a.u(this.options);
@@ -392,13 +392,13 @@ class N {
   }
   _$AC(t) {
     let i = Rt.get(t.strings);
-    return i === void 0 && Rt.set(t.strings, i = new F(t)), i;
+    return i === void 0 && Rt.set(t.strings, i = new K(t)), i;
   }
   k(t) {
     ft(this._$AH) || (this._$AH = [], this._$AR());
     const i = this._$AH;
     let o, r = 0;
-    for (const a of t) r === i.length ? i.push(o = new N(this.O(K()), this.O(K()), this, this.options)) : o = i[r], o._$AI(a), r++;
+    for (const a of t) r === i.length ? i.push(o = new N(this.O(F()), this.O(F()), this, this.options)) : o = i[r], o._$AI(a), r++;
     r < i.length && (this._$AR(o && o._$AB.nextSibling, r), i.length = r);
   }
   _$AR(t = this._$AA.nextSibling, i) {
@@ -424,11 +424,11 @@ class tt {
   _$AI(t, i = this, o, r) {
     const a = this.strings;
     let s = !1;
-    if (a === void 0) t = U(this, t, i, 0), s = !W(t) || t !== this._$AH && t !== $, s && (this._$AH = t);
+    if (a === void 0) t = D(this, t, i, 0), s = !W(t) || t !== this._$AH && t !== $, s && (this._$AH = t);
     else {
       const p = t;
       let n, h;
-      for (t = a[0], n = 0; n < a.length - 1; n++) h = U(this, p[o + n], i, n), h === $ && (h = this._$AH[n]), s ||= !W(h) || h !== this._$AH[n], h === d ? t = d : t !== d && (t += (h ?? "") + a[n + 1]), this._$AH[n] = h;
+      for (t = a[0], n = 0; n < a.length - 1; n++) h = D(this, p[o + n], i, n), h === $ && (h = this._$AH[n]), s ||= !W(h) || h !== this._$AH[n], h === d ? t = d : t !== d && (t += (h ?? "") + a[n + 1]), this._$AH[n] = h;
     }
     s && !r && this.j(t);
   }
@@ -457,7 +457,7 @@ class ke extends tt {
     super(t, i, o, r, a), this.type = 5;
   }
   _$AI(t, i = this) {
-    if ((t = U(this, t, i, 0) ?? d) === $) return;
+    if ((t = D(this, t, i, 0) ?? d) === $) return;
     const o = this._$AH, r = t === d && o !== d || t.capture !== o.capture || t.once !== o.once || t.passive !== o.passive, a = t !== d && (o === d || r);
     r && this.element.removeEventListener(this.name, this, o), a && this.element.addEventListener(this.name, this, t), this._$AH = t;
   }
@@ -473,17 +473,17 @@ class Ee {
     return this._$AM._$AU;
   }
   _$AI(t) {
-    U(this, t);
+    D(this, t);
   }
 }
 const Se = { I: N }, Pe = mt.litHtmlPolyfillSupport;
-Pe?.(F, N), (mt.litHtmlVersions ??= []).push("3.3.3");
+Pe?.(K, N), (mt.litHtmlVersions ??= []).push("3.3.3");
 const Te = (e, t, i) => {
   const o = i?.renderBefore ?? t;
   let r = o._$litPart$;
   if (r === void 0) {
     const a = i?.renderBefore ?? null;
-    o._$litPart$ = r = new N(t.insertBefore(K(), a), a, void 0, i ?? {});
+    o._$litPart$ = r = new N(t.insertBefore(F(), a), a, void 0, i ?? {});
   }
   return r._$AI(e), r;
 };
@@ -493,7 +493,7 @@ const Te = (e, t, i) => {
  * SPDX-License-Identifier: BSD-3-Clause
  */
 const _t = globalThis;
-let T = class extends R {
+let P = class extends O {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
   }
@@ -515,9 +515,9 @@ let T = class extends R {
     return $;
   }
 };
-T._$litElement$ = !0, T.finalized = !0, _t.litElementHydrateSupport?.({ LitElement: T });
+P._$litElement$ = !0, P.finalized = !0, _t.litElementHydrateSupport?.({ LitElement: P });
 const Ce = _t.litElementPolyfillSupport;
-Ce?.({ LitElement: T });
+Ce?.({ LitElement: P });
 (_t.litElementVersions ??= []).push("4.2.2");
 /**
  * @license
@@ -534,7 +534,7 @@ const gt = (e) => (t, i) => {
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const ze = { attribute: !0, type: String, converter: X, reflect: !1, hasChanged: vt }, Me = (e = ze, t, i) => {
+const Me = { attribute: !0, type: String, converter: X, reflect: !1, hasChanged: vt }, ze = (e = Me, t, i) => {
   const { kind: o, metadata: r } = i;
   let a = globalThis.litPropertyMetadata.get(r);
   if (a === void 0 && globalThis.litPropertyMetadata.set(r, a = /* @__PURE__ */ new Map()), o === "setter" && ((e = Object.create(e)).wrapped = !0), a.set(i.name, e), o === "accessor") {
@@ -556,7 +556,7 @@ const ze = { attribute: !0, type: String, converter: X, reflect: !1, hasChanged:
   throw Error("Unsupported decorator location: " + o);
 };
 function I(e) {
-  return (t, i) => typeof i == "object" ? Me(e, t, i) : ((o, r, a) => {
+  return (t, i) => typeof i == "object" ? ze(e, t, i) : ((o, r, a) => {
     const s = r.hasOwnProperty(a);
     return r.constructor.createProperty(a, o), s ? Object.getOwnPropertyDescriptor(r, a) : void 0;
   })(e, t, i);
@@ -615,10 +615,10 @@ let te = class {
  * Copyright 2020 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const { I: Re } = Se, Ut = (e) => e, Ue = (e) => e.strings === void 0, Dt = () => document.createComment(""), L = (e, t, i) => {
+const { I: Re } = Se, Dt = (e) => e, De = (e) => e.strings === void 0, Ut = () => document.createComment(""), L = (e, t, i) => {
   const o = e._$AA.parentNode, r = t === void 0 ? e._$AB : t._$AA;
   if (i === void 0) {
-    const a = o.insertBefore(Dt(), r), s = o.insertBefore(Dt(), r);
+    const a = o.insertBefore(Ut(), r), s = o.insertBefore(Ut(), r);
     i = new Re(a, s, e, e.options);
   } else {
     const a = i._$AB.nextSibling, s = i._$AM, p = s !== e;
@@ -629,13 +629,13 @@ const { I: Re } = Se, Ut = (e) => e, Ue = (e) => e.strings === void 0, Dt = () =
     if (a !== r || p) {
       let n = i._$AA;
       for (; n !== a; ) {
-        const h = Ut(n).nextSibling;
-        Ut(o).insertBefore(n, r), n = h;
+        const h = Dt(n).nextSibling;
+        Dt(o).insertBefore(n, r), n = h;
       }
     }
   }
   return i;
-}, k = (e, t, i = e) => (e._$AI(t, i), e), De = {}, Ne = (e, t = De) => e._$AH = t, Ie = (e) => e._$AH, st = (e) => {
+}, k = (e, t, i = e) => (e._$AI(t, i), e), Ue = {}, Ne = (e, t = Ue) => e._$AH = t, Ie = (e) => e._$AH, st = (e) => {
   e._$AR(), e._$AA.remove();
 };
 /**
@@ -674,25 +674,25 @@ const Nt = (e, t, i) => {
     else if (p[c] === s[f]) n[f] = k(r[c], a[f]), L(e, n[f + 1], r[c]), c++, f--;
     else if (p[m] === s[u]) n[u] = k(r[m], a[u]), L(e, r[c], r[m]), m--, u++;
     else if (h === void 0 && (h = Nt(s, u, f), v = Nt(p, c, m)), h.has(p[c])) if (h.has(p[m])) {
-      const b = v.get(s[u]), rt = b !== void 0 ? r[b] : null;
+      const g = v.get(s[u]), rt = g !== void 0 ? r[g] : null;
       if (rt === null) {
         const xt = L(e, r[c]);
         k(xt, a[u]), n[u] = xt;
-      } else n[u] = k(rt, a[u]), L(e, r[c], rt), r[b] = null;
+      } else n[u] = k(rt, a[u]), L(e, r[c], rt), r[g] = null;
       u++;
     } else st(r[m]), m--;
     else st(r[c]), c++;
     for (; u <= f; ) {
-      const b = L(e, n[f + 1]);
-      k(b, a[u]), n[u++] = b;
+      const g = L(e, n[f + 1]);
+      k(g, a[u]), n[u++] = g;
     }
     for (; c <= m; ) {
-      const b = r[c++];
-      b !== null && st(b);
+      const g = r[c++];
+      g !== null && st(g);
     }
     return this.ut = s, Ne(e, n), $;
   }
-}), g = {
+}), b = {
   PAUSE: 1,
   VOLUME_MUTE: 8,
   PREVIOUS_TRACK: 16,
@@ -716,7 +716,11 @@ const Nt = (e, t, i) => {
   volume_down: "VOLUME_DOWN",
   play_pause: "MEDIA_PLAY_PAUSE",
   next: "MEDIA_NEXT",
-  previous: "MEDIA_PREVIOUS"
+  previous: "MEDIA_PREVIOUS",
+  // No media_player equivalent: its only seek service takes an absolute
+  // position, which a TV cannot report. These are always key codes.
+  rewind: "MEDIA_REWIND",
+  fast_forward: "MEDIA_FAST_FORWARD"
 }, Le = "text:", ee = (e, t) => {
   if (t.media_player_entity) return t.media_player_entity;
   const i = e.entities?.[t.entity]?.device_id;
@@ -751,7 +755,7 @@ const Nt = (e, t, i) => {
     volume: typeof h.volume_level == "number" ? h.volume_level : void 0,
     muted: typeof h.is_volume_muted == "boolean" ? h.is_volume_muted : void 0
   };
-}, P = (e, t) => (e.features & t) !== 0, It = (e, t) => (e.volumeFeatures & t) !== 0, Ht = (e) => e.volume !== void 0, ie = (e, t) => {
+}, R = (e, t) => (e.features & t) !== 0, It = (e, t) => (e.volumeFeatures & t) !== 0, Ht = (e) => e.volume !== void 0, ie = (e, t) => {
   const [i, o] = t.service.split(".");
   return !i || !o ? Promise.reject(
     new Error(`polr-android-tv-remote-card: invalid service "${t.service}"`)
@@ -759,13 +763,13 @@ const Nt = (e, t, i) => {
 }, yt = (e, t, i) => e.callService("remote", "send_command", {
   entity_id: t.remoteId,
   command: i
-}), Be = (e, t, i) => yt(e, t, `${Le}${i}`), Ke = (e, t, i, o) => {
+}), Be = (e, t, i) => yt(e, t, `${Le}${i}`), Fe = (e, t, i, o) => {
   const r = t.overrides[o];
   if (r) return ie(e, r);
   const a = i.playerId;
   switch (o) {
     case "power":
-      return a && P(i, i.on ? g.TURN_OFF : g.TURN_ON) ? e.callService(
+      return a && R(i, i.on ? b.TURN_OFF : b.TURN_ON) ? e.callService(
         "media_player",
         i.on ? "turn_off" : "turn_on",
         { entity_id: a }
@@ -773,26 +777,26 @@ const Nt = (e, t, i) => {
         entity_id: i.remoteId
       });
     case "play_pause":
-      if (a && P(i, g.PAUSE))
+      if (a && R(i, b.PAUSE))
         return e.callService("media_player", "media_play_pause", {
           entity_id: a
         });
       break;
     case "next":
-      if (a && P(i, g.NEXT_TRACK))
+      if (a && R(i, b.NEXT_TRACK))
         return e.callService("media_player", "media_next_track", {
           entity_id: a
         });
       break;
     case "previous":
-      if (a && P(i, g.PREVIOUS_TRACK))
+      if (a && R(i, b.PREVIOUS_TRACK))
         return e.callService("media_player", "media_previous_track", {
           entity_id: a
         });
       break;
     case "volume_up":
     case "volume_down":
-      if (i.volumeId && It(i, g.VOLUME_STEP))
+      if (i.volumeId && It(i, b.VOLUME_STEP))
         return e.callService(
           "media_player",
           o === "volume_up" ? "volume_up" : "volume_down",
@@ -800,7 +804,7 @@ const Nt = (e, t, i) => {
         );
       break;
     case "volume_mute":
-      if (i.volumeId && i.muted !== void 0 && It(i, g.VOLUME_MUTE))
+      if (i.volumeId && i.muted !== void 0 && It(i, b.VOLUME_MUTE))
         return e.callService("media_player", "volume_mute", {
           entity_id: i.volumeId,
           is_volume_muted: !i.muted
@@ -831,7 +835,7 @@ const Nt = (e, t, i) => {
     case "service":
       return ie(e, i);
   }
-}, Fe = (e) => {
+}, Ke = (e) => {
   switch (e.action) {
     case "activity":
       return `Launch ${e.activity}`;
@@ -983,27 +987,27 @@ const G = (e) => {
   for (const [o, r] of Object.entries(e))
     t.has(o) || (i[o] = r);
   return i;
-}, O = (e) => ye`
+}, z = (e) => ye`
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="${e}" />
   </svg>
 `, $t = {
-  disneyplus: O(
+  disneyplus: z(
     "M2.056 6.834C1.572 6.834 1 6.77 1 6.483c0-2.023 3.562-2.11 5.08-2.11 1.978 0 4.506.614 6.66 1.384 3.277 1.188 9.917 5.145 9.917 9.674 0 4.001-4.31 5.914-8.311 5.914a22.376 22.376 0 0 1-3.21-.33c-.066.243-.11.418-.264.924-.253.052-.511.081-.77.087l-.505-.043c-.33-.396-.44-1.033-.572-1.715-2-1.165-3.298-2.155-3.891-2.836-.506-.528-1.078-1.232-1.078-1.913 0-.351.22-.66.726-1.01 1.034-.77 2.352-1.188 4.507-1.563l.044-.9c.022-.22.242-2.573.748-3.013.813.66.901 1.341.967 2.353.022.44.044.901.11 1.385h.308c1.539 0 6.244.395 6.244 2.616 0 .528-.77 1.517-1.518 1.517a1.9 1.9 0 0 1-.966-.285c.329-.375.813-.704.945-.99-.44-.528-2.814-1.143-4.551-1.143a4.043 4.043 0 0 0-.572.022l.022 4.815c.703.44 1.561.483 2.11.483 2.42 0 7.431-.417 7.431-4.331 0-3.87-4.946-6.86-8.64-8.266a21.394 21.394 0 0 0-7.937-1.496 7.22 7.22 0 0 0-1.803.198c-.373.088-.505.176-.505.264 0 .153.747.242.836.286a.221.221 0 0 1 .11.175.26.26 0 0 1-.088.176c-.089 0-.286.022-.528.022zM9.2 14.551c-2.176.177-4.595.397-4.595 1.166 0 .594 1.012 1.32 1.627 1.781a7.052 7.052 0 0 0 2.77 1.319zm11.155-9.85c-.02.428-.042.942-.042 1.723 0 .3 0 .642.01 1.027-.042.193-.32.214-.46.278a1.148 1.148 0 0 1-.256-.192V4.83c0-.29.01-.588.01-1.038 0-.225 0-.482-.01-.792 0-.192.032-.374.15-.802a.342.342 0 0 1 .3-.224c.245.064.491.17.577.374-.257.76-.235 1.594-.279 2.353zm-.384-.085c.428.021.941.042 1.722.042.3 0 .643 0 1.027-.01.193.041.215.32.279.459-.052.094-.116.18-.193.257H20.1c-.289 0-.589-.01-1.037-.01-.225 0-.482 0-.792.01-.193.002-.375-.03-.803-.149a.346.346 0 0 1-.225-.299c.064-.246.172-.492.374-.578.76.257 1.595.235 2.355.278z"
   ),
-  hbomax: O(
+  hbomax: z(
     "M8.844 4.249h3.205a2.013 2.013 0 0 1 1.848 1.876c1.607-3.368 6.667-2.217 6.658 1.515.045 3.744-5.026 4.939-6.658 1.568a2.077 2.077 0 0 1-2.07 1.947H8.845Zm-5.395 0h1.92v2.58h1.213V4.253H8.46v6.902H6.586V8.48H5.373v2.676H3.449ZM9.872 19.83h-.576a.603.603 0 0 1-.6-.57c0-.013-.007-.023-.007-.035v-3.667a1.192 1.192 0 0 0-1.279-1.21 1.192 1.192 0 0 0-1.279 1.211v4.167a.103.103 0 0 1-.102.103h-.575a.61.61 0 0 1-.61-.611v-3.666a1.319 1.319 0 0 0-.066-.296 1.176 1.176 0 0 0-1.213-.913 1.19 1.19 0 0 0-1.183.817c-.05.131-.079.267-.087.406v4.17a.104.104 0 0 1-.104.102h-.579a.61.61 0 0 1-.61-.61V15.56a2.322 2.322 0 0 1 1.68-2.32c.285-.088.584-.133.883-.133a2.584 2.584 0 0 1 1.92.752 2.588 2.588 0 0 1 1.921-.752 2.608 2.608 0 0 1 1.872.715c.451.465.7 1.09.692 1.738v4.171a.103.103 0 0 1-.098.103zm.428-3.35a3.76 3.76 0 0 1 .568-2.102c.133-.2.29-.38.47-.539a2.958 2.958 0 0 1 2.013-.744 3.014 3.014 0 0 1 1.845.59.61.61 0 0 1 .597-.48h.574a.107.107 0 0 1 .105.103v6.427a.104.104 0 0 1-.104.103h-.573a.61.61 0 0 1-.612-.553c-2.16 1.55-5.14-.164-4.887-2.811Zm12.623 3.35h-.977a.813.813 0 0 1-.675-.357l-1.079-1.6a.356.356 0 0 0-.588 0l-1.08 1.6a.825.825 0 0 1-.245.22.803.803 0 0 1-.43.137h-.978a.075.075 0 0 1-.063-.121l1.18-1.752.744-1.1a.61.61 0 0 0 0-.682l-.05-.075-1.872-2.773a.077.077 0 0 1 .062-.121h.978a.813.813 0 0 1 .674.36l.826 1.221.254.376a.355.355 0 0 0 .59 0l1.08-1.597a.82.82 0 0 1 .673-.36h.978a.077.077 0 0 1 .06.122l-1.925 2.855a.61.61 0 0 0 0 .682l1.929 2.853a.076.076 0 0 1-.066.116zM17.068 9.403c1.567.002 2.356-1.89 1.25-3-1.103-1.11-3-.33-3.003 1.237A1.756 1.756 0 0 0 17.068 9.4zm0-3.14c1.23.003 1.843 1.493.97 2.36-.872.866-2.358.246-2.354-.983a1.38 1.38 0 0 1 1.38-1.378zm-3.719 8.1a1.77 1.77 0 0 0-1.783 1.63 3.15 3.15 0 0 0-.037.489 1.867 1.867 0 0 0 1.82 2.123 1.696 1.696 0 0 0 1.455-.764c.253-.407.381-.88.367-1.36a1.867 1.867 0 0 0-1.822-2.118zm.227-6.191a2.976 2.976 0 0 1 0-.954 1.475 1.475 0 0 1-.723.422c.29.096.544.283.722.533zm-1.486.785a.548.548 0 0 0-.5-.577h-.954v1.17h.954a.553.553 0 0 0 .5-.593zm0-2.595a.55.55 0 0 0-.5-.577h-.954V6.94h.954a.548.548 0 0 0 .5-.578z"
   ),
-  hulu: O(
+  hulu: z(
     "m 14.248,8.7019997 h 1.59 V 15.298 h -1.59 z M 5.143,10.764 H 4.124 a 1.4,1.4 0 0 0 -0.36,0.037 C 3.673,10.826 3.615,10.843 3.59,10.851 V 8.7 H 2 v 6.6 h 1.59 v -2.66 a 0.428,0.428 0 0 1 0.124,-0.3 0.4,0.4 0 0 1 0.3,-0.13 h 0.92 a 0.446,0.446 0 0 1 0.435,0.435 V 15.3 h 1.575 v -2.871 a 1.53,1.53 0 0 0 -0.5,-1.261 2,2 0 0 0 -1.301,-0.404 z m 15.267,0 v 2.658 a 0.423,0.423 0 0 1 -0.422,0.423 h -0.932 a 0.423,0.423 0 0 1 -0.422,-0.423 v -2.658 h -1.59 v 2.783 a 1.679,1.679 0 0 0 0.49,1.3 1.874,1.874 0 0 0 1.323,0.453 H 20.41 A 1.47,1.47 0 0 0 21.571,14.816 1.842,1.842 0 0 0 22,13.547 v -2.783 z m -8.957,2.658 a 0.4,0.4 0 0 1 -0.13,0.3 0.43,0.43 0 0 1 -0.3,0.124 H 10.1 A 0.423,0.423 0 0 1 9.678,13.423 V 10.764 H 8.087 v 2.783 a 1.676,1.676 0 0 0 0.491,1.3 1.855,1.855 0 0 0 1.31,0.453 h 1.565 a 1.473,1.473 0 0 0 1.162,-0.484 1.842,1.842 0 0 0 0.429,-1.267 v -2.785 h -1.591 z"
   ),
-  netflix: O(
+  netflix: z(
     "M5.94 1v10.994c0 6.045.006 10.996.014 11.004.01.01.382-.029.834-.078a73.701 73.701 0 0 1 1.383-.139 80.63 80.628 0 0 1 2.06-.133c.05 0 .052-.246.058-4.655l.01-4.645.34.964c1.406 3.979 1.77 5.004 2.166 6.117v.002l.206.581.575 1.624c.003.003.292.02.642.038a48.332 48.33 0 0 1 3.37.29c.12.014.227.024.307.03.038.002.044 0 .067 0 .023 0 .062.003.067 0h.006c.003 0 .003-.967.005-1.382l.002-.435c.007-1.783.01-4.836.007-9.181l-.01-10.979h-4.311L13.73 5.88l-.01 4.859v.003l-.398-1.13V9.61v.002l-2.04-5.765v-.013l-.177-.501c-.422-1.195-.781-2.205-.795-2.251L10.28 1H8.107Z"
   ),
-  prime: O(
+  prime: z(
     "M20.182 5.404a4.05 4.05 0 0 0 .625.05 1.116 1.116 0 0 0 .342-.03.474.474 0 0 0 .404-.306.605.605 0 0 0 .015-.276.4.4 0 0 0-.243-.334.88.88 0 0 0-.281-.064.791.791 0 0 0-.833.499 1.438 1.438 0 0 0-.102.367c-.006.088-.006.088.073.094zm-1.074-.4a1.808 1.808 0 0 1 1.633-1.359 2.38 2.38 0 0 1 1.057.102c.655.224 1.009.932.794 1.59a.986.986 0 0 1-.489.588 1.986 1.986 0 0 1-.66.211 3.534 3.534 0 0 1-1.207-.016 1.221 1.221 0 0 0-.146-.023.88.88 0 0 0 .716.954 2.58 2.58 0 0 0 .995 0c.154-.033.302-.065.456-.102.154-.036.218.012.218.17v.392a.242.242 0 0 1-.18.26 3.082 3.082 0 0 1-.626.17 3.247 3.247 0 0 1-1.214-.01 1.663 1.663 0 0 1-1.36-1.272 2.935 2.935 0 0 1 .016-1.656zm.317 6.367a2.588 2.588 0 0 1 1.012.039 1.936 1.936 0 0 1 1.41 1.635v.011h-.014v.1a.078.078 0 0 0 .024.08v-.021l.007.01v.61l-.012.021v-.01c-.03.02-.02.047-.02.08V14c-.048.9-.747 1.63-1.644 1.717a2.627 2.627 0 0 1-.998-.052 1.694 1.694 0 0 1-1.246-1.114 2.825 2.825 0 0 1 0-2.005c.219-.65.8-1.11 1.482-1.175zM12 3.946c0-.043.006-.086.016-.127a.156.156 0 0 1 .147-.102h.67a.19.19 0 0 1 .184.147c.028.075.044.147.07.223.053 0 .086-.036.122-.057a2.743 2.743 0 0 1 .946-.398 1.962 1.962 0 0 1 .795 0c.25.054.47.202.615.413a.25.25 0 0 0 .03.038v.014c.132-.079.271-.164.415-.237a2.382 2.382 0 0 1 1.203-.266 1.061 1.061 0 0 1 1.095 1.027v2.964c0 .238-.03.27-.27.27h-.647a.906.906 0 0 1-.126 0 .147.147 0 0 1-.128-.122.994.994 0 0 1-.01-.175V5.101a.944.944 0 0 0-.033-.293.4.4 0 0 0-.36-.294 1.861 1.861 0 0 0-.912.176.087.087 0 0 0-.063.096v2.788a.774.774 0 0 1-.01.155c0 .07-.058.127-.128.127h-.81c-.197 0-.24-.047-.24-.243V5.1a1.24 1.24 0 0 0-.026-.276.4.4 0 0 0-.371-.318 1.874 1.874 0 0 0-.928.18.085.085 0 0 0-.059.103v2.833c0 .195-.044.236-.239.236h-.704c-.188 0-.235-.053-.235-.232zm2.71 9.92a.178.178 0 0 0-.074-.011 2 2 0 0 0 .057.324c.08.337.358.59.7.636a2.664 2.664 0 0 0 1.088-.037c.117-.026.229-.053.345-.085.154-.037.223.023.223.17v.385a.235.235 0 0 1-.19.271 3.36 3.36 0 0 1-1.141.217 2.901 2.901 0 0 1-.796-.079 1.63 1.63 0 0 1-1.215-1.136 2.946 2.946 0 0 1-.02-1.776 1.848 1.848 0 0 1 1.838-1.363c.268-.012.535.023.792.101.44.123.775.48.868.928a1.468 1.468 0 0 1 0 .587.983.983 0 0 1-.535.704 2.166 2.166 0 0 1-.891.23 4.15 4.15 0 0 1-1.055-.067zm-3.133-2.202c.027-.037.012-.075.012-.112V9.847c0-.202.037-.238.238-.238h.734c.161.006.207.044.207.208v5.586c0 .147-.049.201-.196.201h-.69a.19.19 0 0 1-.186-.146.82.82 0 0 0-.057-.185c-.048.008-.069.045-.107.067a1.714 1.714 0 0 1-1.615.276 1.526 1.526 0 0 1-.917-.812 2.495 2.495 0 0 1-.266-1.13 2.999 2.999 0 0 1 .187-1.225 1.66 1.66 0 0 1 .826-.945c.552-.263 1.2-.22 1.713.111a.294.294 0 0 0 .117.059zm-.797-3.817h-.733a.32.32 0 0 1-.075 0 .147.147 0 0 1-.147-.137V3.893c0-.127.054-.176.18-.18a19.455 19.455 0 0 1 .828 0c.122 0 .159.037.17.158v3.67a.982.982 0 0 1-.01.176.134.134 0 0 1-.128.12.456.456 0 0 1-.089 0zm-1.045-5.45a.616.616 0 0 1 .642-.586h.064a.649.649 0 0 1 .248.036.6.6 0 0 1 .411.67.587.587 0 0 1-.506.534.963.963 0 0 1-.355 0 .587.587 0 0 1-.504-.66Zm-3.092 5.2V3.983c0-.244.026-.27.27-.27h.51a.211.211 0 0 1 .238.179c.037.132.07.264.1.408a.161.161 0 0 0 .091-.065 3.514 3.514 0 0 1 .303-.27 1.41 1.41 0 0 1 .964-.293c.138 0 .186.048.197.18.01.18 0 .367 0 .546a.985.985 0 0 1-.012.22.147.147 0 0 1-.147.146 1.812 1.812 0 0 1-.22 0 2.523 2.523 0 0 0-1.027.147c-.074.026-.074.079-.074.138v2.678a.13.13 0 0 1-.128.122.992.992 0 0 1-.132 0v.01h-.69a.784.784 0 0 1-.117 0 .147.147 0 0 1-.126-.132zm.904 3.228a.604.604 0 0 1-.192 0 .998.998 0 0 1-.176-.02.6.6 0 0 1-.466-.7.587.587 0 0 1 .567-.536.473.473 0 0 1 .111 0 .638.638 0 0 1 .313.054c.208.078.35.272.361.494a.624.624 0 0 1-.518.716zm.44.855v3.764a.147.147 0 0 1-.133.159h-.88a.147.147 0 0 1-.162-.128v-.026a.567.567 0 0 1 0-.1v-3.67c0-.164.045-.21.21-.21h.751c.164.007.211.054.211.218zm-1.711.047-.317.844-1.067 2.774c-.01.032-.027.063-.037.095a.261.261 0 0 1-.265.175h-.702a.294.294 0 0 1-.318-.218c-.133-.349-.27-.704-.403-1.055-.318-.832-.641-1.666-.96-2.504a.928.928 0 0 1-.069-.207c-.016-.105.021-.158.128-.158h.901c.128 0 .185.085.218.196.058.201.117.408.18.61.217.733.43 1.479.646 2.217h.01l.096-.308.733-2.46.031-.095a.214.214 0 0 1 .213-.147h.812c.2-.003.243.054.176.245zM1.786 3.82a.377.377 0 0 1 .318-.107h.488a.21.21 0 0 1 .234.18c.01.053.02.106.037.16a.022.022 0 0 0 .02.015.429.429 0 0 0 .11-.08 1.87 1.87 0 0 1 1.586-.354c.48.115.874.454 1.061.91a2.451 2.451 0 0 1 .205.798h-.008c.051.444.011.893-.118 1.321a1.942 1.942 0 0 1-.55.88c-.34.306-.795.448-1.248.388A1.776 1.776 0 0 1 3 7.564c-.039.033-.022.074-.022.113v1.506c0 .329 0 .329-.334.329h-.572a.294.294 0 0 1-.294-.126Zm19.37 15.225a.587.587 0 0 1-.176.2 11.64 11.64 0 0 1-1.962 1.247 15.499 15.499 0 0 1-4.152 1.406 18.226 18.226 0 0 1-2.51.27v.022h-.649v-.018c-.293-.014-.578-.026-.868-.047a15.349 15.349 0 0 1-2.296-.352 15.558 15.558 0 0 1-6.885-3.59c-.185-.164-.36-.333-.54-.503a.405.405 0 0 1-.101-.146.195.195 0 0 1 .098-.256.2.2 0 0 1 .147 0 1.21 1.21 0 0 1 .138.069 20.566 20.566 0 0 0 6.164 2.546 22.087 22.087 0 0 0 2.212.398 20.441 20.441 0 0 0 3.213.146 16.97 16.97 0 0 0 1.724-.146 20.908 20.908 0 0 0 3.935-.896 18.627 18.627 0 0 0 1.973-.776.44.44 0 0 1 .318-.043.33.33 0 0 1 .24.398.578.578 0 0 1-.022.066zm1.028 1.488a3.547 3.547 0 0 1-.615.757.432.432 0 0 1-.17.107.123.123 0 0 1-.169-.124.608.608 0 0 1 .038-.162c.185-.496.366-.99.51-1.504a5.346 5.346 0 0 0 .18-.859 1.65 1.65 0 0 0 0-.318.412.412 0 0 0-.294-.388 2.068 2.068 0 0 0-.509-.095 8.356 8.356 0 0 0-1.459.064l-.641.08c-.07 0-.132 0-.17-.065a.18.18 0 0 1 .014-.19.546.546 0 0 1 .162-.148 3.67 3.67 0 0 1 1.299-.562 6.412 6.412 0 0 1 1.097-.121c.346.001.691.042 1.028.121a1.515 1.515 0 0 1 .276.102c.121.05.206.162.219.293a2.157 2.157 0 0 1 .014.455 5.856 5.856 0 0 1-.806 2.55zm-2.55-5.72a.995.995 0 0 0 .301.01.691.691 0 0 0 .505-.293 1.01 1.01 0 0 0 .147-.308l-.009.014a1.924 1.924 0 0 0 .074-.678 2.449 2.449 0 0 0 0-.293 1.64 1.64 0 0 0-.147-.6.685.685 0 0 0-.483-.376.908.908 0 0 0-.302-.01.694.694 0 0 0-.542.328 1.163 1.163 0 0 0-.147.35 2.89 2.89 0 0 0-.042.933 1.494 1.494 0 0 0 .147.525c.09.207.276.355.497.397zm-3.523-1.96a.473.473 0 0 0-.394-.64c-.026 0-.047-.01-.073-.01a.797.797 0 0 0-.775.302 1.321 1.321 0 0 0-.211.578c-.015.047.01.069.058.073a4.705 4.705 0 0 0 .642.053c.11.006.22-.003.328-.026a.465.465 0 0 0 .425-.33zm-5.981-.255a1.174 1.174 0 0 0-.106.26 2.683 2.683 0 0 0-.065.997 1.48 1.48 0 0 0 .147.536.734.734 0 0 0 .568.391 1.306 1.306 0 0 0 .832-.158.147.147 0 0 0 .086-.147v-.966h.007c0-.323-.01-.641 0-.968a.147.147 0 0 0-.096-.156 1.614 1.614 0 0 0-.817-.147.678.678 0 0 0-.556.358zM3.855 7.051a.747.747 0 0 0 .488-.188.807.807 0 0 0 .243-.425 2.654 2.654 0 0 0 .065-1.002 1.505 1.505 0 0 0-.135-.54.653.653 0 0 0-.505-.382 1.44 1.44 0 0 0-.912.137.16.16 0 0 0-.105.164v1.917a.147.147 0 0 0 .09.147 1.468 1.468 0 0 0 .771.17"
   ),
-  youtube: O(
+  youtube: z(
     "M18.43 4.216H5.57A4.57 4.57 0 0 0 1 8.786v6.429a4.57 4.57 0 0 0 4.57 4.569h12.86a4.57 4.57 0 0 0 4.57-4.57V8.786a4.57 4.57 0 0 0-4.57-4.569zm-3.09 8.097-6.015 2.869a.241.241 0 0 1-.346-.218V9.046c0-.18.19-.297.351-.215l6.016 3.048a.242.242 0 0 1-.005.434z"
   )
 }, pt = Object.keys($t), ct = {
@@ -1061,7 +1065,7 @@ class ii extends te {
     t !== this.isConnected && (this.isConnected = t, t ? this.reconnected?.() : this.disconnected?.()), i && (B(this, t), J(this));
   }
   setValue(t) {
-    if (Ue(this._$Ct)) this._$Ct._$AI(t, this);
+    if (De(this._$Ct)) this._$Ct._$AI(t, this);
     else {
       const i = [...this._$Ct._$AH];
       i[this._$Ci] = t, this._$Ct._$AI(i, this, 0);
@@ -2051,7 +2055,7 @@ const Lt = 0.06, di = {
   Enter: "center",
   " ": "center"
 };
-let w = class extends T {
+let w = class extends P {
   constructor() {
     super(...arguments), this.pad = "buttons", this.repeat = !0, this.haptics = !0, this._tracking = !1, this._startX = 0, this._startY = 0, this._onPointerDown = (e) => {
       e.button === 0 && (e.preventDefault(), this._touchpad?.setPointerCapture(e.pointerId), this._startX = e.clientX, this._startY = e.clientY, this._tracking = !0, this._moveDot(e));
@@ -2288,7 +2292,7 @@ const jt = [
   volume_entity: "Point this at a soundbar or receiver if that is what actually changes the volume. A TV passing audio through reports no volume level, so the card shows no level bar for it.",
   show_text_input: "Sends typed text to the TV. Only lands while a search field is focused, and needs “Enable IME” on the integration."
 };
-let D = class extends T {
+let U = class extends P {
   constructor() {
     super(...arguments), this._editing = null, this._computeLabel = (e) => mi[e.name] ?? e.name, this._computeHelper = (e) => fi[e.name];
   }
@@ -2325,11 +2329,11 @@ let D = class extends T {
   /** Change the action kind, carrying the old value across where it makes sense. */
   _setActionKind(e, t) {
     const i = this._config.apps[e].action, o = Bt(i);
-    this._updateApp(e, { action: Kt(t, o) });
+    this._updateApp(e, { action: Ft(t, o) });
   }
   _setActionValue(e, t) {
     const i = this._config.apps[e].action;
-    this._updateApp(e, { action: Kt(i.action, t) });
+    this._updateApp(e, { action: Ft(i.action, t) });
   }
   _renderIcon(e) {
     const t = e.icon ?? "mdi:application";
@@ -2354,7 +2358,7 @@ let D = class extends T {
         <div class="tile-icon">${this._renderIcon(e)}</div>
         <div class="tile-info">
           <div class="primary"><span>${e.name ?? "Untitled app"}</span></div>
-          <div class="secondary"><span>${Fe(e.action)}</span></div>
+          <div class="secondary"><span>${Ke(e.action)}</span></div>
         </div>
         <button
           class="icon-button"
@@ -2603,7 +2607,7 @@ let D = class extends T {
     `;
   }
 };
-D.styles = [
+U.styles = [
   wt,
   ut`
       :host {
@@ -2669,16 +2673,16 @@ D.styles = [
 ];
 it([
   I({ attribute: !1 })
-], D.prototype, "hass", 2);
+], U.prototype, "hass", 2);
 it([
   H()
-], D.prototype, "_config", 2);
+], U.prototype, "_config", 2);
 it([
   H()
-], D.prototype, "_editing", 2);
-D = it([
+], U.prototype, "_editing", 2);
+U = it([
   gt("polr-android-tv-remote-card-editor")
-], D);
+], U);
 const Bt = (e) => {
   switch (e.action) {
     case "activity":
@@ -2690,7 +2694,7 @@ const Bt = (e) => {
     case "service":
       return e.service;
   }
-}, Kt = (e, t) => {
+}, Ft = (e, t) => {
   switch (e) {
     case "activity":
       return { action: "activity", activity: t };
@@ -2711,7 +2715,7 @@ var _i = Object.defineProperty, gi = Object.getOwnPropertyDescriptor, q = (e, t,
   return o && r && _i(t, i, r), r;
 };
 const bi = "2.0.0", ot = "polr-android-tv-remote-card";
-let z = class extends T {
+let C = class extends P {
   constructor() {
     super(...arguments), this._text = "", this._sending = !1;
   }
@@ -2753,7 +2757,7 @@ let z = class extends T {
   }
   _press(e) {
     const t = this._device;
-    !this.hass || !this._config || !t || Ke(this.hass, this._config, t, e);
+    !this.hass || !this._config || !t || Fe(this.hass, this._config, t, e);
   }
   _navigate(e) {
     this._press(e.detail.direction);
@@ -2852,15 +2856,17 @@ let z = class extends T {
    * codes work regardless — it is only the *player* route that needs the bit.
    */
   _renderTransport(e) {
-    const t = e.playerId === null, i = t || P(e, g.PREVIOUS_TRACK), o = t || P(e, g.NEXT_TRACK);
-    return !i && !o && !t && !P(e, g.PAUSE) ? d : l`
+    const t = e.playerId === null, i = t || R(e, b.PREVIOUS_TRACK), o = t || R(e, b.NEXT_TRACK);
+    return l`
       <div class="features">
         ${i ? this._button("previous", "mdi:skip-previous", "Previous") : d}
+        ${this._button("rewind", "mdi:rewind", "Rewind", { repeat: !0 })}
         ${this._button(
       "play_pause",
       e.playing ? "mdi:pause" : "mdi:play",
       e.playing ? "Pause" : "Play"
     )}
+        ${this._button("fast_forward", "mdi:fast-forward", "Fast forward", { repeat: !0 })}
         ${o ? this._button("next", "mdi:skip-next", "Next") : d}
       </div>
     `;
@@ -3024,22 +3030,22 @@ let z = class extends T {
     `;
   }
 };
-z.styles = [wt, ne];
+C.styles = [wt, ne];
 q([
   I({ attribute: !1 })
-], z.prototype, "hass", 2);
+], C.prototype, "hass", 2);
 q([
   H()
-], z.prototype, "_config", 2);
+], C.prototype, "_config", 2);
 q([
   H()
-], z.prototype, "_text", 2);
+], C.prototype, "_text", 2);
 q([
   H()
-], z.prototype, "_sending", 2);
-z = q([
+], C.prototype, "_sending", 2);
+C = q([
   gt(ot)
-], z);
+], C);
 window.customCards = window.customCards ?? [];
 window.customCards.push({
   type: ot,
@@ -3051,6 +3057,6 @@ window.customCards.push({
 console.info(`%c ${ot} %c ${bi} `, "background:#555;color:#fff", "background:#3f51b5;color:#fff");
 export {
   bi as CARD_VERSION,
-  z as PolrAndroidTvRemoteCard
+  C as PolrAndroidTvRemoteCard
 };
 //# sourceMappingURL=polr-android-tv-remote-card.js.map

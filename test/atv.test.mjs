@@ -467,3 +467,17 @@ test("app_id is exposed so the editor can capture the running app", () => {
   const hass = fixture({ playerAttrs: { app_id: "com.netflix.ninja" } });
   assert.equal(readDevice(hass, config()).appId, "com.netflix.ninja");
 });
+
+
+test("rewind and fast forward are key codes, with no media_player route", async () => {
+  // media_player's only seek service takes an absolute position, which a TV
+  // cannot report, so these never go through the player even when one is paired.
+  const hass = fixture();
+  const device = readDevice(hass, config());
+  await pressButton(hass, config(), device, "rewind");
+  await pressButton(hass, config(), device, "fast_forward");
+  assert.deepEqual(hass.calls.map((c) => [c.domain, c.data.command]), [
+    ["remote", "MEDIA_REWIND"],
+    ["remote", "MEDIA_FAST_FORWARD"],
+  ]);
+});

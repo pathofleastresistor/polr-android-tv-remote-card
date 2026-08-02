@@ -36,7 +36,9 @@ export type ButtonId =
   | "volume_mute"
   | "play_pause"
   | "next"
-  | "previous";
+  | "previous"
+  | "rewind"
+  | "fast_forward";
 
 /** An arbitrary service call — v1's `{service, data}` shape, kept intact. */
 export interface ServiceAction {

@@ -243,20 +243,23 @@ export class PolrAndroidTvRemoteCard extends LitElement {
    * Buttons are shown when there is no paired player at all, because the key
    * codes work regardless — it is only the *player* route that needs the bit.
    */
-  private _renderTransport(device: DeviceState): TemplateResult | typeof nothing {
+  private _renderTransport(device: DeviceState): TemplateResult {
+    // Skip previous/next need the player to advertise them. Rewind, fast
+    // forward and play/pause are key codes, so they always work.
     const unpaired = device.playerId === null;
     const showPrev = unpaired || can(device, FEATURE.PREVIOUS_TRACK);
     const showNext = unpaired || can(device, FEATURE.NEXT_TRACK);
-    if (!showPrev && !showNext && !unpaired && !can(device, FEATURE.PAUSE)) return nothing;
 
     return html`
       <div class="features">
         ${showPrev ? this._button("previous", "mdi:skip-previous", "Previous") : nothing}
+        ${this._button("rewind", "mdi:rewind", "Rewind", { repeat: true })}
         ${this._button(
           "play_pause",
           device.playing ? "mdi:pause" : "mdi:play",
           device.playing ? "Pause" : "Play",
         )}
+        ${this._button("fast_forward", "mdi:fast-forward", "Fast forward", { repeat: true })}
         ${showNext ? this._button("next", "mdi:skip-next", "Next") : nothing}
       </div>
     `;
