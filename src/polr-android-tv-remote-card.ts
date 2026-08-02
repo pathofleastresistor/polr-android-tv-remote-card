@@ -38,7 +38,7 @@ import { stateColor, type HomeAssistant } from "./kit/types";
 import "./nav-pad";
 import "./polr-android-tv-remote-card-editor";
 
-export const CARD_VERSION = "2.0.0-beta.5";
+export const CARD_VERSION = "2.0.0-beta.6";
 
 const CARD_TYPE = "polr-android-tv-remote-card";
 
@@ -191,7 +191,9 @@ export class PolrAndroidTvRemoteCard extends LitElement {
         <!-- Not interactive: the icon shows what is playing, and tapping it
              opened a more-info dialog nobody wanted from a remote. -->
         <div class="tile-icon">
-          ${brand ? BRAND_LOGOS[brand] : html`<ha-icon icon="mdi:television"></ha-icon>`}
+          ${brand
+            ? html`<span class="brand-mark">${BRAND_LOGOS[brand]}</span>`
+            : html`<ha-icon icon="mdi:television"></ha-icon>`}
         </div>
         <div class="tile-info">
           <div class="primary"><span>${device.name}</span></div>
@@ -254,8 +256,15 @@ export class PolrAndroidTvRemoteCard extends LitElement {
   }
 
   private _renderNavigationRow(): TemplateResult {
+    const config = this._config!;
+    // Power lives in the header, but the header is optional. Rather than let
+    // "show power" silently do nothing when the header is hidden, the button
+    // moves here — so the setting always means what it says.
+    const orphanedPower = config.show_power && !config.show_header;
+
     return html`
       <div class="features">
+        ${orphanedPower ? this._button("power", "mdi:power", "Power") : nothing}
         ${this._button("back", "mdi:arrow-u-left-top", "Back")}
         ${this._button("home", "mdi:home", "Home")}
         ${this._button("menu", "mdi:menu", "Menu")}

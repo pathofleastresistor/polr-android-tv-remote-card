@@ -200,6 +200,8 @@
         { title: "audio on a soundbar (no volume state)", config: { entity: "remote.main_tv", apps: APPS.slice(0, 5) }, hass: { playerAttrs: { volume_level: null, is_volume_muted: null } } },
         { title: "volume_entity -> soundbar", config: { entity: "remote.main_tv", volume_entity: "media_player.soundbar", apps: APPS.slice(0, 5) }, hass: { playerAttrs: { volume_level: null, is_volume_muted: null } } },
         { title: "TV off", config: { entity: "remote.main_tv", apps: APPS.slice(0, 4) }, hass: { playerState: "off" } },
+        { title: "no header, power on", config: { entity: "remote.main_tv", show_header: false, show_power: true, apps: APPS.slice(0, 3) } },
+        { title: "no header, no power", config: { entity: "remote.main_tv", show_header: false, show_power: false, apps: APPS.slice(0, 3) } },
         { title: "TV off + power override", config: { entity: "remote.main_tv", apps: [], overrides: { power: { service: "remote.send_command", data: { command: "power", entity_id: "remote.living_room_rf" } } } }, hass: { playerState: "off" } },
         { title: "unavailable", config: { entity: "remote.main_tv" }, hass: { playerState: "unavailable", remoteState: "unavailable" } },
         { title: "no paired player", config: { entity: "remote.orphan_tv", apps: APPS.slice(0, 3) }, hass: { orphan: true } },

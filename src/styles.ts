@@ -20,6 +20,16 @@ export const remoteStyles = css`
     height: 22px;
     fill: currentColor;
   }
+  /*
+   * The pill stays tinted by state -- colour when on, grey when off, the same
+   * language as every other tile card -- but the logo inside it does not. A
+   * brand mark recoloured to Home Assistant's media-player purple reads as a
+   * rendering bug, and the tinted pill already carries the state.
+   */
+  .tile-icon .brand-mark {
+    display: flex;
+    color: var(--primary-text-color);
+  }
 
   /* ---------------------------------------------------------- nav region -- */
   .pad {
