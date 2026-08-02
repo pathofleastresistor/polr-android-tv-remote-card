@@ -247,6 +247,8 @@ test("stripLegacyKeys removes only v1 keys", () => {
     volume: false,
     volumeup: { service: "script.x" },
     show_volume: false,
+    // Derived from overrides.favorite; writing it would go stale.
+    show_favorite: true,
   });
   assert.deepEqual(stripped, { type: TYPE, entity: "remote.atv", show_volume: false });
 });

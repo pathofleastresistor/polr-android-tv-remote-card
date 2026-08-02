@@ -27,6 +27,7 @@ import { tileStyles } from "./kit/styles";
 import { showMoreInfo, stateColor, type HomeAssistant } from "./kit/types";
 
 import "./nav-pad";
+import "./polr-android-tv-remote-card-editor";
 
 export const CARD_VERSION = "2.0.0";
 

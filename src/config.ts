@@ -380,11 +380,21 @@ export const balancedColumns = (count: number): number => {
   return Math.ceil(count / rows);
 };
 
-/** Strip v1-only keys, for the editor's first write-back. */
+/**
+ * Strip keys that must never reach stored YAML: v1 spellings the editor has
+ * just migrated, and `show_favorite`, which is derived from
+ * `overrides.favorite` and would go stale the moment that override changed.
+ */
 export const stripLegacyKeys = (
   config: PolrAtvRemoteCardConfig,
 ): PolrAtvRemoteCardConfig => {
-  const legacy = new Set(["entity_id", "remote", "volume", ...Object.keys(V1_OVERRIDE_KEYS)]);
+  const legacy = new Set([
+    "entity_id",
+    "remote",
+    "volume",
+    "show_favorite",
+    ...Object.keys(V1_OVERRIDE_KEYS),
+  ]);
   const out: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(config)) {
     if (!legacy.has(key)) out[key] = value;
