@@ -267,7 +267,7 @@ export const pressButton = (
   node?: HTMLElement,
 ): Promise<unknown> => {
   const tap = config.overrides[button]?.tap_action;
-  if (isActionable(tap) && node) {
+  if (isActionable(tap)) {
     return runAction(node, hass, tap as ActionConfig, device.remoteId);
   }
   // An explicit `action: none` means the button is deliberately inert.

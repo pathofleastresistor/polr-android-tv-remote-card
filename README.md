@@ -141,7 +141,10 @@ overrides:
       action: more-info
 ```
 
-The editor uses HA's own interactions selector for the volume buttons.
+The editor has HA's own interactions selector for **power** and the three
+volume buttons, under those headings — those being the ones people actually
+redirect, because something other than the TV does the job. Every other button
+is available in YAML.
 
 Two shorthands are accepted for the common cases. A bare entity id, for anything
 that can simply be pressed — `button`, `input_button`, `script`, `scene` or
@@ -151,6 +154,10 @@ that can simply be pressed — `button`, `input_button`, `script`, `scene` or
 overrides:
   power: button.media_room_baton_power
 ```
+
+Power is worth calling out: without an override it toggles, choosing `turn_on`
+or `turn_off` from the current state. With one, it always performs your action —
+which is what a blaster sending a single toggle code needs.
 
 …and v1's service-call shape, which becomes the tap action:
 

@@ -92,6 +92,12 @@ const SCHEMA = (config: ResolvedConfig) =>
     {
       type: "expandable",
       name: "",
+      title: "Power",
+      schema: [{ name: "power_action", selector: { ui_action: {} } }],
+    },
+    {
+      type: "expandable",
+      name: "",
       title: "Volume",
       schema: [
         {
@@ -127,6 +133,7 @@ const LABELS: Record<string, string> = {
   entity: "Remote entity",
   media_player_entity: "Paired media player (auto-detected)",
   volume_entity: "Volume on another media player",
+  power_action: "Power",
   volume_up_action: "Volume up",
   volume_down_action: "Volume down",
   volume_mute_action: "Mute",
@@ -149,6 +156,8 @@ const HELPERS: Record<string, string> = {
     "Only needed if the card cannot find the player itself, or to point it at a different player on the same TV.",
   volume_entity:
     "Point this at a soundbar or receiver that exposes a media player. A TV passing audio through reports no volume level, so the card shows no level bar for it.",
+  power_action:
+    "Leave empty to toggle the TV itself. Set it when something else does the switching — an IR or RF blaster, or a script that also powers a receiver.",
   volume_up_action:
     "Leave empty to control the TV or the media player above. Set it for IR bridges and the like, which expose one pressable entity per command instead of a media player.",
   show_text_input:
@@ -167,19 +176,30 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
     this._config = normalizeConfig(config);
   }
 
-  /** Volume buttons the editor can point at a single pressable entity. */
-  private static readonly VOLUME_BUTTONS = ["volume_up", "volume_down", "volume_mute"] as const;
+  /**
+   * Buttons the editor offers an interactions selector for.
+   *
+   * Every button supports overrides in YAML; these are the ones people
+   * actually redirect, because something other than the TV does the job —
+   * a blaster for power, a soundbar or IR bridge for volume.
+   */
+  private static readonly ACTION_BUTTONS = [
+    "power",
+    "volume_up",
+    "volume_down",
+    "volume_mute",
+  ] as const;
 
   /**
-   * ha-form data, with the three volume tap actions flattened.
+   * ha-form data, with the editable tap actions flattened.
    *
-   * ha-form has no vocabulary for a nested map, so `overrides.volume_up` is
-   * surfaced as `volume_up_action` and folded back in `_formChanged`. Hold and
+   * ha-form has no vocabulary for a nested map, so `overrides.power` is
+   * surfaced as `power_action` and folded back in `_formChanged`. Hold and
    * double-tap actions are preserved untouched; the selector only edits the tap.
    */
   private get _formData(): Record<string, unknown> {
     const data: Record<string, unknown> = { ...this._config! };
-    for (const button of PolrAndroidTvRemoteCardEditor.VOLUME_BUTTONS) {
+    for (const button of PolrAndroidTvRemoteCardEditor.ACTION_BUTTONS) {
       data[`${button}_action`] = this._config!.overrides[button]?.tap_action;
     }
     return data;
@@ -201,7 +221,7 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
     const value = { ...event.detail.value } as Record<string, unknown>;
 
     const overrides: Record<string, unknown> = { ...this._config!.overrides };
-    for (const button of PolrAndroidTvRemoteCardEditor.VOLUME_BUTTONS) {
+    for (const button of PolrAndroidTvRemoteCardEditor.ACTION_BUTTONS) {
       const key = `${button}_action`;
       const action = value[key];
       delete value[key];

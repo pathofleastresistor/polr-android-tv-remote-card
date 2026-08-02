@@ -495,3 +495,61 @@ test("rewind and fast forward are key codes, with no media_player route", async 
     ["remote", "MEDIA_FAST_FORWARD"],
   ]);
 });
+
+/* ------------------------------------------------------------------------ *
+ * Power overrides.
+ *
+ * Power is the one button with real default behaviour of its own -- it reads
+ * the current state and toggles -- so an override has to short-circuit that,
+ * not merge with it. The author's Main TV switches through an RF blaster.
+ * ------------------------------------------------------------------------ */
+
+test("a power override replaces the toggle entirely", async () => {
+  const hass = fixture({ playerState: "on" });
+  const cfg = config({
+    power: {
+      service: "remote.send_command",
+      data: { command: "power", device: "livingroomtv", entity_id: "remote.living_room_rf" },
+    },
+  });
+  await pressButton(hass, cfg, readDevice(hass, cfg), "power", node());
+  assert.deepEqual(hass.calls, [
+    {
+      domain: "remote",
+      service: "send_command",
+      data: { command: "power", device: "livingroomtv", entity_id: "remote.living_room_rf" },
+      target: undefined,
+    },
+  ]);
+});
+
+test("a power override fires the same whether the TV reads on or off", async () => {
+  // The blaster sends one toggle code; the card must not decide between
+  // turn_on and turn_off on its behalf.
+  for (const playerState of ["on", "off"]) {
+    const hass = fixture({ playerState });
+    const cfg = config({ power: "button.blaster_power" });
+    await pressButton(hass, cfg, readDevice(hass, cfg), "power", node());
+    assert.deepEqual(hass.calls[0], {
+      domain: "button",
+      service: "press",
+      data: {},
+      target: { entity_id: "button.blaster_power" },
+    });
+  }
+});
+
+test("an override still applies when no element was passed", async () => {
+  // runAction only needs a node for more-info. Gating the override on one made
+  // it silently fall through to the button's default behaviour.
+  const hass = fixture({ playerState: "on" });
+  const cfg = config({ power: "button.blaster_power" });
+  await pressButton(hass, cfg, readDevice(hass, cfg), "power");
+  assert.equal(hass.calls[0].service, "press", "override ran without a node");
+});
+
+test("power still toggles when it has no override", async () => {
+  const hass = fixture({ playerState: "on" });
+  await pressButton(hass, config(), readDevice(hass, config()), "power", node());
+  assert.equal(hass.calls[0].service, "turn_off");
+});

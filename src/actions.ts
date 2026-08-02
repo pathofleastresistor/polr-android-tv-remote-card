@@ -64,9 +64,13 @@ export const serviceAction = (
  *
  * `fallbackEntity` stands in where the config omits one, matching HA: a bare
  * `more-info` or `toggle` acts on the card's own entity.
+ *
+ * `node` is only needed to dispatch the more-info dialog, so it is optional:
+ * an override must never be skipped just because a caller had no element to
+ * hand, which would silently fall through to the button's default behaviour.
  */
 export const runAction = (
-  node: HTMLElement,
+  node: HTMLElement | undefined,
   hass: HomeAssistant,
   action: ActionConfig,
   fallbackEntity?: string,
@@ -77,7 +81,7 @@ export const runAction = (
 
     case "more-info": {
       const entity = action.entity ?? fallbackEntity;
-      if (entity) showMoreInfo(node, entity);
+      if (entity && node) showMoreInfo(node, entity);
       return Promise.resolve();
     }
 
