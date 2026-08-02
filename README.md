@@ -121,7 +121,8 @@ instead of a deep link.
 
 ### Overriding buttons
 
-Any button can call an action instead of doing its normal job:
+Any button can call an action instead of doing its normal job. An override is
+either a full service call:
 
 ```yaml
 overrides:
@@ -131,6 +132,14 @@ overrides:
       command: power
       device: livingroomtv
       entity_id: remote.living_room_ir_repeater
+```
+
+…or a bare entity id, for anything that can simply be pressed — `button`,
+`input_button`, `script`, `scene` or `automation`:
+
+```yaml
+overrides:
+  power: button.media_room_baton_power
 ```
 
 Valid buttons: `up`, `down`, `left`, `right`, `center`, `power`, `home`, `back`,
@@ -152,15 +161,28 @@ rather than inventing a bar. Mute falls back to the `MUTE` key, which is a real
 toggle, instead of `media_player.volume_mute`, which is absolute and would mute
 every time.
 
-If a soundbar or receiver is what actually changes the volume, point the card at
-it:
+If a soundbar or receiver exposes a media player, point the card at it:
 
 ```yaml
 volume_entity: media_player.living_room_soundbar
 ```
 
-The buttons then drive that entity, and its level and mute state come back —
-soundbars usually do report them. Everything else still follows the TV.
+The buttons then drive that entity, and its level and mute state come back.
+Everything else still follows the TV.
+
+**If volume goes through an IR bridge**, there is usually no media player at
+all — instead you get one pressable entity per command. A Sofabaton X1S, for
+instance, exposes `button.<name>_volume_up`, `_volume_down` and `_volume_mute`.
+Point each button at its entity:
+
+```yaml
+overrides:
+  volume_up: button.media_room_baton_volume_up
+  volume_down: button.media_room_baton_volume_down
+  volume_mute: button.media_room_baton_volume_mute
+```
+
+The editor has an entity picker for each of these under **Volume**.
 
 ### Text input
 

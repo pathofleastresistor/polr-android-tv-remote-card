@@ -9,7 +9,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { BRANDS, DEFAULTS, normalizeConfig, stripLegacyKeys, _resetWarnings } from "./.build/config.mjs";
+import { BRANDS, DEFAULTS, entityAction, normalizeConfig, stripLegacyKeys, _resetWarnings } from "./.build/config.mjs";
 
 const TYPE = "custom:polr-android-tv-remote-card";
 const base = (extra) => ({ type: TYPE, ...extra });
@@ -332,4 +332,81 @@ test("a nonsensical app_columns falls back to the default", () => {
       `app_columns: ${JSON.stringify(value)}`,
     );
   }
+});
+
+
+/* ------------------------------------------------------------------------ *
+ * Overrides as bare entity ids.
+ *
+ * IR bridges expose one pressable entity per command rather than a
+ * media_player -- a Sofabaton X1S gives button.<name>_volume_up,
+ * _volume_down and _volume_mute -- so a single volume_entity cannot cover
+ * them and three full service calls is a lot of YAML for "press this".
+ * ------------------------------------------------------------------------ */
+
+test("a bare button entity becomes button.press on that entity", () => {
+  assert.deepEqual(entityAction("button.media_room_baton_volume_up"), {
+    service: "button.press",
+    target: { entity_id: "button.media_room_baton_volume_up" },
+  });
+});
+
+test("each pressable domain maps to its own service", () => {
+  assert.equal(entityAction("input_button.x").service, "input_button.press");
+  assert.equal(entityAction("script.x").service, "script.turn_on");
+  assert.equal(entityAction("scene.x").service, "scene.turn_on");
+  assert.equal(entityAction("automation.x").service, "automation.trigger");
+});
+
+test("a domain with no obvious press is refused rather than guessed", () => {
+  // A remote needs a command, a light needs a target state: there is no
+  // single sensible "press" for either.
+  assert.equal(entityAction("remote.living_room_ir"), null);
+  assert.equal(entityAction("light.lamp"), null);
+  assert.equal(entityAction("nonsense"), null);
+});
+
+test("the three Sofabaton volume buttons configure in one line each", () => {
+  const config = normalizeConfig(
+    base({
+      entity: "remote.media_room_tv",
+      overrides: {
+        volume_up: "button.media_room_baton_volume_up",
+        volume_down: "button.media_room_baton_volume_down",
+        volume_mute: "button.media_room_baton_volume_mute",
+      },
+    }),
+  );
+  assert.deepEqual(config.overrides.volume_up, {
+    service: "button.press",
+    target: { entity_id: "button.media_room_baton_volume_up" },
+  });
+  assert.deepEqual(config.overrides.volume_mute, {
+    service: "button.press",
+    target: { entity_id: "button.media_room_baton_volume_mute" },
+  });
+});
+
+test("an entity override that cannot be pressed is dropped, not fatal", () => {
+  const config = normalizeConfig(
+    base({ entity: "remote.atv", overrides: { volume_up: "light.lamp" } }),
+  );
+  assert.equal(config.overrides.volume_up, undefined);
+});
+
+test("full service-call overrides still work alongside entity ones", () => {
+  const config = normalizeConfig(
+    base({
+      entity: "remote.atv",
+      overrides: {
+        volume_up: "button.up",
+        volume_mute: { service: "script.mute", data: { room: "media" } },
+      },
+    }),
+  );
+  assert.equal(config.overrides.volume_up.service, "button.press");
+  assert.deepEqual(config.overrides.volume_mute, {
+    service: "script.mute",
+    data: { room: "media" },
+  });
 });

@@ -48,6 +48,31 @@ export interface ServiceAction {
   target?: Record<string, unknown>;
 }
 
+/**
+ * How to "press" an entity, by domain.
+ *
+ * Lets an override be written as a bare entity id. IR bridges expose one entity
+ * per command rather than a media_player — the Sofabaton X1S, for example, gives
+ * button.<name>_volume_up / _volume_down / _volume_mute — so pointing three
+ * buttons at three entities is the normal shape, and spelling out
+ * `{service: button.press, target: {entity_id: ...}}` three times is noise.
+ */
+const PRESS_SERVICE: Record<string, string> = {
+  button: "press",
+  input_button: "press",
+  scene: "turn_on",
+  script: "turn_on",
+  automation: "trigger",
+};
+
+/** Turn a bare entity id into the service call that presses it. */
+export const entityAction = (entityId: string): ServiceAction | null => {
+  const domain = entityId.split(".")[0];
+  const service = domain ? PRESS_SERVICE[domain] : undefined;
+  if (!domain || !service) return null;
+  return { service: `${domain}.${service}`, target: { entity_id: entityId } };
+};
+
 /** How an app tile launches. */
 export type AppAction =
   /** remote.turn_on with `activity:` — a configured app name or a deep link. */
@@ -100,7 +125,11 @@ export interface PolrAtvRemoteCardConfig {
 
   hold_repeat?: boolean;
   haptics?: boolean;
-  overrides?: Partial<Record<ButtonId, ServiceAction>>;
+  /**
+   * Redirect individual buttons. A value is either a full service call or a
+   * bare entity id, for anything that can simply be pressed.
+   */
+  overrides?: Partial<Record<ButtonId, ServiceAction | string>>;
 
   /** v1 keys are tolerated on input; see normalizeConfig. */
   [key: string]: unknown;
@@ -186,6 +215,30 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 const isServiceAction = (value: unknown): value is ServiceAction =>
   isRecord(value) && typeof value["service"] === "string";
+
+/** Accept either shape of override and normalise to a service call. */
+const toServiceAction = (value: unknown, label: string): ServiceAction | undefined => {
+  if (typeof value === "string") {
+    const action = entityAction(value);
+    if (action) return action;
+    warnOnce(
+      `override "${label}" points at ${value}, which cannot simply be pressed. ` +
+        `Use a {service, target} object instead.`,
+    );
+    return undefined;
+  }
+  if (isServiceAction(value)) {
+    return {
+      service: value.service,
+      ...(isRecord(value.data) ? { data: value.data } : {}),
+      ...(isRecord(value.target) ? { target: value.target } : {}),
+    };
+  }
+  if (value !== undefined) {
+    warnOnce(`override "${label}" is not an entity id or a {service, data} object`);
+  }
+  return undefined;
+};
 
 let warned = new Set<string>();
 
@@ -308,21 +361,17 @@ export const normalizeConfig = (raw: PolrAtvRemoteCardConfig): ResolvedConfig =>
   const legacyVolume =
     typeof raw["volume"] === "boolean" ? (raw["volume"] as boolean) : undefined;
 
-  const overrides: Partial<Record<ButtonId, ServiceAction>> = {
-    ...(isRecord(raw.overrides) ? (raw.overrides as Partial<Record<ButtonId, ServiceAction>>) : {}),
-  };
+  const overrides: Partial<Record<ButtonId, ServiceAction>> = {};
+  if (isRecord(raw.overrides)) {
+    for (const [buttonId, value] of Object.entries(raw.overrides)) {
+      const action = toServiceAction(value, buttonId);
+      if (action) overrides[buttonId as ButtonId] = action;
+    }
+  }
   for (const [v1Key, buttonId] of Object.entries(V1_OVERRIDE_KEYS)) {
     if (overrides[buttonId]) continue;
-    const value = raw[v1Key];
-    if (isServiceAction(value)) {
-      overrides[buttonId] = {
-        service: value.service,
-        ...(isRecord(value.data) ? { data: value.data } : {}),
-        ...(isRecord(value.target) ? { target: value.target } : {}),
-      };
-    } else if (value !== undefined) {
-      warnOnce(`override "${v1Key}" is not a {service, data} object and was ignored`);
-    }
+    const action = toServiceAction(raw[v1Key], v1Key);
+    if (action) overrides[buttonId] = action;
   }
 
   const rawApps = Array.isArray(raw.apps) ? raw.apps : [];

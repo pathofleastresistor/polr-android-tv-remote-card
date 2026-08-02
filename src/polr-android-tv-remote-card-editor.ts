@@ -25,6 +25,7 @@ import {
   type AppAction,
   type AppConfig,
   type BrandId,
+  type ServiceAction,
   type PolrAtvRemoteCardConfig,
   type ResolvedConfig,
 } from "./config";
@@ -91,14 +92,36 @@ const SCHEMA = (config: ResolvedConfig) =>
     {
       type: "expandable",
       name: "",
+      title: "Volume",
+      schema: [
+        {
+          name: "volume_entity",
+          selector: { entity: { filter: [{ domain: "media_player" }] } },
+        },
+        ...(["volume_up", "volume_down", "volume_mute"] as const).map((name) => ({
+          name: `${name}_entity`,
+          // IR bridges expose one pressable entity per command rather than a
+          // media_player, so each volume button gets its own target.
+          selector: {
+            entity: {
+              filter: [
+                { domain: "button" },
+                { domain: "input_button" },
+                { domain: "script" },
+                { domain: "scene" },
+              ],
+            },
+          },
+        })),
+      ],
+    },
+    {
+      type: "expandable",
+      name: "",
       title: "Advanced",
       schema: [
         {
           name: "media_player_entity",
-          selector: { entity: { filter: [{ domain: "media_player" }] } },
-        },
-        {
-          name: "volume_entity",
           selector: { entity: { filter: [{ domain: "media_player" }] } },
         },
         { name: "hold_repeat", selector: { boolean: {} } },
@@ -111,7 +134,10 @@ const SCHEMA = (config: ResolvedConfig) =>
 const LABELS: Record<string, string> = {
   entity: "Remote entity",
   media_player_entity: "Paired media player (auto-detected)",
-  volume_entity: "Volume controls",
+  volume_entity: "Volume on another media player",
+  volume_up_entity: "Volume up presses",
+  volume_down_entity: "Volume down presses",
+  volume_mute_entity: "Mute presses",
   name: "Title",
   pad: "Pad style",
   show_header: "Show header",
@@ -130,7 +156,9 @@ const HELPERS: Record<string, string> = {
   media_player_entity:
     "Only needed if the card cannot find the player itself, or to point it at a different player on the same TV.",
   volume_entity:
-    "Point this at a soundbar or receiver if that is what actually changes the volume. A TV passing audio through reports no volume level, so the card shows no level bar for it.",
+    "Point this at a soundbar or receiver that exposes a media player. A TV passing audio through reports no volume level, so the card shows no level bar for it.",
+  volume_up_entity:
+    "For IR bridges and the like, which expose one pressable entity per command instead of a media player.",
   show_text_input:
     "Sends typed text to the TV. Only lands while a search field is focused, and needs “Enable IME” on the integration.",
 };
@@ -147,6 +175,26 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
     this._config = normalizeConfig(config);
   }
 
+  /** Volume buttons the editor can point at a single pressable entity. */
+  private static readonly VOLUME_BUTTONS = ["volume_up", "volume_down", "volume_mute"] as const;
+
+  /**
+   * ha-form data, with the three volume overrides flattened.
+   *
+   * ha-form has no vocabulary for a nested map, so `overrides.volume_up` is
+   * surfaced as `volume_up_entity` and folded back in `_formChanged`. Only
+   * overrides that are a plain entity press round-trip; a hand-written service
+   * call with data is left alone and shown as empty here rather than being
+   * flattened into something lossy.
+   */
+  private get _formData(): Record<string, unknown> {
+    const data: Record<string, unknown> = { ...this._config! };
+    for (const button of PolrAndroidTvRemoteCardEditor.VOLUME_BUTTONS) {
+      data[`${button}_entity`] = simpleEntityOf(this._config!.overrides[button]);
+    }
+    return data;
+  }
+
   private _computeLabel = (schema: { name: string }): string =>
     LABELS[schema.name] ?? schema.name;
 
@@ -160,8 +208,29 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
 
   private _formChanged(event: CustomEvent): void {
     event.stopPropagation();
+    const value = { ...event.detail.value } as Record<string, unknown>;
+
+    const overrides: Record<string, unknown> = { ...this._config!.overrides };
+    for (const button of PolrAndroidTvRemoteCardEditor.VOLUME_BUTTONS) {
+      const key = `${button}_entity`;
+      const entity = value[key];
+      delete value[key];
+      // Only touch overrides this editor is responsible for: an existing
+      // hand-written service call stays put unless the field is actually used.
+      if (typeof entity === "string" && entity) {
+        overrides[button] = entity;
+      } else if (simpleEntityOf(this._config!.overrides[button])) {
+        delete overrides[button];
+      }
+    }
+
     // ha-form only knows the scalars; apps are managed below.
-    this._emit({ ...this._config!, ...event.detail.value, apps: this._config!.apps });
+    this._emit({
+      ...this._config!,
+      ...value,
+      overrides: overrides as PolrAtvRemoteCardConfig["overrides"],
+      apps: this._config!.apps,
+    });
   }
 
   private _setApps(apps: AppConfig[]): void {
@@ -409,7 +478,7 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
     return html`
       <ha-form
         .hass=${this.hass}
-        .data=${config}
+        .data=${this._formData}
         .schema=${SCHEMA(config)}
         .computeLabel=${this._computeLabel}
         .computeHelper=${this._computeHelper}
@@ -566,6 +635,20 @@ const buildAction = (kind: ActionKind, value: string): AppAction => {
     case "service":
       return { action: "service", service: value };
   }
+};
+
+/**
+ * The entity id behind an override, when it is just a press.
+ *
+ * Anything with extra service data is not representable as a single entity
+ * picker, so it returns undefined and the field stays empty rather than
+ * silently rewriting the user's YAML.
+ */
+const simpleEntityOf = (action: ServiceAction | string | undefined): string | undefined => {
+  if (typeof action === "string") return action;
+  if (!action || action.data) return undefined;
+  const entity = (action.target as { entity_id?: unknown } | undefined)?.entity_id;
+  return typeof entity === "string" ? entity : undefined;
 };
 
 /** Best-effort icon for an app name reported by the TV. */
