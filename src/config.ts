@@ -8,6 +8,13 @@
  * has a test in test/config.test.mjs.
  */
 
+import {
+  isActionConfig,
+  serviceAction,
+  type ActionConfig,
+  type ButtonActions,
+} from "./actions";
+
 export const PAD_STYLES = ["buttons", "dpad", "touchpad"] as const;
 export type PadStyle = (typeof PAD_STYLES)[number];
 
@@ -126,10 +133,13 @@ export interface PolrAtvRemoteCardConfig {
   hold_repeat?: boolean;
   haptics?: boolean;
   /**
-   * Redirect individual buttons. A value is either a full service call or a
-   * bare entity id, for anything that can simply be pressed.
+   * Redirect individual buttons. A value is any of:
+   *
+   *   - HA's standard interactions: {tap_action, hold_action, double_tap_action}
+   *   - a bare entity id, for anything that can simply be pressed
+   *   - v1's {service, data}, treated as a tap action
    */
-  overrides?: Partial<Record<ButtonId, ServiceAction | string>>;
+  overrides?: Partial<Record<ButtonId, ButtonActions | ServiceAction | string>>;
 
   /** v1 keys are tolerated on input; see normalizeConfig. */
   [key: string]: unknown;
@@ -151,7 +161,7 @@ export interface ResolvedConfig extends PolrAtvRemoteCardConfig {
   app_columns: number;
   hold_repeat: boolean;
   haptics: boolean;
-  overrides: Partial<Record<ButtonId, ServiceAction>>;
+  overrides: Partial<Record<ButtonId, ButtonActions>>;
 }
 
 export const DEFAULTS = {
@@ -216,27 +226,60 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const isServiceAction = (value: unknown): value is ServiceAction =>
   isRecord(value) && typeof value["service"] === "string";
 
-/** Accept either shape of override and normalise to a service call. */
-const toServiceAction = (value: unknown, label: string): ServiceAction | undefined => {
+/**
+ * Normalise any accepted override shape to HA interactions.
+ *
+ * Everything converges on {tap_action, hold_action, double_tap_action} so the
+ * runtime has exactly one shape to handle, and the editor's ui_action selectors
+ * have something to bind to whichever spelling was written.
+ */
+const toButtonActions = (value: unknown, label: string): ButtonActions | undefined => {
+  // Shorthand: a bare entity id.
   if (typeof value === "string") {
     const action = entityAction(value);
-    if (action) return action;
+    if (action) {
+      return { tap_action: serviceAction(action.service, undefined, action.target) };
+    }
     warnOnce(
       `override "${label}" points at ${value}, which cannot simply be pressed. ` +
-        `Use a {service, target} object instead.`,
+        `Use an action config instead.`,
     );
     return undefined;
   }
+
+  if (!isRecord(value)) {
+    if (value !== undefined) {
+      warnOnce(`override "${label}" is not an entity id or an action config`);
+    }
+    return undefined;
+  }
+
+  // Already interactions.
+  if (
+    isActionConfig(value["tap_action"]) ||
+    isActionConfig(value["hold_action"]) ||
+    isActionConfig(value["double_tap_action"])
+  ) {
+    const actions: ButtonActions = {};
+    for (const key of ["tap_action", "hold_action", "double_tap_action"] as const) {
+      const action = value[key];
+      if (isActionConfig(action)) actions[key] = action as ActionConfig;
+    }
+    return actions;
+  }
+
+  // v1's {service, data, target}.
   if (isServiceAction(value)) {
     return {
-      service: value.service,
-      ...(isRecord(value.data) ? { data: value.data } : {}),
-      ...(isRecord(value.target) ? { target: value.target } : {}),
+      tap_action: serviceAction(
+        value.service,
+        isRecord(value.data) ? value.data : undefined,
+        isRecord(value.target) ? value.target : undefined,
+      ),
     };
   }
-  if (value !== undefined) {
-    warnOnce(`override "${label}" is not an entity id or a {service, data} object`);
-  }
+
+  warnOnce(`override "${label}" is not an entity id or an action config`);
   return undefined;
 };
 
@@ -361,17 +404,17 @@ export const normalizeConfig = (raw: PolrAtvRemoteCardConfig): ResolvedConfig =>
   const legacyVolume =
     typeof raw["volume"] === "boolean" ? (raw["volume"] as boolean) : undefined;
 
-  const overrides: Partial<Record<ButtonId, ServiceAction>> = {};
+  const overrides: Partial<Record<ButtonId, ButtonActions>> = {};
   if (isRecord(raw.overrides)) {
     for (const [buttonId, value] of Object.entries(raw.overrides)) {
-      const action = toServiceAction(value, buttonId);
-      if (action) overrides[buttonId as ButtonId] = action;
+      const actions = toButtonActions(value, buttonId);
+      if (actions) overrides[buttonId as ButtonId] = actions;
     }
   }
   for (const [v1Key, buttonId] of Object.entries(V1_OVERRIDE_KEYS)) {
     if (overrides[buttonId]) continue;
-    const action = toServiceAction(raw[v1Key], v1Key);
-    if (action) overrides[buttonId] = action;
+    const actions = toButtonActions(raw[v1Key], v1Key);
+    if (actions) overrides[buttonId] = actions;
   }
 
   const rawApps = Array.isArray(raw.apps) ? raw.apps : [];

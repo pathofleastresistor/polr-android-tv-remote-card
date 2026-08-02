@@ -14,6 +14,16 @@ import { BRANDS, DEFAULTS, entityAction, normalizeConfig, stripLegacyKeys, _rese
 const TYPE = "custom:polr-android-tv-remote-card";
 const base = (extra) => ({ type: TYPE, ...extra });
 
+/** Overrides normalise to HA interactions; a service call becomes the tap. */
+const tap = ({ service, data, target }) => ({
+  tap_action: {
+    action: "perform-action",
+    perform_action: service,
+    ...(data ? { data } : {}),
+    ...(target ? { target } : {}),
+  },
+});
+
 test.beforeEach(() => _resetWarnings());
 
 test("entity_id becomes entity", () => {
@@ -181,9 +191,9 @@ test("the nine same-named override keys move into overrides", () => {
     }),
   );
   for (const id of ["up", "down", "left", "right", "center", "power", "home", "back"]) {
-    assert.deepEqual(config.overrides[id], call(id), `override ${id}`);
+    assert.deepEqual(config.overrides[id], tap(call(id)), `override ${id}`);
   }
-  assert.deepEqual(config.overrides.favorite, call("fav"));
+  assert.deepEqual(config.overrides.favorite, tap(call("fav")));
 });
 
 test("the three renamed volume override keys move across", () => {
@@ -196,9 +206,9 @@ test("the three renamed volume override keys move across", () => {
       volumemute: call("volumemute"),
     }),
   );
-  assert.deepEqual(config.overrides.volume_up, call("volumeup"));
-  assert.deepEqual(config.overrides.volume_down, call("volumedown"));
-  assert.deepEqual(config.overrides.volume_mute, call("volumemute"));
+  assert.deepEqual(config.overrides.volume_up, tap(call("volumeup")));
+  assert.deepEqual(config.overrides.volume_down, tap(call("volumedown")));
+  assert.deepEqual(config.overrides.volume_mute, tap(call("volumemute")));
 });
 
 test("an explicit v2 override wins over the v1 key of the same button", () => {
@@ -209,7 +219,7 @@ test("an explicit v2 override wins over the v1 key of the same button", () => {
       overrides: { volume_up: { service: "script.new" } },
     }),
   );
-  assert.deepEqual(config.overrides.volume_up, { service: "script.new" });
+  assert.deepEqual(config.overrides.volume_up, tap({ service: "script.new" }));
 });
 
 test("an override that is not a service call is ignored, not fatal", () => {
@@ -307,9 +317,9 @@ test("the README's v1 customisation example still resolves", () => {
   assert.equal(config.apps[0].action.service, "remote.send_command");
   assert.equal(config.apps[0].icon, "mdi:volume-low");
   assert.equal(config.show_favorite, true);
-  assert.deepEqual(config.overrides.power, ir("power"));
-  assert.deepEqual(config.overrides.volume_up, ir("volumeup"));
-  assert.deepEqual(config.overrides.volume_down, ir("volumedown"));
+  assert.deepEqual(config.overrides.power, tap(ir("power")));
+  assert.deepEqual(config.overrides.volume_up, tap(ir("volumeup")));
+  assert.deepEqual(config.overrides.volume_down, tap(ir("volumedown")));
   // volumemute was not overridden, so the card handles it itself.
   assert.equal(config.overrides.volume_mute, undefined);
 });
@@ -378,12 +388,14 @@ test("the three Sofabaton volume buttons configure in one line each", () => {
     }),
   );
   assert.deepEqual(config.overrides.volume_up, {
-    service: "button.press",
-    target: { entity_id: "button.media_room_baton_volume_up" },
+    tap_action: {
+      action: "perform-action",
+      perform_action: "button.press",
+      target: { entity_id: "button.media_room_baton_volume_up" },
+    },
   });
-  assert.deepEqual(config.overrides.volume_mute, {
-    service: "button.press",
-    target: { entity_id: "button.media_room_baton_volume_mute" },
+  assert.deepEqual(config.overrides.volume_mute.tap_action.target, {
+    entity_id: "button.media_room_baton_volume_mute",
   });
 });
 
@@ -404,9 +416,71 @@ test("full service-call overrides still work alongside entity ones", () => {
       },
     }),
   );
-  assert.equal(config.overrides.volume_up.service, "button.press");
+  assert.equal(config.overrides.volume_up.tap_action.perform_action, "button.press");
   assert.deepEqual(config.overrides.volume_mute, {
-    service: "script.mute",
-    data: { room: "media" },
+    tap_action: {
+      action: "perform-action",
+      perform_action: "script.mute",
+      data: { room: "media" },
+    },
   });
+});
+
+/* ------------------------------------------------------------------------ *
+ * HA's standard interactions.
+ *
+ * Every override shape converges on {tap_action, hold_action,
+ * double_tap_action}, so the runtime has one shape to handle and the editor's
+ * ui_action selectors have something to bind to.
+ * ------------------------------------------------------------------------ */
+
+test("interactions pass through as written", () => {
+  const actions = {
+    tap_action: { action: "perform-action", perform_action: "script.louder" },
+    hold_action: { action: "more-info" },
+    double_tap_action: { action: "navigate", navigation_path: "/lovelace/tv" },
+  };
+  const config = normalizeConfig(
+    base({ entity: "remote.atv", overrides: { volume_up: actions } }),
+  );
+  assert.deepEqual(config.overrides.volume_up, actions);
+});
+
+test("a bare entity id becomes a tap action, leaving hold free", () => {
+  const config = normalizeConfig(
+    base({ entity: "remote.atv", overrides: { volume_up: "button.up" } }),
+  );
+  assert.deepEqual(config.overrides.volume_up, {
+    tap_action: {
+      action: "perform-action",
+      perform_action: "button.press",
+      target: { entity_id: "button.up" },
+    },
+  });
+  assert.equal(config.overrides.volume_up.hold_action, undefined);
+});
+
+test("an override may configure hold alone, leaving tap at its default", () => {
+  const config = normalizeConfig(
+    base({
+      entity: "remote.atv",
+      overrides: { power: { hold_action: { action: "more-info" } } },
+    }),
+  );
+  assert.equal(config.overrides.power.tap_action, undefined);
+  assert.deepEqual(config.overrides.power.hold_action, { action: "more-info" });
+});
+
+test("action: none is kept, so a button can be deliberately inert", () => {
+  const config = normalizeConfig(
+    base({ entity: "remote.atv", overrides: { menu: { tap_action: { action: "none" } } } }),
+  );
+  assert.deepEqual(config.overrides.menu.tap_action, { action: "none" });
+});
+
+test("a garbage override is dropped rather than half-applied", () => {
+  const config = normalizeConfig(
+    base({ entity: "remote.atv", overrides: { menu: { nonsense: true } } }),
+  );
+  assert.equal(config.overrides.menu, undefined);
 });

@@ -95,6 +95,13 @@ const fixture = ({ playerState = "on", playerAttrs = {}, remoteState = "on" } = 
   return makeHass({ entities, states });
 };
 
+/**
+ * Overrides run through the action layer, which takes an element to dispatch
+ * more-info events from. Service-call actions never touch it, so a stub with
+ * dispatchEvent is enough and keeps these tests free of a DOM.
+ */
+const node = () => ({ dispatchEvent: () => true });
+
 const config = (extra) =>
   normalizeConfig({ type: "custom:polr-android-tv-remote-card", entity: "remote.main_tv", ...extra });
 
@@ -279,7 +286,7 @@ test("an override replaces the button entirely", async () => {
   const cfg = config({
     up: { service: "remote.send_command", data: { command: "up", entity_id: "remote.ir" } },
   });
-  await pressButton(hass, cfg, readDevice(hass, cfg), "up");
+  await pressButton(hass, cfg, readDevice(hass, cfg), "up", node());
   assert.deepEqual(hass.calls, [
     {
       domain: "remote",
@@ -295,7 +302,7 @@ test("an override may carry a target", async () => {
   const cfg = config({
     overrides: { home: { service: "script.turn_on", target: { entity_id: "script.movie" } } },
   });
-  await pressButton(hass, cfg, readDevice(hass, cfg), "home");
+  await pressButton(hass, cfg, readDevice(hass, cfg), "home", node());
   assert.deepEqual(hass.calls[0].target, { entity_id: "script.movie" });
 });
 
@@ -464,7 +471,7 @@ test("a volume override still beats volume_entity", async () => {
     volume_entity: "media_player.soundbar",
     volumeup: { service: "script.louder" },
   });
-  await pressButton(hass, cfg, readDevice(hass, cfg), "volume_up");
+  await pressButton(hass, cfg, readDevice(hass, cfg), "volume_up", node());
   assert.deepEqual(hass.calls, [
     { domain: "script", service: "louder", data: {}, target: undefined },
   ]);

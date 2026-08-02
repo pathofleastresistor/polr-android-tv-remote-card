@@ -24,10 +24,30 @@ const REPEAT_DELAY_MS = 500;
 const REPEAT_INTERVAL_MS = 220;
 /** Backstop so a stuck pointer cannot flood the TV's websocket. */
 const MAX_REPEATS = 40;
+/** How long a press must last to count as a hold. Matches HA's own handler. */
+const HOLD_MS = 500;
+/** Window for a second tap. Only applied when a double-tap action exists. */
+const DOUBLE_TAP_MS = 250;
 
 export interface PressOptions {
   /** Runs on press, and on every repeat. */
   onPress: () => void;
+  /**
+   * Runs when the press passes the hold threshold.
+   *
+   * Mutually exclusive with `repeat`: a control cannot both repeat while held
+   * and do something else on hold. When both are supplied, hold wins, because
+   * it was configured explicitly and repeat is only ever a default.
+   */
+  onHold?: () => void;
+  /**
+   * Runs on a second tap inside the double-tap window.
+   *
+   * Supplying this delays the single tap by that window, since there is no way
+   * to know a tap is single until it has passed. Left undefined, taps fire
+   * immediately — which is why it is only wired when actually configured.
+   */
+  onDoubleTap?: () => void;
   /** Hold to repeat. Only sensible for idempotent, directional controls. */
   repeat?: boolean;
   /** Fire HA haptic feedback (Companion app only; a no-op elsewhere). */
@@ -47,9 +67,13 @@ class PressDirective extends AsyncDirective {
   private _element?: HTMLElement;
   private _options?: PressOptions;
   private _timer?: number;
+  private _holdTimer?: number;
+  private _tapTimer?: number;
   private _repeats = 0;
   private _inFlight = false;
   private _bound = false;
+  private _held = false;
+  private _awaitingSecondTap = false;
 
   constructor(partInfo: PartInfo) {
     super(partInfo);
@@ -105,7 +129,19 @@ class PressDirective extends AsyncDirective {
     if (!options || options.disabled) return;
 
     this._element?.classList.add("pressed");
-    this._fire();
+    this._held = false;
+
+    // A hold action means the press cannot resolve until the pointer lifts or
+    // the threshold passes, so nothing fires here.
+    if (options.onHold) {
+      this._holdTimer = window.setTimeout(() => {
+        this._held = true;
+        this._fire(options.onHold!, "medium");
+      }, HOLD_MS);
+      return;
+    }
+
+    this._tap();
 
     if (!options.repeat) return;
     this._repeats = 0;
@@ -116,12 +152,34 @@ class PressDirective extends AsyncDirective {
           return;
         }
         this._repeats += 1;
-        this._fire();
+        this._fire(options.onPress);
       }, REPEAT_INTERVAL_MS);
     }, REPEAT_DELAY_MS);
   }
 
-  private _fire(): void {
+  /** A tap, resolving single vs double first when that distinction exists. */
+  private _tap(): void {
+    const options = this._options!;
+    if (!options.onDoubleTap) {
+      this._fire(options.onPress);
+      return;
+    }
+
+    if (this._awaitingSecondTap) {
+      window.clearTimeout(this._tapTimer);
+      this._awaitingSecondTap = false;
+      this._fire(options.onDoubleTap);
+      return;
+    }
+
+    this._awaitingSecondTap = true;
+    this._tapTimer = window.setTimeout(() => {
+      this._awaitingSecondTap = false;
+      this._fire(options.onPress);
+    }, DOUBLE_TAP_MS);
+  }
+
+  private _fire(run: () => void, haptic = "light"): void {
     const options = this._options;
     if (!options) return;
 
@@ -136,12 +194,17 @@ class PressDirective extends AsyncDirective {
     });
 
     if (options.haptics !== false && this._element) {
-      fireEvent(this._element, "haptic", "light");
+      fireEvent(this._element, "haptic", haptic);
     }
-    options.onPress();
+    run();
   }
 
   private _onRelease = (): void => {
+    const options = this._options;
+    // A hold that never reached the threshold is an ordinary tap.
+    if (options?.onHold && !this._held && this._holdTimer !== undefined) {
+      this._tap();
+    }
     this._stop();
   };
 
@@ -152,11 +215,21 @@ class PressDirective extends AsyncDirective {
       window.clearInterval(this._timer);
       this._timer = undefined;
     }
+    if (this._holdTimer !== undefined) {
+      window.clearTimeout(this._holdTimer);
+      this._holdTimer = undefined;
+    }
+    this._held = false;
     this._repeats = 0;
   }
 
   protected override disconnected(): void {
     this._stop();
+    if (this._tapTimer !== undefined) {
+      window.clearTimeout(this._tapTimer);
+      this._tapTimer = undefined;
+    }
+    this._awaitingSecondTap = false;
   }
 }
 

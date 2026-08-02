@@ -245,7 +245,7 @@
         ["editor: v2 config", { entity: "remote.main_tv", apps: APPS.slice(0, 4) }],
         ["editor: migrating a v1 config", { entity_id: "remote.main_tv", remote: "touch", apps: ["netflix", { icon: "mdi:youtube", url: "https://www.youtube.com" }] }],
         ["editor: no apps yet", { entity: "remote.main_tv" }],
-        ["editor: IR volume buttons", { entity: "remote.main_tv", overrides: { volume_up: "button.baton_volume_up", volume_down: "button.baton_volume_down", volume_mute: "button.baton_volume_mute" } }],
+        ["editor: IR volume buttons", { entity: "remote.main_tv", overrides: { volume_up: "button.baton_volume_up", volume_down: "button.baton_volume_down", volume_mute: { tap_action: { action: "perform-action", perform_action: "button.press", target: { entity_id: "button.baton_volume_mute" } }, hold_action: { action: "more-info" } } } }],
       ]) {
         const wrap = document.createElement("div");
         wrap.className = "case";

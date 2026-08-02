@@ -29,7 +29,8 @@ import {
   type ResolvedConfig,
 } from "./config";
 import { BRAND_LOGOS, brandFor } from "./icons";
-import { press } from "./press";
+import { isActionable, runAction, type ActionConfig } from "./actions";
+import { press, type PressOptions } from "./press";
 import { remoteStyles } from "./styles";
 import { tileStyles } from "./kit/styles";
 import { showMoreInfo, stateColor, type HomeAssistant } from "./kit/types";
@@ -106,7 +107,36 @@ export class PolrAndroidTvRemoteCard extends LitElement {
   private _press(button: ButtonId): void {
     const device = this._device;
     if (!this.hass || !this._config || !device) return;
-    void pressButton(this.hass, this._config, device, button);
+    void pressButton(this.hass, this._config, device, button, this);
+  }
+
+  /**
+   * Press options for a button, folding in any configured interactions.
+   *
+   * Hold and double-tap handlers are wired only when configured: a double-tap
+   * handler forces every tap to wait out the double-tap window, and a hold
+   * handler replaces hold-to-repeat, so neither should exist by default.
+   */
+  private _pressOptions(
+    button: ButtonId,
+    options: { repeat?: boolean } = {},
+  ): PressOptions {
+    const config = this._config!;
+    const actions = config.overrides[button];
+    const hold = actions?.hold_action;
+    const doubleTap = actions?.double_tap_action;
+
+    const run = (action: ActionConfig) => () => {
+      if (this.hass) void runAction(this, this.hass, action, config.entity);
+    };
+
+    return {
+      onPress: () => this._press(button),
+      ...(isActionable(hold) ? { onHold: run(hold as ActionConfig) } : {}),
+      ...(isActionable(doubleTap) ? { onDoubleTap: run(doubleTap as ActionConfig) } : {}),
+      repeat: options.repeat && config.hold_repeat,
+      haptics: config.haptics,
+    };
   }
 
   private _navigate(event: CustomEvent<{ direction: string }>): void {
@@ -174,7 +204,7 @@ export class PolrAndroidTvRemoteCard extends LitElement {
                 class="icon-button"
                 type="button"
                 aria-label=${device.on ? "Turn off" : "Turn on"}
-                ${press({ onPress: () => this._press("power"), haptics: config.haptics })}
+                ${press(this._pressOptions("power"))}
               >
                 <ha-icon icon="mdi:power"></ha-icon>
               </button>
@@ -211,18 +241,13 @@ export class PolrAndroidTvRemoteCard extends LitElement {
     label: string,
     options: { repeat?: boolean } = {},
   ): TemplateResult {
-    const config = this._config!;
     return html`
       <button
         class="control-button"
         type="button"
         aria-label=${label}
         title=${label}
-        ${press({
-          onPress: () => this._press(button),
-          repeat: options.repeat && config.hold_repeat,
-          haptics: config.haptics,
-        })}
+        ${press(this._pressOptions(button, options))}
       >
         <ha-icon icon=${icon}></ha-icon>
       </button>
@@ -230,13 +255,14 @@ export class PolrAndroidTvRemoteCard extends LitElement {
   }
 
   private _renderNavigationRow(): TemplateResult {
-    const config = this._config!;
     return html`
       <div class="features">
         ${this._button("back", "mdi:arrow-u-left-top", "Back")}
         ${this._button("home", "mdi:home", "Home")}
         ${this._button("menu", "mdi:menu", "Menu")}
-        ${config.show_favorite ? this._button("favorite", "mdi:star", "Favourite") : nothing}
+        ${this._config!.show_favorite
+          ? this._button("favorite", "mdi:star", "Favourite")
+          : nothing}
       </div>
     `;
   }
@@ -290,10 +316,7 @@ export class PolrAndroidTvRemoteCard extends LitElement {
           type="button"
           aria-label=${muted ? "Unmute" : "Mute"}
           aria-pressed=${device.muted === undefined ? "undefined" : muted ? "true" : "false"}
-          ${press({
-            onPress: () => this._press("volume_mute"),
-            haptics: this._config!.haptics,
-          })}
+          ${press(this._pressOptions("volume_mute"))}
         >
           <ha-icon icon=${muted ? "mdi:volume-off" : "mdi:volume-high"}></ha-icon>
         </button>
@@ -430,10 +453,7 @@ export class PolrAndroidTvRemoteCard extends LitElement {
                   <button
                     class="control-button accent wide"
                     type="button"
-                    ${press({
-                      onPress: () => this._press("power"),
-                      haptics: config.haptics,
-                    })}
+                    ${press(this._pressOptions("power"))}
                   >
                     <ha-icon icon="mdi:power"></ha-icon><span>Turn on</span>
                   </button>

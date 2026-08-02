@@ -17,6 +17,7 @@
  *      the card renders a volume *bar* and not a slider.
  */
 
+import { isActionable, runAction, type ActionConfig } from "./actions";
 import type { AppAction, ButtonId, ResolvedConfig, ServiceAction } from "./config";
 import type { HassEntity, HomeAssistant } from "./kit/types";
 
@@ -263,9 +264,14 @@ export const pressButton = (
   config: ResolvedConfig,
   device: DeviceState,
   button: ButtonId,
+  node?: HTMLElement,
 ): Promise<unknown> => {
-  const override = config.overrides[button];
-  if (override) return callService(hass, override);
+  const tap = config.overrides[button]?.tap_action;
+  if (isActionable(tap) && node) {
+    return runAction(node, hass, tap as ActionConfig, device.remoteId);
+  }
+  // An explicit `action: none` means the button is deliberately inert.
+  if (tap && tap.action === "none") return Promise.resolve();
 
   const player = device.playerId;
 

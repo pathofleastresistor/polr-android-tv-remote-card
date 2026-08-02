@@ -121,8 +121,35 @@ instead of a deep link.
 
 ### Overriding buttons
 
-Any button can call an action instead of doing its normal job. An override is
-either a full service call:
+Any button can be given Home Assistant's standard **interactions** — the same
+tap / hold / double-tap config the tile card uses, with the full action
+vocabulary (`perform-action`, `more-info`, `navigate`, `url`, `toggle`, `none`):
+
+```yaml
+overrides:
+  volume_up:
+    tap_action:
+      action: perform-action
+      perform_action: button.press
+      target:
+        entity_id: button.media_room_baton_volume_up
+  power:
+    hold_action:
+      action: more-info
+```
+
+The editor uses HA's own interactions selector for the volume buttons.
+
+Two shorthands are accepted for the common cases. A bare entity id, for anything
+that can simply be pressed — `button`, `input_button`, `script`, `scene` or
+`automation`:
+
+```yaml
+overrides:
+  power: button.media_room_baton_power
+```
+
+…and v1's service-call shape, which becomes the tap action:
 
 ```yaml
 overrides:
@@ -130,17 +157,16 @@ overrides:
     service: remote.send_command
     data:
       command: power
-      device: livingroomtv
       entity_id: remote.living_room_ir_repeater
 ```
 
-…or a bare entity id, for anything that can simply be pressed — `button`,
-`input_button`, `script`, `scene` or `automation`:
+Two things worth knowing:
 
-```yaml
-overrides:
-  power: button.media_room_baton_power
-```
+- A `hold_action` **replaces hold-to-repeat** on that button. A control cannot
+  both repeat while held and do something else.
+- A `double_tap_action` delays every tap on that button by 250ms, because a tap
+  is not known to be single until the window passes. That is why neither is
+  wired unless you configure it.
 
 Valid buttons: `up`, `down`, `left`, `right`, `center`, `power`, `home`, `back`,
 `menu`, `favorite`, `volume_up`, `volume_down`, `volume_mute`, `play_pause`,
@@ -182,7 +208,9 @@ overrides:
   volume_mute: button.media_room_baton_volume_mute
 ```
 
-The editor has an entity picker for each of these under **Volume**.
+The editor has HA's interactions selector for each of these under **Volume**, so
+you can also give them a hold or double-tap action. See
+[Overriding buttons](#overriding-buttons).
 
 ### Text input
 
