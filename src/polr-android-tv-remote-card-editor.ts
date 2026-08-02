@@ -885,7 +885,6 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
       ha-icon-picker,
       ha-entity-picker {
         display: block;
-        margin-bottom: var(--ha-space-3, 12px);
       }
       .section-block {
         padding: var(--ha-space-3, 12px);
@@ -944,12 +943,18 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
       .hint {
         padding: 0 var(--ha-space-3, 12px) var(--ha-space-2, 8px);
       }
-      /* The kit lays .fields out as a two-column grid, which is right for pairs
-         of short inputs but shreds a chip row or a paragraph of help text. */
+      /*
+       * One control per row. The kit lays .fields out as a responsive
+       * multi-column grid, which suits pairs of short inputs — but these are a
+       * name, an icon picker, an entity picker and an action, and pairing them
+       * up inside the narrow editor panel made the form read as a cramped
+       * table with truncated values.
+       */
+      .fields {
+        grid-template-columns: 1fr;
+      }
       .fields > .chips,
-      .fields > .hint,
-      .fields > .field.wide {
-        grid-column: 1 / -1;
+      .fields > .hint {
         padding: 0;
       }
     `,
