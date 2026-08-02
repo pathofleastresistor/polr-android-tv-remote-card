@@ -42,6 +42,18 @@ const ACTION_KINDS: Array<{ value: ActionKind; label: string; hint: string }> = 
   { value: "service", label: "Call an action", hint: "domain.service, e.g. script.movie_night" },
 ];
 
+/**
+ * One expandable per region of the card, in the order those regions appear.
+ *
+ * The previous shape put every visibility toggle in one grid and every setting
+ * somewhere after it, so "Pad style" sat nowhere near "Show pad" and Volume was
+ * at the bottom while its toggle was at the top. Grouping by region means each
+ * section holds its own on/off switch and everything that configures it, and
+ * reading the editor top to bottom matches reading the card top to bottom.
+ *
+ * Helper text also stays out of grids: a grid lays cells side by side, and one
+ * cell growing to fit a paragraph misaligns the whole row.
+ */
 const SCHEMA = (config: ResolvedConfig) =>
   [
     {
@@ -59,47 +71,80 @@ const SCHEMA = (config: ResolvedConfig) =>
       },
     },
     { name: "name", selector: { text: {} } },
-    {
-      type: "grid",
-      name: "",
-      schema: [
-        { name: "show_header", selector: { boolean: {} } },
-        { name: "show_power", selector: { boolean: {} } },
-        { name: "show_nav", selector: { boolean: {} } },
-        { name: "show_transport", selector: { boolean: {} } },
-        { name: "show_volume", selector: { boolean: {} } },
-        { name: "show_apps", selector: { boolean: {} } },
-        { name: "show_text_input", selector: { boolean: {} } },
-      ],
-    },
-    ...(config.show_nav
-      ? [
-          {
-            name: "pad",
-            selector: {
-              select: {
-                mode: "dropdown",
-                options: [
-                  { value: "buttons", label: "Buttons" },
-                  { value: "dpad", label: "D-pad" },
-                  { value: "touchpad", label: "Touchpad" },
-                ],
-              },
-            },
-          },
-        ]
-      : []),
+
     {
       type: "expandable",
       name: "",
-      title: "Power",
-      schema: [{ name: "power_action", selector: { ui_action: {} } }],
+      title: "Header",
+      icon: "mdi:television",
+      schema: [
+        { name: "show_header", selector: { boolean: {} } },
+        { name: "show_power", selector: { boolean: {} } },
+        { name: "power_action", selector: { ui_action: {} } },
+      ],
+    },
+    {
+      type: "expandable",
+      name: "",
+      title: "Pad",
+      icon: "mdi:gesture-tap-button",
+      schema: [
+        { name: "show_nav", selector: { boolean: {} } },
+        ...(config.show_nav
+          ? [
+              {
+                name: "pad",
+                selector: {
+                  select: {
+                    mode: "dropdown",
+                    options: [
+                      { value: "buttons", label: "Buttons" },
+                      { value: "dpad", label: "D-pad" },
+                      { value: "touchpad", label: "Touchpad" },
+                    ],
+                  },
+                },
+              },
+            ]
+          : []),
+      ],
+    },
+    {
+      type: "expandable",
+      name: "",
+      title: "Playback",
+      icon: "mdi:play-pause",
+      schema: [
+        { name: "show_transport", selector: { boolean: {} } },
+        ...(config.show_transport
+          ? [
+              {
+                name: "transport_buttons",
+                selector: {
+                  select: {
+                    multiple: true,
+                    mode: "list",
+                    options: [
+                      { value: "previous", label: "Previous" },
+                      { value: "rewind", label: "Rewind" },
+                      { value: "play_pause", label: "Play / pause" },
+                      { value: "fast_forward", label: "Fast forward" },
+                      { value: "next", label: "Next" },
+                    ],
+                  },
+                },
+              },
+            ]
+          : []),
+      ],
     },
     {
       type: "expandable",
       name: "",
       title: "Volume",
+      icon: "mdi:volume-high",
       schema: [
+        { name: "show_volume", selector: { boolean: {} } },
         {
           name: "volume_entity",
           selector: { entity: { filter: [{ domain: "media_player" }] } },
@@ -116,7 +161,32 @@ const SCHEMA = (config: ResolvedConfig) =>
     {
       type: "expandable",
       name: "",
+      title: "Apps",
+      icon: "mdi:apps",
+      schema: [
+        { name: "show_apps", selector: { boolean: {} } },
+        ...(config.show_apps
+          ? [
+              {
+                name: "app_columns",
+                selector: { number: { min: 1, max: 8, mode: "box" } },
+              },
+            ]
+          : []),
+      ],
+    },
+    {
+      type: "expandable",
+      name: "",
+      title: "Text input",
+      icon: "mdi:keyboard",
+      schema: [{ name: "show_text_input", selector: { boolean: {} } }],
+    },
+    {
+      type: "expandable",
+      name: "",
       title: "Advanced",
+      icon: "mdi:tune",
       schema: [
         { name: "hold_repeat", selector: { boolean: {} } },
         { name: "haptics", selector: { boolean: {} } },
@@ -140,6 +210,8 @@ const LABELS: Record<string, string> = {
   show_transport: "Transport controls",
   show_volume: "Volume controls",
   show_apps: "App launcher",
+  transport_buttons: "Buttons",
+  app_columns: "Buttons per row",
   show_text_input: "Text input",
   hold_repeat: "Hold to repeat",
   haptics: "Haptic feedback",

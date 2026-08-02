@@ -119,7 +119,7 @@ export interface PolrAtvRemoteCardConfig {
   show_nav?: boolean;
   pad?: PadStyle;
   show_transport?: boolean;
-  /** Which transport buttons to draw, in order. */
+  /** Which transport buttons to draw. They always render in playback order. */
   transport_buttons?: ButtonId[];
   show_volume?: boolean;
   show_text_input?: boolean;

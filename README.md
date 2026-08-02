@@ -78,7 +78,7 @@ apps:
 | `show_power`          | `true`   | Power button in the header.                                                  |
 | `show_nav`            | `true`   | The pad itself.                                                              |
 | `show_transport`      | `true`   | Previous, rewind, play-pause, fast-forward, next.                            |
-| `transport_buttons`   | all five | Which transport buttons to draw, in order.                                   |
+| `transport_buttons`   | all five | Which transport buttons to draw; they always render in playback order.       |
 | `show_volume`         | `true`   | Volume down / mute / up, plus a level bar where there is one.                |
 | `show_text_input`     | `false`  | Type text on the TV. See [Text input](#text-input).                          |
 | `show_apps`           | `true`   | The app launcher.                                                            |
