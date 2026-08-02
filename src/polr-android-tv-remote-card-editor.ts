@@ -28,7 +28,7 @@ import {
   type PolrAtvRemoteCardConfig,
   type ResolvedConfig,
 } from "./config";
-import { BRAND_IDS, BRAND_LABELS, BRAND_LOGOS } from "./icons";
+import { BRAND_IDS, BRAND_LABELS, BRAND_LOGOS, brandFor } from "./icons";
 import { tileStyles } from "./kit/styles";
 import { fireEvent, type HomeAssistant } from "./kit/types";
 
@@ -570,8 +570,7 @@ const buildAction = (kind: ActionKind, value: string): AppAction => {
 
 /** Best-effort icon for an app name reported by the TV. */
 const guessIcon = (activity: string): string => {
-  const key = activity.toLowerCase().replace(/[^a-z]/g, "");
-  const brand = BRAND_IDS.find((id) => key.includes(id) || id.includes(key));
+  const brand = brandFor(activity);
   return brand ? `brand:${brand}` : "mdi:application";
 };
 

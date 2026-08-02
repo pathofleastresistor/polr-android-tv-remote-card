@@ -14,6 +14,13 @@ import { css } from "lit";
 
 export const remoteStyles = css`
   /* --------------------------------------------------------- now playing -- */
+  /* Brand logos are square art; match the kit's 24px --mdc-icon-size. */
+  .tile-icon svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+  }
+
   .now-playing-art {
     flex: 0 0 auto;
     width: 40px;

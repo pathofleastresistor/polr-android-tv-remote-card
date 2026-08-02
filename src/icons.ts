@@ -53,3 +53,17 @@ export const BRAND_LABELS: Record<BrandId, string> = {
   prime: "Prime Video",
   youtube: "YouTube",
 };
+
+/**
+ * Match an app name reported by the TV to one of the bundled logos.
+ *
+ * Deliberately loose: `app_name` is whatever the TV feels like calling the app
+ * ("Netflix", "Disney+", "Prime Video"), so it is normalised to letters before
+ * comparing. Returns undefined when nothing matches, which is the common case.
+ */
+export const brandFor = (name: string | undefined): BrandId | undefined => {
+  if (!name) return undefined;
+  const key = name.toLowerCase().replace(/[^a-z]/g, "");
+  if (!key) return undefined;
+  return BRAND_IDS.find((id) => key.includes(id) || id.includes(key));
+};

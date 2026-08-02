@@ -28,7 +28,7 @@ import {
   type PolrAtvRemoteCardConfig,
   type ResolvedConfig,
 } from "./config";
-import { BRAND_LOGOS } from "./icons";
+import { BRAND_LOGOS, brandFor } from "./icons";
 import { press } from "./press";
 import { remoteStyles } from "./styles";
 import { tileStyles } from "./kit/styles";
@@ -145,6 +145,9 @@ export class PolrAndroidTvRemoteCard extends LitElement {
         : "Off"
       : "Unavailable";
 
+    // A brand logo is instantly readable at 24px; mdi:television-play is not.
+    const brand = device.on && device.available ? brandFor(device.appName) : undefined;
+
     return html`
       <div class="tile">
         ${device.picture
@@ -156,7 +159,9 @@ export class PolrAndroidTvRemoteCard extends LitElement {
                 aria-label="More information"
                 @click=${() => showMoreInfo(this, device.playerId ?? device.remoteId)}
               >
-                <ha-icon icon=${device.on ? "mdi:television-play" : "mdi:television"}></ha-icon>
+                ${brand
+                  ? BRAND_LOGOS[brand]
+                  : html`<ha-icon icon="mdi:television"></ha-icon>`}
               </button>
             `}
         <div class="tile-info">

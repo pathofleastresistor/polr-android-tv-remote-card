@@ -62,6 +62,8 @@ export interface HomeAssistant {
     notifyOnError?: boolean,
     returnResponse?: boolean,
   ) => Promise<ServiceCallResponse>;
+  /** Raw websocket call — how cards reach APIs with no service, e.g. history. */
+  callWS: <T>(msg: Record<string, unknown> & { type: string }) => Promise<T>;
 }
 
 export interface LovelaceCardConfig {

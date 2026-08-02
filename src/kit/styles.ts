@@ -397,6 +397,29 @@ export const tileStyles = css`
     position: relative;
   }
 
+  /*
+   * .tile-icon and .chip were written for a div and a span, but both have
+   * interactive variants and so get rendered as <button>. Neither resets the
+   * UA's button chrome, which shows through as a 2px outset border and a
+   * ButtonFace background — and with a pill radius plus overflow: hidden, that
+   * border becomes a partial ring around the icon.
+   *
+   * .control-button and .icon-button already reset their own; these are the two
+   * that were missed.
+   */
+  button.tile-icon,
+  button.chip {
+    margin: 0;
+    border: none;
+    font: inherit;
+    cursor: pointer;
+    outline: none;
+  }
+  button.tile-icon {
+    padding: 0;
+    background: none;
+  }
+
   /* ---------------------------------------------------------------- chips -- */
   .chips {
     display: flex;
