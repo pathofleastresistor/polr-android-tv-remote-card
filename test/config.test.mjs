@@ -711,19 +711,45 @@ test("a section normalises its buttons like apps, keeping entity", () => {
   assert.equal(config.sections[0].buttons[1].action.activity, "IR");
 });
 
-test("a section with no usable buttons is dropped, not rendered empty", () => {
+test("an empty section survives normalisation", () => {
+  // The bug this exists to prevent: "Add section" in the editor emits a section
+  // with no buttons yet, HA hands the config straight back through setConfig,
+  // and dropping empties here deleted it before it could be filled — so the
+  // button appeared to do nothing at all.
+  const config = normalizeConfig(
+    base({ entity: "remote.atv", sections: [{ name: "New section", buttons: [] }] }),
+  );
+  assert.equal(config.sections.length, 1);
+  assert.deepEqual(config.sections[0], { name: "New section", buttons: [] });
+});
+
+test("adding a section in the editor survives the round-trip HA performs", () => {
+  // setConfig -> emit -> setConfig is exactly what happens on every edit.
+  const before = normalizeConfig(base({ entity: "remote.atv" }));
+  const emitted = stripLegacyKeys({
+    ...before,
+    sections: [...before.sections, { name: "New section", buttons: [] }],
+  });
+  const after = normalizeConfig(emitted);
+  assert.equal(after.sections.length, 1, "the new section must still be there");
+
+  // And again, since the editor re-emits on every subsequent keystroke.
+  assert.equal(normalizeConfig(stripLegacyKeys(after)).sections.length, 1);
+});
+
+test("malformed sections and buttons are still dropped", () => {
   _resetWarnings();
   const config = normalizeConfig(
     base({
       entity: "remote.atv",
       sections: [
-        { name: "Broken", buttons: [{ name: "nope" }] },
-        { name: "Empty", buttons: [] },
+        { name: "Keeps good buttons", buttons: [{ name: "nope" }, { icon: "mdi:power", url: "x" }] },
         "not an object",
       ],
     }),
   );
-  assert.deepEqual(config.sections, []);
+  assert.equal(config.sections.length, 1);
+  assert.equal(config.sections[0].buttons.length, 1, "the malformed button is gone");
 });
 
 test("absent sections yield an empty list", () => {

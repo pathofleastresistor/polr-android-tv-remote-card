@@ -759,13 +759,21 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
           ${config.sections.map(
             (section, i) => html`
               <div class="section-head">
-                <ha-textfield
-                  class="grow"
-                  label="Section name"
-                  .value=${section.name ?? ""}
-                  @change=${(event: Event) =>
-                    this._renameSection(i, (event.target as HTMLInputElement).value)}
-                ></ha-textfield>
+                <!--
+                  A plain input, like every other field in this editor.
+                  ha-textfield is not a component this frontend defines, so it
+                  rendered as an inert unknown element and the name could not be
+                  typed at all.
+                -->
+                <label class="field grow">
+                  <span>Section name</span>
+                  <input
+                    type="text"
+                    .value=${section.name ?? ""}
+                    @change=${(event: Event) =>
+                      this._renameSection(i, (event.target as HTMLInputElement).value)}
+                  />
+                </label>
                 <button
                   class="icon-button"
                   title="Remove section"

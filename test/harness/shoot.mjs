@@ -246,12 +246,37 @@ for (const dark of [false, true]) {
       let emitted;
       editor.addEventListener("config-changed", (e) => { emitted = e.detail.config; });
 
-      // Rename the section: a change owned by the sections UI, not by ha-form.
-      editor._renameSection(0, "Theater");
+      // Drive the real controls, not the methods behind them. Calling
+      // _renameSection directly is what let "Add section" ship broken: the
+      // method worked, the button did not.
+      const clickByText = (text) => {
+        const el = [...editor.shadowRoot.querySelectorAll("button")].find((b) =>
+          b.textContent.trim().toLowerCase().includes(text),
+        );
+        if (!el) throw new Error(`no button matching "${text}"`);
+        el.click();
+      };
+
+      clickByText("add section");
       await editor.updateComplete;
+      // HA echoes every change back through setConfig; without that the editor
+      // is testing its own optimism rather than the round-trip.
+      if (emitted) editor.setConfig(emitted);
+      await editor.updateComplete;
+      const sectionsAfterAdd = emitted?.sections?.length;
+
+      const nameInput = [...editor.shadowRoot.querySelectorAll("input")].find(
+        (i) => i.value === "Theater" || i.value === "Home theater",
+      );
+      if (nameInput) {
+        nameInput.value = "Theater";
+        nameInput.dispatchEvent(new Event("change", { bubbles: true }));
+        await editor.updateComplete;
+      }
 
       const section = emitted?.sections?.[0];
       return {
+        sectionsAfterAdd,
         renamed: section?.name,
         buttonCount: section?.buttons?.length,
         entityKept: section?.buttons?.[0]?.entity,
@@ -261,6 +286,8 @@ for (const dark of [false, true]) {
     });
 
     const expected = {
+      // Two: the one from the config, plus the one the button added.
+      sectionsAfterAdd: 2,
       renamed: "Theater",
       buttonCount: 2,
       entityKept: "media_player.projector",

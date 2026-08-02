@@ -511,9 +511,16 @@ export const normalizeConfig = (raw: PolrAtvRemoteCardConfig): ResolvedConfig =>
     : DEFAULTS.transport_buttons;
 
   /**
-   * A section is dropped when nothing in it survived normalisation, matching
-   * the app list's rule: one malformed entry must not take the card down, and
-   * an empty labelled row is worse than no row.
+   * Sections keep their shape even when empty.
+   *
+   * Emptiness is a *rendering* decision, not a config one. Dropping empty
+   * sections here deleted every section the editor created, because "Add
+   * section" emits one with no buttons yet and HA immediately hands the config
+   * back through setConfig — so the button appeared to do nothing at all.
+   *
+   * Malformed entries are still dropped: a section that is not an object, and
+   * individual buttons that fail to normalise. The card skips drawing a section
+   * with no buttons, so nothing renders as an empty labelled row.
    */
   const sections = (Array.isArray(raw.sections) ? raw.sections : [])
     .map((entry): SectionConfig | null => {
@@ -524,10 +531,6 @@ export const normalizeConfig = (raw: PolrAtvRemoteCardConfig): ResolvedConfig =>
       const buttons = (Array.isArray(entry["buttons"]) ? entry["buttons"] : [])
         .map(normalizeApp)
         .filter((button): button is TileConfig => button !== null);
-      if (!buttons.length) {
-        warnOnce(`section "${String(entry["name"] ?? "")}" has no usable buttons and was skipped`);
-        return null;
-      }
       return {
         ...(typeof entry["name"] === "string" ? { name: entry["name"] } : {}),
         ...(typeof entry["columns"] === "number" && entry["columns"] > 0
