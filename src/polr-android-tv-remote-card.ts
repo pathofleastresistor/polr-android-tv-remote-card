@@ -38,7 +38,7 @@ import { showMoreInfo, stateColor, type HomeAssistant } from "./kit/types";
 import "./nav-pad";
 import "./polr-android-tv-remote-card-editor";
 
-export const CARD_VERSION = "2.0.0-beta.3";
+export const CARD_VERSION = "2.0.0-beta.4";
 
 const CARD_TYPE = "polr-android-tv-remote-card";
 
@@ -373,10 +373,6 @@ export class PolrAndroidTvRemoteCard extends LitElement {
         >
           <ha-icon class=${this._sending ? "spin" : ""} icon="mdi:send"></ha-icon>
         </button>
-      </div>
-      <div class="hint">
-        Text only lands while a search or input field is focused on the TV, and
-        needs “Enable IME” on the Android TV Remote config entry.
       </div>
     `;
   }
