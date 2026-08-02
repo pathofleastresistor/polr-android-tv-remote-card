@@ -173,13 +173,24 @@ export const remoteStyles = css`
   }
 
   /* ------------------------------------------------------------ touchpad -- */
+  /*
+   * A swipe surface has to claim the gesture, so touch-action: none is
+   * unavoidable -- every comparable card does the same. What it costs is page
+   * scrolling: wherever the pad covers, a thumb drag moves the pointer instead
+   * of the page.
+   *
+   * Softened two ways rather than surrendering up/down swipes to the browser:
+   * the pad is shorter, and it leaves a gutter down each side. Together with
+   * taps resolving on release -- which makes every button row draggable -- the
+   * card is now scrollable from most of its area. The buttons pad avoids the
+   * trade-off entirely for anyone who wants that.
+   */
   .touchpad {
     position: relative;
-    /* Scoped to the pad, never the card: touch-action on a whole custom card
-       eats dashboard scrolling on mobile. */
     touch-action: none;
-    aspect-ratio: 1 / 0.8;
-    width: 100%;
+    aspect-ratio: 1 / 0.55;
+    width: auto;
+    margin: 0 var(--ha-space-5, 20px);
     border: none;
     padding: 0;
     border-radius: var(--radius-lg);

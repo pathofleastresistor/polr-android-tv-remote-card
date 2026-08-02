@@ -262,7 +262,7 @@ U.elementStyles = [], U.shadowRootOptions = { mode: "open" }, U[K("elementProper
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const gt = globalThis, Ct = (e) => e, J = gt.trustedTypes, Ot = J ? J.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, ee = "$lit$", A = `lit$${Math.random().toFixed(9).slice(2)}$`, ie = "?" + A, Pe = `<${ie}>`, C = document, W = () => C.createComment(""), Y = (e) => e === null || typeof e != "object" && typeof e != "function", bt = Array.isArray, Ce = (e) => bt(e) || typeof e?.[Symbol.iterator] == "function", st = `[ 	
+const gt = globalThis, Ct = (e) => e, J = gt.trustedTypes, Ot = J ? J.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, ee = "$lit$", A = `lit$${Math.random().toFixed(9).slice(2)}$`, ie = "?" + A, Pe = `<${ie}>`, C = document, F = () => C.createComment(""), Y = (e) => e === null || typeof e != "object" && typeof e != "function", bt = Array.isArray, Ce = (e) => bt(e) || typeof e?.[Symbol.iterator] == "function", st = `[ 	
 \f\r]`, V = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Mt = /-->/g, zt = />/g, k = RegExp(`>|${st}(?:([^\\s"'>=/]+)(${st}*=${st}*(?:[^ 	
 \f\r"'\`<>=]|("|')|))|$)`, "g"), Ut = /'/g, Rt = /"/g, oe = /^(?:script|style|textarea|title)$/i, re = (e) => (t, ...i) => ({ _$litType$: e, strings: t, values: i }), p = re(1), Oe = re(2), w = Symbol.for("lit-noChange"), d = Symbol.for("lit-nothing"), Dt = /* @__PURE__ */ new WeakMap(), T = C.createTreeWalker(C, 129);
 function ae(e, t) {
@@ -301,8 +301,8 @@ class X {
           const l = r.textContent.split(A), h = l.length - 1;
           if (h > 0) {
             r.textContent = J ? J.emptyScript : "";
-            for (let u = 0; u < h; u++) r.append(l[u], W()), T.nextNode(), s.push({ type: 2, index: ++a });
-            r.append(l[h], W());
+            for (let u = 0; u < h; u++) r.append(l[u], F()), T.nextNode(), s.push({ type: 2, index: ++a });
+            r.append(l[h], F());
           }
         }
       } else if (r.nodeType === 8) if (r.data === ie) s.push({ type: 2, index: a });
@@ -398,7 +398,7 @@ class H {
     bt(this._$AH) || (this._$AH = [], this._$AR());
     const i = this._$AH;
     let o, r = 0;
-    for (const a of t) r === i.length ? i.push(o = new H(this.O(W()), this.O(W()), this, this.options)) : o = i[r], o._$AI(a), r++;
+    for (const a of t) r === i.length ? i.push(o = new H(this.O(F()), this.O(F()), this, this.options)) : o = i[r], o._$AI(a), r++;
     r < i.length && (this._$AR(o && o._$AB.nextSibling, r), i.length = r);
   }
   _$AR(t = this._$AA.nextSibling, i) {
@@ -483,7 +483,7 @@ const Le = (e, t, i) => {
   let r = o._$litPart$;
   if (r === void 0) {
     const a = i?.renderBefore ?? null;
-    o._$litPart$ = r = new H(t.insertBefore(W(), a), a, void 0, i ?? {});
+    o._$litPart$ = r = new H(t.insertBefore(F(), a), a, void 0, i ?? {});
   }
   return r._$AI(e), r;
 };
@@ -615,11 +615,11 @@ let ce = class {
  * Copyright 2020 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const { I: Fe } = He, Nt = (e) => e, We = (e) => e.strings === void 0, Ht = () => document.createComment(""), j = (e, t, i) => {
+const { I: We } = He, Nt = (e) => e, Fe = (e) => e.strings === void 0, Ht = () => document.createComment(""), j = (e, t, i) => {
   const o = e._$AA.parentNode, r = t === void 0 ? e._$AB : t._$AA;
   if (i === void 0) {
     const a = o.insertBefore(Ht(), r), n = o.insertBefore(Ht(), r);
-    i = new Fe(a, n, e, e.options);
+    i = new We(a, n, e, e.options);
   } else {
     const a = i._$AB.nextSibling, n = i._$AM, c = n !== e;
     if (c) {
@@ -1122,10 +1122,10 @@ const D = (e) => {
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const F = (e, t) => {
+const W = (e, t) => {
   const i = e._$AN;
   if (i === void 0) return !1;
-  for (const o of i) o._$AO?.(t, !1), F(o, t);
+  for (const o of i) o._$AO?.(t, !1), W(o, t);
   return !0;
 }, tt = (e) => {
   let t, i;
@@ -1146,9 +1146,9 @@ function ui(e) {
 }
 function _i(e, t = !1, i = 0) {
   const o = this._$AH, r = this._$AN;
-  if (r !== void 0 && r.size !== 0) if (t) if (Array.isArray(o)) for (let a = i; a < o.length; a++) F(o[a], !1), tt(o[a]);
-  else o != null && (F(o, !1), tt(o));
-  else F(this, e);
+  if (r !== void 0 && r.size !== 0) if (t) if (Array.isArray(o)) for (let a = i; a < o.length; a++) W(o[a], !1), tt(o[a]);
+  else o != null && (W(o, !1), tt(o));
+  else W(this, e);
 }
 const vi = (e) => {
   e.type == $t.CHILD && (e._$AP ??= _i, e._$AQ ??= ui);
@@ -1161,10 +1161,10 @@ class mi extends ce {
     super._$AT(t, i, o), fe(this), this.isConnected = t._$AU;
   }
   _$AO(t, i = !0) {
-    t !== this.isConnected && (this.isConnected = t, t ? this.reconnected?.() : this.disconnected?.()), i && (F(this, t), tt(this));
+    t !== this.isConnected && (this.isConnected = t, t ? this.reconnected?.() : this.disconnected?.()), i && (W(this, t), tt(this));
   }
   setValue(t) {
-    if (We(this._$Ct)) this._$Ct._$AI(t, this);
+    if (Fe(this._$Ct)) this._$Ct._$AI(t, this);
     else {
       const i = [...this._$Ct._$AH];
       i[this._$Ci] = t, this._$Ct._$AI(i, this, 0);
@@ -1175,7 +1175,7 @@ class mi extends ce {
   reconnected() {
   }
 }
-const Ft = 500, Wt = 220, Yt = 40, Xt = 500, fi = 250, qt = 12;
+const Wt = 500, Ft = 220, Yt = 40, Xt = 500, fi = 250, qt = 12;
 class gi extends mi {
   constructor(t) {
     if (super(t), this._repeats = 0, this._inFlight = !1, this._bound = !1, this._active = !1, this._resolved = !1, this._startX = 0, this._startY = 0, this._awaitingSecondTap = !1, this._onPointerDown = (i) => {
@@ -1195,8 +1195,8 @@ class gi extends mi {
               return;
             }
             this._repeats += 1, this._fire(o.onPress);
-          }, Wt));
-        }, Ft));
+          }, Ft));
+        }, Wt));
       }
     }, this._onPointerMove = (i) => {
       if (!this._active) return;
@@ -1223,8 +1223,8 @@ class gi extends mi {
               return;
             }
             this._repeats += 1, this._fire(o.onPress);
-          }, Wt);
-        }, Ft));
+          }, Ft);
+        }, Wt));
       }
     }, this._onKeyUp = () => {
       this._reset();
@@ -1436,13 +1436,24 @@ const S = se(gi), ge = mt`
   }
 
   /* ------------------------------------------------------------ touchpad -- */
+  /*
+   * A swipe surface has to claim the gesture, so touch-action: none is
+   * unavoidable -- every comparable card does the same. What it costs is page
+   * scrolling: wherever the pad covers, a thumb drag moves the pointer instead
+   * of the page.
+   *
+   * Softened two ways rather than surrendering up/down swipes to the browser:
+   * the pad is shorter, and it leaves a gutter down each side. Together with
+   * taps resolving on release -- which makes every button row draggable -- the
+   * card is now scrollable from most of its area. The buttons pad avoids the
+   * trade-off entirely for anyone who wants that.
+   */
   .touchpad {
     position: relative;
-    /* Scoped to the pad, never the card: touch-action on a whole custom card
-       eats dashboard scrolling on mobile. */
     touch-action: none;
-    aspect-ratio: 1 / 0.8;
-    width: 100%;
+    aspect-ratio: 1 / 0.55;
+    width: auto;
+    margin: 0 var(--ha-space-5, 20px);
     border: none;
     padding: 0;
     border-radius: var(--radius-lg);

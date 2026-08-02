@@ -215,6 +215,16 @@ The editor has HA's interactions selector for each of these under **Volume**, so
 you can also give them a hold or double-tap action. See
 [Overriding buttons](#overriding-buttons).
 
+### Scrolling on mobile
+
+Buttons resolve on release, so you can start a scroll anywhere on a button and
+it will not fire — it only presses if your finger lifts without travelling.
+
+The touchpad is the exception. A swipe surface has to claim the gesture, so it
+sets `touch-action: none` and the page will not scroll from it. It is kept short
+with a gutter down each side to leave room to scroll past; if you would rather
+not have the trade-off at all, use `pad: buttons` or `pad: dpad`.
+
 ### Text input
 
 `show_text_input: true` adds a field that types on the TV, which beats entering
