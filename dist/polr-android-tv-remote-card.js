@@ -3211,13 +3211,20 @@ x.styles = [
         display: block;
         margin-bottom: 0;
       }
-      /* The parts stop insetting themselves; the panel and the block do it. */
+      /*
+       * The parts stop insetting themselves; the panel and the block do it.
+       *
+       * Deliberately not the inline edit form: it is a surface of its own, like
+       * a section block, so it keeps its 12px all the way round and only gives
+       * up the outer margin -- which li.form-host .form has already zeroed.
+       * Stripping its padding along with everyone else's put every field hard
+       * against the tinted edge.
+       */
       ha-expansion-panel .content .section-head,
       ha-expansion-panel .content ul.list,
       ha-expansion-panel .content .chips,
       ha-expansion-panel .content .hint,
-      ha-expansion-panel .content .empty-state,
-      ha-expansion-panel .content .form {
+      ha-expansion-panel .content .empty-state {
         margin-left: 0;
         margin-right: 0;
         padding-left: 0;
@@ -3228,10 +3235,12 @@ x.styles = [
       ha-expansion-panel .content .chips,
       ha-expansion-panel .content .hint,
       ha-expansion-panel .content ul.list,
-      ha-expansion-panel .content .empty-state,
-      ha-expansion-panel .content .form {
+      ha-expansion-panel .content .empty-state {
         margin-bottom: 0;
         padding-bottom: 0;
+      }
+      ha-expansion-panel .content .form {
+        margin: 0;
       }
       /*
        * A heading belongs to what follows it, so it sits nearer that than the
