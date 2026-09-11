@@ -25,7 +25,7 @@ import {
   sendKey,
   sendText,
 } from "./.build/atv.mjs";
-import { normalizeConfig } from "./.build/config.mjs";
+import { brandFor, normalizeConfig } from "./.build/config.mjs";
 
 const FULL_FEATURES =
   FEATURE.PAUSE |
@@ -562,6 +562,58 @@ test("external volume is readable while the TV is off", () => {
   assert.equal(hasExternalVolume(cfg, device), true);
   assert.equal(hasVolumeState(device), true);
   assert.equal(device.volume, 0.31);
+});
+
+/* ------------------------------------------------------------------------ *
+ * What the header calls the app.
+ *
+ * androidtv_remote names an app only when you have named it yourself in the
+ * integration's options; everything else arrives as a package id, so a header
+ * that shows what the TV reports shows "com.netflix.ninja" on a TV that is
+ * plainly playing Netflix.
+ * ------------------------------------------------------------------------ */
+
+test("a package id the card knows becomes the app's name", () => {
+  const hass = fixture({ playerAttrs: { app_name: "com.netflix.ninja" } });
+  assert.equal(readDevice(hass, config()).appName, "Netflix");
+});
+
+test("a package id only the brand list knows agrees with the logo beside it", () => {
+  // brandFor already matches this id -- it is how the header finds the logo --
+  // so the label has to come out of the same match, not a second opinion.
+  const hass = fixture({ playerAttrs: { app_name: "com.disney.disneyplus" } });
+  const device = readDevice(hass, config());
+  assert.equal(device.appName, "Disney+");
+  assert.equal(brandFor(device.appName), "disneyplus");
+});
+
+test("an unknown package id is left alone rather than guessed at", () => {
+  // "Android" for com.google.android.something would read as a name and be
+  // wrong, which is worse than the id -- and the id is what you type into the
+  // integration's own naming options.
+  const hass = fixture({ playerAttrs: { app_name: "com.example.someapp" } });
+  assert.equal(readDevice(hass, config()).appName, "com.example.someapp");
+});
+
+test("a name the integration already resolved is untouched", () => {
+  for (const name of ["Netflix", "Prime Video", "Some App 2"]) {
+    const hass = fixture({ playerAttrs: { app_name: name } });
+    assert.equal(readDevice(hass, config()).appName, name);
+  }
+});
+
+test("the launcher reads as the home screen, not as a package", () => {
+  const hass = fixture({ playerAttrs: { app_name: null } });
+  hass.states["remote.main_tv"].attributes.current_activity =
+    "com.google.android.tvlauncher";
+  assert.equal(readDevice(hass, config()).appName, "Home screen");
+});
+
+test("current_activity is translated too, not only app_name", () => {
+  const hass = fixture({ playerAttrs: { app_name: null } });
+  hass.states["remote.main_tv"].attributes.current_activity =
+    "com.peacocktv.peacockandroid";
+  assert.equal(readDevice(hass, config()).appName, "Peacock");
 });
 
 test("app_id is exposed so the editor can capture the running app", () => {

@@ -295,6 +295,65 @@ export const BRANDS: Record<BrandId, { label: string; activity: string }> = {
 export const BRAND_IDS = Object.keys(BRANDS) as BrandId[];
 
 /**
+ * Names for the package ids an Android TV reports.
+ *
+ * `androidtv_remote` names an app only if you have named it yourself in the
+ * integration's options; everything else comes through as its package id. So a
+ * card that shows what the TV reports shows "com.netflix.ninja" on the header
+ * of a TV that is plainly playing Netflix.
+ *
+ * This is the short list of what actually runs on an Android TV, not an
+ * attempt at every app on the Play Store: anything missing keeps its id, which
+ * is honest and still tells a determined user what to type into the
+ * integration's own naming options.
+ */
+const APP_NAMES: Record<string, string> = {
+  "com.netflix.ninja": "Netflix",
+  "com.disney.disneyplus": "Disney+",
+  "com.hulu.plus": "Hulu",
+  "com.amazon.amazonvideo.livingroom": "Prime Video",
+  "com.hbo.hbonow": "Max",
+  "com.wbd.stream": "Max",
+  "com.peacocktv.peacockandroid": "Peacock",
+  "com.google.android.youtube.tv": "YouTube",
+  "com.google.android.youtube.tvunplugged": "YouTube TV",
+  "com.google.android.youtube.tvmusic": "YouTube Music",
+  "com.apple.atve.androidtv.appletv": "Apple TV",
+  "com.plexapp.android": "Plex",
+  "com.spotify.tv.android": "Spotify",
+  "tv.twitch.android.app": "Twitch",
+  "com.espn.score_center": "ESPN",
+  "com.cbs.ott": "Paramount+",
+  "com.nba.game": "NBA",
+  "com.google.android.tv.remote.service": "Home screen",
+  // Both launchers Google ships, because "on the home screen" is a state
+  // people look at the header to learn.
+  "com.google.android.tvlauncher": "Home screen",
+  "com.google.android.apps.tv.launcherx": "Home screen",
+};
+
+/** Shaped like a package id: dotted, unspaced, no capitals of its own. */
+const isPackageId = (value: string): boolean => /^[a-z][\w]*(\.[\w]+)+$/.test(value);
+
+/**
+ * A name worth putting on the header for whatever the TV says is running.
+ *
+ * A package id is translated where the card knows it and left alone where it
+ * does not -- a guess derived from the id itself ("Android" for
+ * com.google.android.tv) would read as a name and be wrong, which is worse than
+ * the id. Anything that is already a name is returned untouched.
+ */
+export const appLabel = (activity: string | undefined): string | undefined => {
+  if (!activity || !isPackageId(activity)) return activity;
+  const known = APP_NAMES[activity];
+  if (known) return known;
+  // The six bundled brands already match package ids -- it is how the header
+  // finds a logo for one -- so the label agrees with the logo beside it.
+  const brand = brandFor(activity);
+  return brand ? BRANDS[brand].label : activity;
+};
+
+/**
  * Match an app name reported by the TV to one of the bundled brands.
  *
  * Deliberately loose: `app_name` is whatever the TV feels like calling the app

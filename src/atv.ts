@@ -18,6 +18,7 @@
  */
 
 import { isActionable, runAction, splitService, type ActionConfig } from "./actions";
+import { appLabel } from "./config";
 import type { AppAction, ButtonId, ResolvedConfig, ServiceAction, TileConfig } from "./config";
 import type { HassEntity, HomeAssistant } from "./kit/types";
 
@@ -168,10 +169,13 @@ export const readDevice = (
       (remoteAttrs["friendly_name"] as string | undefined) ??
       config.entity,
     // app_name is all the integration provides. It never sets media_title or
-    // entity_picture, so there is no now-playing text or artwork to read.
-    appName:
+    // entity_picture, so there is no now-playing text or artwork to read -- and
+    // it is a package id unless the app was named in the integration's options,
+    // which appLabel is what stands between the header and "com.netflix.ninja".
+    appName: appLabel(
       (playerAttrs["app_name"] as string | undefined) ??
-      (remoteAttrs["current_activity"] as string | undefined),
+        (remoteAttrs["current_activity"] as string | undefined),
+    ),
     appId: playerAttrs["app_id"] as string | undefined,
     playing: player?.state === "playing",
     features: (playerAttrs["supported_features"] as number | undefined) ?? 0,

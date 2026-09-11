@@ -204,6 +204,9 @@
         { title: "touchpad + text", config: { entity: "remote.main_tv", pad: "touchpad", show_text_input: true, apps: APPS.slice(0, 3) } },
         { title: "v1 config (touch, mixed apps)", config: { entity_id: "remote.main_tv", remote: "touch", apps: ["disneyplus", "hbomax", "netflix", "prime", { icon: "mdi:youtube", url: "https://www.youtube.com" }] } },
         { title: "v1 default pad + favourite", config: { entity_id: "remote.main_tv", remote: "default", volume: false, favorite: { service: "script.fav" }, apps: APPS.slice(0, 2) } },
+        // The integration reports a package id for any app you have not named
+        // in its options, which is most of them.
+        { title: "app reported as a package id", config: { entity: "remote.main_tv", apps: APPS.slice(0, 3) }, hass: { playerAttrs: { app_name: "com.peacocktv.peacockandroid" } } },
         { title: "muted", config: { entity: "remote.main_tv", apps: [] }, hass: { playerAttrs: { is_volume_muted: true } } },
         // The real-world case: the TV passes audio to a soundbar, so it reports
         // no volume level and no mute state. No bar, no percentage chip.
