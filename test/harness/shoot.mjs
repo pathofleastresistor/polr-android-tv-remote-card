@@ -166,6 +166,32 @@ for (const dark of [false, true]) {
       );
     }
     console.log(`power override via "Turn on": ${usedOverride ? "ok" : "FAILED"}`);
+
+    // And the other half of that: with power off the card has no business
+    // offering it, off TV or not. This is the state where the button is the
+    // only thing on the card, so a leak here is the whole card disobeying.
+    const hidden = await page.evaluate(() => {
+      const kase = [...document.querySelectorAll(".case")].find(
+        (c) => c.querySelector("h2")?.textContent === "TV off, power hidden",
+      );
+      const card = kase.querySelector("polr-android-tv-remote-card");
+      const buttons = [...card.shadowRoot.querySelectorAll("button")];
+      return {
+        turnOn: buttons.some((b) => b.textContent.includes("Turn on")),
+        // The rest of what an off TV shows is untouched: the apps are still
+        // there, so this is a missing button rather than a blank card.
+        tiles: card.shadowRoot.querySelectorAll(".app-tile").length,
+      };
+    });
+    if (hidden.turnOn || hidden.tiles !== 3) {
+      failed = true;
+      console.error(
+        `[power] show_power: false, TV off — expected no "Turn on" and 3 tiles, got ${JSON.stringify(hidden)}`,
+      );
+    }
+    console.log(
+      `power hidden on an off TV: ${!hidden.turnOn && hidden.tiles === 3 ? "ok" : "FAILED"}`,
+    );
   }
 
   // Accessibility is a claim the README makes, so it is checked rather than

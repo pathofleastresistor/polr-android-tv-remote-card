@@ -58,7 +58,7 @@ entity: remote.living_room_tv
 | `entity`              | required | A `remote` entity from the Android TV Remote integration.               |
 | `name`                | entity   | Header title.                                                           |
 | `show_header`         | `true`   | Now-playing tile with power. Always at the top.                         |
-| `show_power`          | `true`   | Power button — in the header, or in the back/home/menu row without one. |
+| `show_power`          | `true`   | Power button — in the header, or in the back/home/menu row without one. Off also drops the **Turn on** button an off TV shows. |
 | `layout`              | see below| What the card draws and in what order. See [Layout](#layout).           |
 | `pad`                 | buttons  | `buttons`, `dpad` or `touchpad`.                                        |
 | `transport_buttons`   | all five | Which playback buttons to draw; they always render in playback order.   |
