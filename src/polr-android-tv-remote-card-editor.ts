@@ -603,34 +603,42 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
               they are everywhere else. It emits value-changed with the icon in
               event.detail.value, matching how HA's helper dialogs consume it.
             -->
-            <ha-icon-picker
-              .hass=${this.hass}
-              .value=${app.icon ?? ""}
-              label="Icon"
-              @value-changed=${(event: CustomEvent) => {
+            <!--
+              Captioned by the label around it rather than by its own, so it
+              is not the one field in the form wearing its name inside the box.
+            -->
+            <label class="field">
+              <span>Icon</span>
+              <ha-icon-picker
+                .hass=${this.hass}
+                .value=${app.icon ?? ""}
+                @value-changed=${(event: CustomEvent) => {
                 const next = event.detail?.value as string | undefined;
                 // The picker only knows mdi icons. If it reports empty while
                 // this tile holds a brand logo or an image path, that is the
                 // picker normalising a value it does not recognise, not the
                 // user clearing the field — so keep what we have. Clearing a
                 // brand logo is done with the chips or by typing a new icon.
-                if (!next && app.icon && !app.icon.startsWith("mdi:")) return;
-                this._updateTile(path, index, { icon: next || undefined });
-              }}
-            ></ha-icon-picker>
+                  if (!next && app.icon && !app.icon.startsWith("mdi:")) return;
+                  this._updateTile(path, index, { icon: next || undefined });
+                }}
+              ></ha-icon-picker>
+            </label>
 
             ${path !== "apps"
               ? html`
-                  <ha-entity-picker
-                    .hass=${this.hass}
-                    .value=${app.entity ?? ""}
-                    label="Lights up when this entity is on"
-                    allow-custom-entity
-                    @value-changed=${(event: CustomEvent) =>
-                      this._updateTile(path, index, {
-                        entity: (event.detail?.value as string) || undefined,
-                      })}
-                  ></ha-entity-picker>
+                  <label class="field">
+                    <span>Lights up when this entity is on</span>
+                    <ha-entity-picker
+                      .hass=${this.hass}
+                      .value=${app.entity ?? ""}
+                      allow-custom-entity
+                      @value-changed=${(event: CustomEvent) =>
+                        this._updateTile(path, index, {
+                          entity: (event.detail?.value as string) || undefined,
+                        })}
+                    ></ha-entity-picker>
+                  </label>
                 `
               : nothing}
 
@@ -703,21 +711,23 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
                   -->
                   ${haAction?.action === "more-info"
                     ? html`
-                        <ha-entity-picker
-                          .hass=${this.hass}
-                          .value=${haAction.entity ?? ""}
-                          label="Dialog to open"
-                          allow-custom-entity
-                          @value-changed=${(event: CustomEvent) =>
-                            this._updateTile(path, index, {
-                              action: {
-                                action: "more-info",
-                                ...((event.detail?.value as string)
-                                  ? { entity: event.detail.value as string }
-                                  : {}),
-                              },
-                            })}
-                        ></ha-entity-picker>
+                        <label class="field">
+                          <span>Dialog to open</span>
+                          <ha-entity-picker
+                            .hass=${this.hass}
+                            .value=${haAction.entity ?? ""}
+                            allow-custom-entity
+                            @value-changed=${(event: CustomEvent) =>
+                              this._updateTile(path, index, {
+                                action: {
+                                  action: "more-info",
+                                  ...((event.detail?.value as string)
+                                    ? { entity: event.detail.value as string }
+                                    : {}),
+                                },
+                              })}
+                          ></ha-entity-picker>
+                        </label>
                         <div class="hint">
                           ${app.entity
                             ? html`Leave empty to open ${app.entity}, the entity
@@ -1240,18 +1250,63 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
         height: 100%;
         fill: currentColor;
       }
-      .field select,
-      .field input {
+      /* ------------------------------------------------------- fields -- */
+      /*
+       * The card's own inputs, dressed as the text fields Home Assistant puts
+       * beside them.
+       *
+       * Half this form is HA's -- the icon picker, the entity pickers, the
+       * interactions selector -- and half is hand-rolled, because ha-textfield
+       * is not a component this frontend defines and rendered as an inert
+       * unknown element when tried. So the two halves disagreed: an outlined
+       * 40px box with a caption above it, next to a filled 56px one with its
+       * label inside.
+       *
+       * Convergence goes this way round on purpose. Restyling HA's components
+       * means reaching past their shadow boundary into internals that have
+       * already moved once (ha-textfield to ha-generic-picker), and a version
+       * that ignored the attempt would leave a filled box inside a border of
+       * mine -- worse than the mismatch. Dressing my own inputs is entirely
+       * this stylesheet's business, and it reads from HA's own theme variables,
+       * so a theme that restyles its text fields restyles these with them.
+       *
+       * Note the selectors: the kit's label.field input outranks a bare
+       * .field input, so the filled treatment this panel already asked for
+       * never applied. It does now.
+       */
+      label.field input,
+      label.field select {
         width: 100%;
         box-sizing: border-box;
-        height: 36px;
-        padding: 0 var(--ha-space-2, 8px);
+        height: 56px;
+        padding: 0 var(--ha-space-4, 16px);
         border: none;
-        border-radius: var(--radius-md);
-        background-color: rgba(var(--rgb-primary-text-color, 0, 0, 0), 0.08);
+        border-bottom: 1px solid var(--mdc-text-field-idle-line-color, rgba(0, 0, 0, 0.42));
+        border-radius: var(--ha-border-radius-sm, 4px) var(--ha-border-radius-sm, 4px) 0 0;
+        background-color: var(--mdc-text-field-fill-color, whitesmoke);
         color: var(--primary-text-color);
         font: inherit;
         font-size: var(--ha-font-size-m, 14px);
+      }
+      /* The 2px underline HA's fields grow when focused, rather than the kit's
+         ring -- which would be the one control in the form wearing one. */
+      label.field input:focus,
+      label.field select:focus {
+        outline: none;
+        box-shadow: none;
+        border-bottom: 2px solid var(--mdc-theme-primary, var(--primary-color));
+        padding-bottom: 0;
+      }
+      /*
+       * A picker's own label is switched off in the template, so every field in
+       * the form is captioned the same way: above the box, in the same type.
+       * HA has moved that label in and out of the box across versions -- the
+       * entity picker already puts it on top in some -- and this is the one
+       * arrangement that looks deliberate on all of them.
+       */
+      label.field ha-icon-picker,
+      label.field ha-entity-picker {
+        display: block;
       }
       .chips {
         padding: 0 var(--ha-space-3, 12px) var(--ha-space-2, 8px);
