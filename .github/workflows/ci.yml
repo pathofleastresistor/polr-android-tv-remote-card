@@ -34,6 +34,13 @@ jobs:
         # years. Fails on any console error.
         run: npm run shots
 
+      - name: The press controller, driven through real controls
+        # src/press.ts arbitrates tap, hold, double tap, repeat and keyboard
+        # for every control on the card, and its failures are silent: a button
+        # that repeats when it should not reads as a flaky remote. Needs a
+        # browser for PointerEvent, so it cannot live in `npm test`.
+        run: npm run test:press
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -444,6 +444,7 @@ npm run watch        # rebuild on save
 npm test             # config migration, actions and the device layer
 npm run typecheck
 npm run shots        # render in a real browser; screenshots and behaviour checks
+npm run test:press   # tap, hold, double tap, repeat and keyboard, on a fake clock
 npm run lint:exports # exports nothing imports
 ```
 
@@ -453,3 +454,11 @@ unavailable, no paired player, reduced `supported_features`. `npm run shots`
 screenshots them in light and dark and fails on any console error, on a tap that
 does not fire, on a scroll that does, and on a control that is unlabelled or
 unreachable by keyboard.
+
+`npm run test:press` drives the press controller through those same controls —
+pointer and keyboard events at a real button, asserting what reached `hass` —
+with `setTimeout` and `setInterval` replaced by a fake clock, so a hold that
+repeats forty times resolves at once and identically every run. Every case was
+checked against a deliberately broken build first: a raised repeat cap, disabled
+coalescing, an infinite slop threshold, a hold that stops suppressing its tap
+and a missing key-repeat guard each fail the case that claims to cover them.

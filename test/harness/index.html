@@ -225,6 +225,13 @@
           { type: "apps", title: "Streaming" },
         ] } },
         { title: "layout: volume first, no pad", config: { entity: "remote.main_tv", apps: APPS.slice(0, 3), layout: ["volume", "transport", "navigation", "apps"] } },
+        // Hold and double tap only exist on a control that configures them, so
+        // the press tests need a card that does. Both are scripts, so what
+        // fired is unambiguous in the recorded calls.
+        { title: "gestures: hold and double tap", config: { entity: "remote.main_tv", apps: APPS.slice(0, 2), overrides: {
+          volume_up: { hold_action: { action: "perform-action", perform_action: "script.held" } },
+          home: { double_tap_action: { action: "perform-action", perform_action: "script.double" } },
+        } } },
         { title: "TV off", config: { entity: "remote.main_tv", apps: APPS.slice(0, 4) }, hass: { playerState: "off" } },
         // A soundbar does not sleep with the TV, so volume routed to one keeps
         // its row on an off set -- the only way to turn down music playing

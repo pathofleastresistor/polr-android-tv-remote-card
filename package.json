@@ -21,6 +21,7 @@
     "pretest": "esbuild src/config.ts src/atv.ts src/actions.ts --bundle --format=esm --outdir=test/.build --out-extension:.js=.mjs",
     "test": "node --test \"test/*.test.mjs\"",
     "shots": "node test/harness/shoot.mjs",
+    "test:press": "node test/harness/press.mjs",
     "lint:exports": "node scripts/unused-exports.mjs"
   },
   "dependencies": {
