@@ -380,6 +380,23 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
     return this._editing?.path === path && this._editing.index === index;
   }
 
+  /**
+   * The reading that lights this tile, as typed.
+   *
+   * A comma separates several, because a box that takes one name and a box that
+   * takes a list are the same box to everyone who is not writing YAML.
+   */
+  private _setActiveWhen(path: ListPath, index: number, value: string): void {
+    const readings = value
+      .split(",")
+      .map((reading) => reading.trim())
+      .filter(Boolean);
+    this._updateTile(path, index, {
+      active_when:
+        readings.length === 0 ? undefined : readings.length === 1 ? readings[0] : readings,
+    });
+  }
+
   /** Change the action kind, carrying the old value across where it makes sense. */
   private _setActionKind(path: ListPath, index: number, kind: ActionKind): void {
     const current = this._tiles(path)[index]!.action;
@@ -629,7 +646,7 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
             ${path !== "apps"
               ? html`
                   <label class="field">
-                    <span>Lights up when this entity is on</span>
+                    <span>Lights up with this entity</span>
                     <ha-entity-picker
                       .hass=${this.hass}
                       .value=${app.entity ?? ""}
@@ -640,6 +657,48 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
                         })}
                     ></ha-entity-picker>
                   </label>
+
+                  <!--
+                    Only once there is an entity to read: these two say how to
+                    read it, and mean nothing on their own.
+                  -->
+                  ${app.entity
+                    ? html`
+                        <label class="field">
+                          <span>Lit when it reads</span>
+                          <input
+                            type="text"
+                            .value=${activeWhenValue(app)}
+                            @change=${(event: Event) =>
+                              this._setActiveWhen(
+                                path,
+                                index,
+                                (event.target as HTMLInputElement).value,
+                              )}
+                          />
+                        </label>
+                        <label class="field">
+                          <span>Read from</span>
+                          <input
+                            type="text"
+                            .value=${app.attribute ?? ""}
+                            placeholder="state"
+                            @change=${(event: Event) =>
+                              this._updateTile(path, index, {
+                                attribute:
+                                  (event.target as HTMLInputElement).value.trim() || undefined,
+                              })}
+                          />
+                        </label>
+                        <div class="hint">
+                          Leave the reading empty to light whenever the entity is
+                          on. For one button per receiver input, put the input's
+                          name in it and <code>source</code> in “Read from”;
+                          for a hub activity, the activity's name and nothing
+                          else. Separate several with a comma.
+                        </div>
+                      `
+                    : nothing}
                 `
               : nothing}
 
@@ -1353,6 +1412,13 @@ const actionKind = (action: AppAction): ActionKind =>
   action.action === "activity" || action.action === "app" || action.action === "key"
     ? action.action
     : "action";
+
+/** A tile's readings in one box, however many it carries. */
+const activeWhenValue = (tile: TileConfig): string => {
+  const when = tile.active_when;
+  if (when === undefined) return "";
+  return Array.isArray(when) ? when.join(", ") : when;
+};
 
 /** The single free-text value behind a shorthand kind. */
 const actionValue = (action: AppAction): string => {

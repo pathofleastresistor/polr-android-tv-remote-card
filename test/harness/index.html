@@ -170,6 +170,11 @@
               state: "on",
               attributes: { friendly_name: "Projector" },
             },
+            "media_player.avr": {
+              entity_id: "media_player.avr",
+              state: "on",
+              attributes: { friendly_name: "Receiver", source: "Google TV" },
+            },
             "media_player.soundbar": {
               entity_id: "media_player.soundbar",
               state: "on",
@@ -241,6 +246,16 @@
           volume_up: { hold_action: { action: "perform-action", perform_action: "script.held" } },
           home: { double_tap_action: { action: "perform-action", perform_action: "script.double" } },
         } } },
+        // One receiver, three inputs: the selected one is lit and the other two
+        // are not, though the receiver is on for all three.
+        { title: "source row, one input selected", config: { entity: "remote.main_tv", show_section_labels: true, apps: [], layout: [
+          { type: "section", name: "Source", buttons: [
+            { name: "Google TV", icon: "mdi:cast", entity: "media_player.avr", attribute: "source", active_when: "Google TV", action: { action: "service", service: "media_player.select_source" } },
+            { name: "Radio", icon: "mdi:radio", entity: "media_player.avr", attribute: "source", active_when: "Tuner", action: { action: "service", service: "media_player.select_source" } },
+            { name: "Cable", icon: "mdi:television-box", entity: "media_player.avr", attribute: "source", active_when: ["Cable", "CBL/SAT"], action: { action: "service", service: "media_player.select_source" } },
+          ] },
+          "navigation",
+        ] } },
         { title: "TV off", config: { entity: "remote.main_tv", apps: APPS.slice(0, 4) }, hass: { playerState: "off" } },
         // A soundbar does not sleep with the TV, so volume routed to one keeps
         // its row on an off set -- the only way to turn down music playing

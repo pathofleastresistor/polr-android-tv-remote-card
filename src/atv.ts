@@ -224,6 +224,34 @@ export const isActive = (hass: HomeAssistant, entity: string | undefined): boole
   return !INACTIVE_STATES.has(state.toLowerCase());
 };
 
+/**
+ * Is this tile lit?
+ *
+ * Without `active_when` the question is the old one -- is the entity on -- and
+ * the answer is unchanged. With it, the tile is lit only while the reading it
+ * names is the one showing, which is what a row of inputs needs: a receiver is
+ * on for all three of them and on the Google TV input for exactly one.
+ *
+ * Compared case-insensitively and trimmed, because these are names a human
+ * typed twice: once in the integration that publishes them, once here.
+ */
+export const isTileActive = (hass: HomeAssistant, tile: TileConfig): boolean => {
+  if (!tile.entity) return false;
+  if (tile.active_when === undefined) return isActive(hass, tile.entity);
+
+  const entity = hass.states?.[tile.entity];
+  if (!entity) return false;
+
+  const reading = tile.attribute
+    ? entity.attributes?.[tile.attribute]
+    : entity.state;
+  if (typeof reading !== "string") return false;
+
+  const wanted = Array.isArray(tile.active_when) ? tile.active_when : [tile.active_when];
+  const shown = reading.trim().toLowerCase();
+  return wanted.some((want) => want.trim().toLowerCase() === shown);
+};
+
 /** Does the paired player advertise this capability? */
 export const can = (device: DeviceState, feature: number): boolean =>
   (device.features & feature) !== 0;

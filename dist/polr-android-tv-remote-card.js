@@ -3,16 +3,16 @@
  * Copyright 2019 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const Q = globalThis, ft = Q.ShadowRoot && (Q.ShadyCSS === void 0 || Q.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, vt = Symbol(), Ct = /* @__PURE__ */ new WeakMap();
+const Q = globalThis, vt = Q.ShadowRoot && (Q.ShadyCSS === void 0 || Q.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, ft = Symbol(), Ct = /* @__PURE__ */ new WeakMap();
 let ne = class {
   constructor(e, i, o) {
-    if (this._$cssResult$ = !0, o !== vt) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
+    if (this._$cssResult$ = !0, o !== ft) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
     this.cssText = e, this.t = i;
   }
   get styleSheet() {
     let e = this.o;
     const i = this.t;
-    if (ft && e === void 0) {
+    if (vt && e === void 0) {
       const o = i !== void 0 && i.length === 1;
       o && (e = Ct.get(i)), e === void 0 && ((this.o = e = new CSSStyleSheet()).replaceSync(this.cssText), o && Ct.set(i, e));
     }
@@ -22,20 +22,20 @@ let ne = class {
     return this.cssText;
   }
 };
-const xe = (t) => new ne(typeof t == "string" ? t : t + "", void 0, vt), _t = (t, ...e) => {
+const xe = (t) => new ne(typeof t == "string" ? t : t + "", void 0, ft), _t = (t, ...e) => {
   const i = t.length === 1 ? t[0] : e.reduce((o, n, a) => o + ((s) => {
     if (s._$cssResult$ === !0) return s.cssText;
     if (typeof s == "number") return s;
     throw Error("Value passed to 'css' function must be a 'css' function result: " + s + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
   })(n) + t[a + 1], t[0]);
-  return new ne(i, t, vt);
+  return new ne(i, t, ft);
 }, Ae = (t, e) => {
-  if (ft) t.adoptedStyleSheets = e.map((i) => i instanceof CSSStyleSheet ? i : i.styleSheet);
+  if (vt) t.adoptedStyleSheets = e.map((i) => i instanceof CSSStyleSheet ? i : i.styleSheet);
   else for (const i of e) {
     const o = document.createElement("style"), n = Q.litNonce;
     n !== void 0 && o.setAttribute("nonce", n), o.textContent = i.cssText, t.appendChild(o);
   }
-}, Ot = ft ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((e) => {
+}, Ot = vt ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((e) => {
   let i = "";
   for (const o of e.cssRules) i += o.cssText;
   return xe(i);
@@ -262,22 +262,22 @@ N.elementStyles = [], N.shadowRootOptions = { mode: "open" }, N[F("elementProper
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const bt = globalThis, Lt = (t) => t, et = bt.trustedTypes, Ht = et ? et.createPolicy("lit-html", { createHTML: (t) => t }) : void 0, ae = "$lit$", S = `lit$${Math.random().toFixed(9).slice(2)}$`, se = "?" + S, ze = `<${se}>`, L = document, q = () => L.createComment(""), X = (t) => t === null || typeof t != "object" && typeof t != "function", yt = Array.isArray, Le = (t) => yt(t) || typeof t?.[Symbol.iterator] == "function", ct = `[ 	
-\f\r]`, K = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Dt = /-->/g, Rt = />/g, P = RegExp(`>|${ct}(?:([^\\s"'>=/]+)(${ct}*=${ct}*(?:[^ 	
-\f\r"'\`<>=]|("|')|))|$)`, "g"), Nt = /'/g, Ut = /"/g, re = /^(?:script|style|textarea|title)$/i, ce = (t) => (e, ...i) => ({ _$litType$: t, strings: e, values: i }), c = ce(1), He = ce(2), A = Symbol.for("lit-noChange"), d = Symbol.for("lit-nothing"), It = /* @__PURE__ */ new WeakMap(), M = L.createTreeWalker(L, 129);
+const bt = globalThis, Lt = (t) => t, et = bt.trustedTypes, Rt = et ? et.createPolicy("lit-html", { createHTML: (t) => t }) : void 0, ae = "$lit$", S = `lit$${Math.random().toFixed(9).slice(2)}$`, se = "?" + S, ze = `<${se}>`, L = document, q = () => L.createComment(""), X = (t) => t === null || typeof t != "object" && typeof t != "function", yt = Array.isArray, Le = (t) => yt(t) || typeof t?.[Symbol.iterator] == "function", ct = `[ 	
+\f\r]`, K = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Ht = /-->/g, Dt = />/g, P = RegExp(`>|${ct}(?:([^\\s"'>=/]+)(${ct}*=${ct}*(?:[^ 	
+\f\r"'\`<>=]|("|')|))|$)`, "g"), Nt = /'/g, Ut = /"/g, re = /^(?:script|style|textarea|title)$/i, ce = (t) => (e, ...i) => ({ _$litType$: t, strings: e, values: i }), c = ce(1), Re = ce(2), A = Symbol.for("lit-noChange"), d = Symbol.for("lit-nothing"), It = /* @__PURE__ */ new WeakMap(), M = L.createTreeWalker(L, 129);
 function le(t, e) {
   if (!yt(t) || !t.hasOwnProperty("raw")) throw Error("invalid template strings array");
-  return Ht !== void 0 ? Ht.createHTML(e) : e;
+  return Rt !== void 0 ? Rt.createHTML(e) : e;
 }
-const De = (t, e) => {
+const He = (t, e) => {
   const i = t.length - 1, o = [];
   let n, a = e === 2 ? "<svg>" : e === 3 ? "<math>" : "", s = K;
   for (let r = 0; r < i; r++) {
     const l = t[r];
-    let m, v, h = -1, u = 0;
-    for (; u < l.length && (s.lastIndex = u, v = s.exec(l), v !== null); ) u = s.lastIndex, s === K ? v[1] === "!--" ? s = Dt : v[1] !== void 0 ? s = Rt : v[2] !== void 0 ? (re.test(v[2]) && (n = RegExp("</" + v[2], "g")), s = P) : v[3] !== void 0 && (s = P) : s === P ? v[0] === ">" ? (s = n ?? K, h = -1) : v[1] === void 0 ? h = -2 : (h = s.lastIndex - v[2].length, m = v[1], s = v[3] === void 0 ? P : v[3] === '"' ? Ut : Nt) : s === Ut || s === Nt ? s = P : s === Dt || s === Rt ? s = K : (s = P, n = void 0);
-    const f = s === P && t[r + 1].startsWith("/>") ? " " : "";
-    a += s === K ? l + ze : h >= 0 ? (o.push(m), l.slice(0, h) + ae + l.slice(h) + S + f) : l + S + (h === -2 ? r : f);
+    let m, f, h = -1, u = 0;
+    for (; u < l.length && (s.lastIndex = u, f = s.exec(l), f !== null); ) u = s.lastIndex, s === K ? f[1] === "!--" ? s = Ht : f[1] !== void 0 ? s = Dt : f[2] !== void 0 ? (re.test(f[2]) && (n = RegExp("</" + f[2], "g")), s = P) : f[3] !== void 0 && (s = P) : s === P ? f[0] === ">" ? (s = n ?? K, h = -1) : f[1] === void 0 ? h = -2 : (h = s.lastIndex - f[2].length, m = f[1], s = f[3] === void 0 ? P : f[3] === '"' ? Ut : Nt) : s === Ut || s === Nt ? s = P : s === Ht || s === Dt ? s = K : (s = P, n = void 0);
+    const v = s === P && t[r + 1].startsWith("/>") ? " " : "";
+    a += s === K ? l + ze : h >= 0 ? (o.push(m), l.slice(0, h) + ae + l.slice(h) + S + v) : l + S + (h === -2 ? r : v);
   }
   return [le(t, a + (t[i] || "<?>") + (e === 2 ? "</svg>" : e === 3 ? "</math>" : "")), o];
 };
@@ -286,7 +286,7 @@ class Z {
     let n;
     this.parts = [];
     let a = 0, s = 0;
-    const r = e.length - 1, l = this.parts, [m, v] = De(e, i);
+    const r = e.length - 1, l = this.parts, [m, f] = He(e, i);
     if (this.el = Z.createElement(m, o), M.currentNode = this.el.content, i === 2 || i === 3) {
       const h = this.el.content.firstChild;
       h.replaceWith(...h.childNodes);
@@ -294,14 +294,14 @@ class Z {
     for (; (n = M.nextNode()) !== null && l.length < r; ) {
       if (n.nodeType === 1) {
         if (n.hasAttributes()) for (const h of n.getAttributeNames()) if (h.endsWith(ae)) {
-          const u = v[s++], f = n.getAttribute(h).split(S), p = /([.?@])?(.*)/.exec(u);
-          l.push({ type: 1, index: a, name: p[2], strings: f, ctor: p[1] === "." ? Ne : p[1] === "?" ? Ue : p[1] === "@" ? Ie : at }), n.removeAttribute(h);
+          const u = f[s++], v = n.getAttribute(h).split(S), p = /([.?@])?(.*)/.exec(u);
+          l.push({ type: 1, index: a, name: p[2], strings: v, ctor: p[1] === "." ? Ne : p[1] === "?" ? Ue : p[1] === "@" ? Ie : at }), n.removeAttribute(h);
         } else h.startsWith(S) && (l.push({ type: 6, index: a }), n.removeAttribute(h));
         if (re.test(n.tagName)) {
           const h = n.textContent.split(S), u = h.length - 1;
           if (u > 0) {
             n.textContent = et ? et.emptyScript : "";
-            for (let f = 0; f < u; f++) n.append(h[f], q()), M.nextNode(), l.push({ type: 2, index: ++a });
+            for (let v = 0; v < u; v++) n.append(h[v], q()), M.nextNode(), l.push({ type: 2, index: ++a });
             n.append(h[u], q());
           }
         }
@@ -324,7 +324,7 @@ function V(t, e, i = t, o) {
   const a = X(e) ? void 0 : e._$litDirective$;
   return n?.constructor !== a && (n?._$AO?.(!1), a === void 0 ? n = void 0 : (n = new a(t), n._$AT(t, i, o)), o !== void 0 ? (i._$Co ??= [])[o] = n : i._$Cl = n), n !== void 0 && (e = V(t, n._$AS(t, e.values), n, o)), e;
 }
-class Re {
+class De {
   constructor(e, i) {
     this._$AV = [], this._$AN = void 0, this._$AD = e, this._$AM = i;
   }
@@ -386,7 +386,7 @@ class B {
     const { values: i, _$litType$: o } = e, n = typeof o == "number" ? this._$AC(e) : (o.el === void 0 && (o.el = Z.createElement(le(o.h, o.h[0]), this.options)), o);
     if (this._$AH?._$AD === n) this._$AH.p(i);
     else {
-      const a = new Re(n, this), s = a.u(this.options);
+      const a = new De(n, this), s = a.u(this.options);
       a.p(i), this.T(s), this._$AH = a;
     }
   }
@@ -566,7 +566,7 @@ function j(t) {
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-function H(t) {
+function R(t) {
   return j({ ...t, state: !0, attribute: !1 });
 }
 /**
@@ -666,25 +666,25 @@ const jt = (t, e, i) => {
     const n = Qe(t), { values: a, keys: s } = this.dt(e, i, o);
     if (!Array.isArray(n)) return this.ut = s, a;
     const r = this.ut ??= [], l = [];
-    let m, v, h = 0, u = n.length - 1, f = 0, p = a.length - 1;
-    for (; h <= u && f <= p; ) if (n[h] === null) h++;
+    let m, f, h = 0, u = n.length - 1, v = 0, p = a.length - 1;
+    for (; h <= u && v <= p; ) if (n[h] === null) h++;
     else if (n[u] === null) u--;
-    else if (r[h] === s[f]) l[f] = C(n[h], a[f]), h++, f++;
+    else if (r[h] === s[v]) l[v] = C(n[h], a[v]), h++, v++;
     else if (r[u] === s[p]) l[p] = C(n[u], a[p]), u--, p--;
     else if (r[h] === s[p]) l[p] = C(n[h], a[p]), W(t, l[p + 1], n[h]), h++, p--;
-    else if (r[u] === s[f]) l[f] = C(n[u], a[f]), W(t, n[h], n[u]), u--, f++;
-    else if (m === void 0 && (m = jt(s, f, p), v = jt(r, h, u)), m.has(r[h])) if (m.has(r[u])) {
-      const _ = v.get(s[f]), $ = _ !== void 0 ? n[_] : null;
+    else if (r[u] === s[v]) l[v] = C(n[u], a[v]), W(t, n[h], n[u]), u--, v++;
+    else if (m === void 0 && (m = jt(s, v, p), f = jt(r, h, u)), m.has(r[h])) if (m.has(r[u])) {
+      const _ = f.get(s[v]), $ = _ !== void 0 ? n[_] : null;
       if ($ === null) {
         const Pt = W(t, n[h]);
-        C(Pt, a[f]), l[f] = Pt;
-      } else l[f] = C($, a[f]), W(t, n[h], $), n[_] = null;
-      f++;
+        C(Pt, a[v]), l[v] = Pt;
+      } else l[v] = C($, a[v]), W(t, n[h], $), n[_] = null;
+      v++;
     } else lt(n[u]), u--;
     else lt(n[h]), h++;
-    for (; f <= p; ) {
+    for (; v <= p; ) {
       const _ = W(t, l[p + 1]);
-      C(_, a[f]), l[f++] = _;
+      C(_, a[v]), l[v++] = _;
     }
     for (; h <= u; ) {
       const _ = n[h++];
@@ -823,7 +823,7 @@ const jt = (t, e, i) => {
   volumeup: "volume_up",
   volumedown: "volume_down",
   volumemute: "volume_mute"
-}, fe = {
+}, ve = {
   showRemote: "show_nav",
   showApps: "show_apps",
   showVolume: "show_volume",
@@ -833,7 +833,7 @@ const jt = (t, e, i) => {
   default: "buttons",
   touch: "touchpad",
   dpad: "dpad"
-}, b = (t) => typeof t == "object" && t !== null && !Array.isArray(t), ve = (t) => b(t) && typeof t.service == "string", Kt = (t, e) => {
+}, b = (t) => typeof t == "object" && t !== null && !Array.isArray(t), fe = (t) => b(t) && typeof t.service == "string", Kt = (t, e) => {
   if (typeof t == "string") {
     const i = si(t);
     if (i)
@@ -855,7 +855,7 @@ const jt = (t, e, i) => {
     }
     return i;
   }
-  if (ve(t))
+  if (fe(t))
     return {
       tap_action: ht(
         t.service,
@@ -922,7 +922,7 @@ const y = (t) => {
   if (b(t.action))
     return t;
   const e = typeof t.icon == "string" ? t.icon : void 0, i = typeof t.name == "string" ? t.name : void 0, o = typeof t.color == "string" ? t.color : void 0, n = typeof t.entity == "string" ? t.entity : void 0;
-  return ve(t) ? {
+  return fe(t) ? {
     ...i ? { name: i } : {},
     ...e ? { icon: e } : {},
     ...o ? { color: o } : {},
@@ -960,11 +960,11 @@ const y = (t) => {
     $ && (a[_] = $);
   }
   const s = {};
-  for (const [p, _] of Object.entries(fe))
+  for (const [p, _] of Object.entries(ve))
     typeof t[p] == "boolean" && (s[_] = t[p]);
   const r = Array.isArray(t.transport_buttons) ? t.transport_buttons : Array.isArray(t.media_controls) ? t.media_controls : void 0, l = r ? r.filter(
     (p) => typeof p == "string" && g.transport_buttons.includes(p)
-  ) : g.transport_buttons, m = (Array.isArray(t.sections) ? t.sections : []).map(_e).filter((p) => p !== null), h = (Array.isArray(t.apps) ? t.apps : []).map(ge).filter((p) => p !== null), u = (p, _) => p === void 0 ? _ : p, f = {
+  ) : g.transport_buttons, m = (Array.isArray(t.sections) ? t.sections : []).map(_e).filter((p) => p !== null), h = (Array.isArray(t.apps) ? t.apps : []).map(ge).filter((p) => p !== null), u = (p, _) => p === void 0 ? _ : p, v = {
     ...t,
     type: t.type,
     entity: e,
@@ -998,8 +998,8 @@ const y = (t) => {
     haptics: u(t.haptics, g.haptics),
     overrides: a
   };
-  for (const p of ui) delete f[p];
-  return f;
+  for (const p of ui) delete v[p];
+  return v;
 }, ui = [
   "show_nav",
   "show_transport",
@@ -1019,7 +1019,7 @@ const y = (t) => {
     "media_player_entity",
     "showBasic",
     "media_controls",
-    ...Object.keys(fe),
+    ...Object.keys(ve),
     ...Object.keys(me)
   ]), i = {};
   for (const [o, n] of Object.entries(t))
@@ -1033,7 +1033,7 @@ const y = (t) => {
   TURN_ON: 128,
   TURN_OFF: 256,
   VOLUME_STEP: 1024
-}, fi = {
+}, vi = {
   up: "DPAD_UP",
   down: "DPAD_DOWN",
   left: "DPAD_LEFT",
@@ -1054,7 +1054,7 @@ const y = (t) => {
   // position, which a TV cannot report. These are always key codes.
   rewind: "MEDIA_REWIND",
   fast_forward: "MEDIA_FAST_FORWARD"
-}, vi = "text:", ye = (t, e) => {
+}, fi = "text:", ye = (t, e) => {
   const i = t.entities?.[e.entity]?.device_id;
   if (!i) return null;
   for (const o of Object.values(t.entities ?? {}))
@@ -1062,7 +1062,7 @@ const y = (t) => {
       return o.entity_id;
   return null;
 }, dt = (t) => t === void 0 || t.state === "unavailable" || t.state === "unknown", _i = (t, e) => {
-  const i = t.states?.[e.entity], o = ye(t, e), n = o ? t.states?.[o] : void 0, a = n?.attributes ?? {}, s = i?.attributes ?? {}, r = e.volume_entity ?? o, m = (e.volume_entity && e.volume_entity !== o ? t.states?.[e.volume_entity] : n)?.attributes ?? {}, v = n && !dt(n) ? n.state !== "off" : i?.state === "on";
+  const i = t.states?.[e.entity], o = ye(t, e), n = o ? t.states?.[o] : void 0, a = n?.attributes ?? {}, s = i?.attributes ?? {}, r = e.volume_entity ?? o, m = (e.volume_entity && e.volume_entity !== o ? t.states?.[e.volume_entity] : n)?.attributes ?? {}, f = n && !dt(n) ? n.state !== "off" : i?.state === "on";
   return {
     remoteId: e.entity,
     playerId: o,
@@ -1070,7 +1070,7 @@ const y = (t) => {
     player: n,
     found: i !== void 0,
     available: !dt(i) && (n === void 0 || !dt(n)),
-    on: v,
+    on: f,
     name: e.name ?? s.friendly_name ?? e.entity,
     // app_name is all the integration provides. It never sets media_title or
     // entity_picture, so there is no now-playing text or artwork to read -- and
@@ -1098,7 +1098,16 @@ const y = (t) => {
   if (!e) return !1;
   const i = t.states?.[e]?.state;
   return i === void 0 ? !1 : !gi.has(i.toLowerCase());
-}, I = (t, e) => (t.features & e) !== 0, Yt = (t, e) => (t.volumeFeatures & e) !== 0, qt = (t) => t.volume !== void 0, yi = ["volume_up", "volume_down", "volume_mute"], wi = (t, e) => t.volume_entity !== void 0 && t.volume_entity !== e.playerId || yi.some((i) => it(t.overrides[i]?.tap_action)), $i = (t, e) => {
+}, yi = (t, e) => {
+  if (!e.entity) return !1;
+  if (e.active_when === void 0) return bi(t, e.entity);
+  const i = t.states?.[e.entity];
+  if (!i) return !1;
+  const o = e.attribute ? i.attributes?.[e.attribute] : i.state;
+  if (typeof o != "string") return !1;
+  const n = Array.isArray(e.active_when) ? e.active_when : [e.active_when], a = o.trim().toLowerCase();
+  return n.some((s) => s.trim().toLowerCase() === a);
+}, I = (t, e) => (t.features & e) !== 0, Yt = (t, e) => (t.volumeFeatures & e) !== 0, qt = (t) => t.volume !== void 0, wi = ["volume_up", "volume_down", "volume_mute"], $i = (t, e) => t.volume_entity !== void 0 && t.volume_entity !== e.playerId || wi.some((i) => it(t.overrides[i]?.tap_action)), xi = (t, e) => {
   const i = At(e.service);
   return i ? t.callService(i[0], i[1], e.data ?? {}, e.target) : Promise.reject(
     new Error(`polr-android-tv-remote-card: invalid service "${e.service}"`)
@@ -1106,7 +1115,7 @@ const y = (t) => {
 }, St = (t, e, i) => t.callService("remote", "send_command", {
   entity_id: e.remoteId,
   command: i
-}), xi = (t, e, i) => St(t, e, `${vi}${i}`), Ai = (t, e, i, o, n) => {
+}), Ai = (t, e, i) => St(t, e, `${fi}${i}`), ki = (t, e, i, o, n) => {
   const a = e.overrides[o]?.tap_action;
   if (it(a))
     return kt(n, t, a, i.remoteId);
@@ -1156,9 +1165,9 @@ const y = (t) => {
         });
       break;
   }
-  const r = fi[o];
+  const r = vi[o];
   return r ? St(t, i, r) : Promise.resolve();
-}, ki = (t, e, i, o) => {
+}, Ti = (t, e, i, o) => {
   const n = i.action;
   switch (n.action) {
     case "activity":
@@ -1180,7 +1189,7 @@ const y = (t) => {
       return St(t, e, n.key);
     // v1's shape.
     case "service":
-      return $i(t, n);
+      return xi(t, n);
     /*
      * Everything else is a Home Assistant action, run exactly as an override
      * would run it -- except for which entity a bare one lands on.
@@ -1203,7 +1212,7 @@ const y = (t) => {
         i.entity ?? e.remoteId
       );
   }
-}, Ti = (t, e) => {
+}, Si = (t, e) => {
   switch (t.action) {
     case "activity":
       return `Launch ${t.activity}`;
@@ -1230,27 +1239,27 @@ const y = (t) => {
     case "none":
       return "Do nothing";
   }
-}, R = (t) => He`
+}, D = (t) => Re`
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="${t}" />
   </svg>
 `, ut = {
-  disneyplus: R(
+  disneyplus: D(
     "M2.056 6.834C1.572 6.834 1 6.77 1 6.483c0-2.023 3.562-2.11 5.08-2.11 1.978 0 4.506.614 6.66 1.384 3.277 1.188 9.917 5.145 9.917 9.674 0 4.001-4.31 5.914-8.311 5.914a22.376 22.376 0 0 1-3.21-.33c-.066.243-.11.418-.264.924-.253.052-.511.081-.77.087l-.505-.043c-.33-.396-.44-1.033-.572-1.715-2-1.165-3.298-2.155-3.891-2.836-.506-.528-1.078-1.232-1.078-1.913 0-.351.22-.66.726-1.01 1.034-.77 2.352-1.188 4.507-1.563l.044-.9c.022-.22.242-2.573.748-3.013.813.66.901 1.341.967 2.353.022.44.044.901.11 1.385h.308c1.539 0 6.244.395 6.244 2.616 0 .528-.77 1.517-1.518 1.517a1.9 1.9 0 0 1-.966-.285c.329-.375.813-.704.945-.99-.44-.528-2.814-1.143-4.551-1.143a4.043 4.043 0 0 0-.572.022l.022 4.815c.703.44 1.561.483 2.11.483 2.42 0 7.431-.417 7.431-4.331 0-3.87-4.946-6.86-8.64-8.266a21.394 21.394 0 0 0-7.937-1.496 7.22 7.22 0 0 0-1.803.198c-.373.088-.505.176-.505.264 0 .153.747.242.836.286a.221.221 0 0 1 .11.175.26.26 0 0 1-.088.176c-.089 0-.286.022-.528.022zM9.2 14.551c-2.176.177-4.595.397-4.595 1.166 0 .594 1.012 1.32 1.627 1.781a7.052 7.052 0 0 0 2.77 1.319zm11.155-9.85c-.02.428-.042.942-.042 1.723 0 .3 0 .642.01 1.027-.042.193-.32.214-.46.278a1.148 1.148 0 0 1-.256-.192V4.83c0-.29.01-.588.01-1.038 0-.225 0-.482-.01-.792 0-.192.032-.374.15-.802a.342.342 0 0 1 .3-.224c.245.064.491.17.577.374-.257.76-.235 1.594-.279 2.353zm-.384-.085c.428.021.941.042 1.722.042.3 0 .643 0 1.027-.01.193.041.215.32.279.459-.052.094-.116.18-.193.257H20.1c-.289 0-.589-.01-1.037-.01-.225 0-.482 0-.792.01-.193.002-.375-.03-.803-.149a.346.346 0 0 1-.225-.299c.064-.246.172-.492.374-.578.76.257 1.595.235 2.355.278z"
   ),
-  hbomax: R(
+  hbomax: D(
     "M8.844 4.249h3.205a2.013 2.013 0 0 1 1.848 1.876c1.607-3.368 6.667-2.217 6.658 1.515.045 3.744-5.026 4.939-6.658 1.568a2.077 2.077 0 0 1-2.07 1.947H8.845Zm-5.395 0h1.92v2.58h1.213V4.253H8.46v6.902H6.586V8.48H5.373v2.676H3.449ZM9.872 19.83h-.576a.603.603 0 0 1-.6-.57c0-.013-.007-.023-.007-.035v-3.667a1.192 1.192 0 0 0-1.279-1.21 1.192 1.192 0 0 0-1.279 1.211v4.167a.103.103 0 0 1-.102.103h-.575a.61.61 0 0 1-.61-.611v-3.666a1.319 1.319 0 0 0-.066-.296 1.176 1.176 0 0 0-1.213-.913 1.19 1.19 0 0 0-1.183.817c-.05.131-.079.267-.087.406v4.17a.104.104 0 0 1-.104.102h-.579a.61.61 0 0 1-.61-.61V15.56a2.322 2.322 0 0 1 1.68-2.32c.285-.088.584-.133.883-.133a2.584 2.584 0 0 1 1.92.752 2.588 2.588 0 0 1 1.921-.752 2.608 2.608 0 0 1 1.872.715c.451.465.7 1.09.692 1.738v4.171a.103.103 0 0 1-.098.103zm.428-3.35a3.76 3.76 0 0 1 .568-2.102c.133-.2.29-.38.47-.539a2.958 2.958 0 0 1 2.013-.744 3.014 3.014 0 0 1 1.845.59.61.61 0 0 1 .597-.48h.574a.107.107 0 0 1 .105.103v6.427a.104.104 0 0 1-.104.103h-.573a.61.61 0 0 1-.612-.553c-2.16 1.55-5.14-.164-4.887-2.811Zm12.623 3.35h-.977a.813.813 0 0 1-.675-.357l-1.079-1.6a.356.356 0 0 0-.588 0l-1.08 1.6a.825.825 0 0 1-.245.22.803.803 0 0 1-.43.137h-.978a.075.075 0 0 1-.063-.121l1.18-1.752.744-1.1a.61.61 0 0 0 0-.682l-.05-.075-1.872-2.773a.077.077 0 0 1 .062-.121h.978a.813.813 0 0 1 .674.36l.826 1.221.254.376a.355.355 0 0 0 .59 0l1.08-1.597a.82.82 0 0 1 .673-.36h.978a.077.077 0 0 1 .06.122l-1.925 2.855a.61.61 0 0 0 0 .682l1.929 2.853a.076.076 0 0 1-.066.116zM17.068 9.403c1.567.002 2.356-1.89 1.25-3-1.103-1.11-3-.33-3.003 1.237A1.756 1.756 0 0 0 17.068 9.4zm0-3.14c1.23.003 1.843 1.493.97 2.36-.872.866-2.358.246-2.354-.983a1.38 1.38 0 0 1 1.38-1.378zm-3.719 8.1a1.77 1.77 0 0 0-1.783 1.63 3.15 3.15 0 0 0-.037.489 1.867 1.867 0 0 0 1.82 2.123 1.696 1.696 0 0 0 1.455-.764c.253-.407.381-.88.367-1.36a1.867 1.867 0 0 0-1.822-2.118zm.227-6.191a2.976 2.976 0 0 1 0-.954 1.475 1.475 0 0 1-.723.422c.29.096.544.283.722.533zm-1.486.785a.548.548 0 0 0-.5-.577h-.954v1.17h.954a.553.553 0 0 0 .5-.593zm0-2.595a.55.55 0 0 0-.5-.577h-.954V6.94h.954a.548.548 0 0 0 .5-.578z"
   ),
-  hulu: R(
+  hulu: D(
     "m 14.248,8.7019997 h 1.59 V 15.298 h -1.59 z M 5.143,10.764 H 4.124 a 1.4,1.4 0 0 0 -0.36,0.037 C 3.673,10.826 3.615,10.843 3.59,10.851 V 8.7 H 2 v 6.6 h 1.59 v -2.66 a 0.428,0.428 0 0 1 0.124,-0.3 0.4,0.4 0 0 1 0.3,-0.13 h 0.92 a 0.446,0.446 0 0 1 0.435,0.435 V 15.3 h 1.575 v -2.871 a 1.53,1.53 0 0 0 -0.5,-1.261 2,2 0 0 0 -1.301,-0.404 z m 15.267,0 v 2.658 a 0.423,0.423 0 0 1 -0.422,0.423 h -0.932 a 0.423,0.423 0 0 1 -0.422,-0.423 v -2.658 h -1.59 v 2.783 a 1.679,1.679 0 0 0 0.49,1.3 1.874,1.874 0 0 0 1.323,0.453 H 20.41 A 1.47,1.47 0 0 0 21.571,14.816 1.842,1.842 0 0 0 22,13.547 v -2.783 z m -8.957,2.658 a 0.4,0.4 0 0 1 -0.13,0.3 0.43,0.43 0 0 1 -0.3,0.124 H 10.1 A 0.423,0.423 0 0 1 9.678,13.423 V 10.764 H 8.087 v 2.783 a 1.676,1.676 0 0 0 0.491,1.3 1.855,1.855 0 0 0 1.31,0.453 h 1.565 a 1.473,1.473 0 0 0 1.162,-0.484 1.842,1.842 0 0 0 0.429,-1.267 v -2.785 h -1.591 z"
   ),
-  netflix: R(
+  netflix: D(
     "M5.94 1v10.994c0 6.045.006 10.996.014 11.004.01.01.382-.029.834-.078a73.701 73.701 0 0 1 1.383-.139 80.63 80.628 0 0 1 2.06-.133c.05 0 .052-.246.058-4.655l.01-4.645.34.964c1.406 3.979 1.77 5.004 2.166 6.117v.002l.206.581.575 1.624c.003.003.292.02.642.038a48.332 48.33 0 0 1 3.37.29c.12.014.227.024.307.03.038.002.044 0 .067 0 .023 0 .062.003.067 0h.006c.003 0 .003-.967.005-1.382l.002-.435c.007-1.783.01-4.836.007-9.181l-.01-10.979h-4.311L13.73 5.88l-.01 4.859v.003l-.398-1.13V9.61v.002l-2.04-5.765v-.013l-.177-.501c-.422-1.195-.781-2.205-.795-2.251L10.28 1H8.107Z"
   ),
-  prime: R(
+  prime: D(
     "M20.182 5.404a4.05 4.05 0 0 0 .625.05 1.116 1.116 0 0 0 .342-.03.474.474 0 0 0 .404-.306.605.605 0 0 0 .015-.276.4.4 0 0 0-.243-.334.88.88 0 0 0-.281-.064.791.791 0 0 0-.833.499 1.438 1.438 0 0 0-.102.367c-.006.088-.006.088.073.094zm-1.074-.4a1.808 1.808 0 0 1 1.633-1.359 2.38 2.38 0 0 1 1.057.102c.655.224 1.009.932.794 1.59a.986.986 0 0 1-.489.588 1.986 1.986 0 0 1-.66.211 3.534 3.534 0 0 1-1.207-.016 1.221 1.221 0 0 0-.146-.023.88.88 0 0 0 .716.954 2.58 2.58 0 0 0 .995 0c.154-.033.302-.065.456-.102.154-.036.218.012.218.17v.392a.242.242 0 0 1-.18.26 3.082 3.082 0 0 1-.626.17 3.247 3.247 0 0 1-1.214-.01 1.663 1.663 0 0 1-1.36-1.272 2.935 2.935 0 0 1 .016-1.656zm.317 6.367a2.588 2.588 0 0 1 1.012.039 1.936 1.936 0 0 1 1.41 1.635v.011h-.014v.1a.078.078 0 0 0 .024.08v-.021l.007.01v.61l-.012.021v-.01c-.03.02-.02.047-.02.08V14c-.048.9-.747 1.63-1.644 1.717a2.627 2.627 0 0 1-.998-.052 1.694 1.694 0 0 1-1.246-1.114 2.825 2.825 0 0 1 0-2.005c.219-.65.8-1.11 1.482-1.175zM12 3.946c0-.043.006-.086.016-.127a.156.156 0 0 1 .147-.102h.67a.19.19 0 0 1 .184.147c.028.075.044.147.07.223.053 0 .086-.036.122-.057a2.743 2.743 0 0 1 .946-.398 1.962 1.962 0 0 1 .795 0c.25.054.47.202.615.413a.25.25 0 0 0 .03.038v.014c.132-.079.271-.164.415-.237a2.382 2.382 0 0 1 1.203-.266 1.061 1.061 0 0 1 1.095 1.027v2.964c0 .238-.03.27-.27.27h-.647a.906.906 0 0 1-.126 0 .147.147 0 0 1-.128-.122.994.994 0 0 1-.01-.175V5.101a.944.944 0 0 0-.033-.293.4.4 0 0 0-.36-.294 1.861 1.861 0 0 0-.912.176.087.087 0 0 0-.063.096v2.788a.774.774 0 0 1-.01.155c0 .07-.058.127-.128.127h-.81c-.197 0-.24-.047-.24-.243V5.1a1.24 1.24 0 0 0-.026-.276.4.4 0 0 0-.371-.318 1.874 1.874 0 0 0-.928.18.085.085 0 0 0-.059.103v2.833c0 .195-.044.236-.239.236h-.704c-.188 0-.235-.053-.235-.232zm2.71 9.92a.178.178 0 0 0-.074-.011 2 2 0 0 0 .057.324c.08.337.358.59.7.636a2.664 2.664 0 0 0 1.088-.037c.117-.026.229-.053.345-.085.154-.037.223.023.223.17v.385a.235.235 0 0 1-.19.271 3.36 3.36 0 0 1-1.141.217 2.901 2.901 0 0 1-.796-.079 1.63 1.63 0 0 1-1.215-1.136 2.946 2.946 0 0 1-.02-1.776 1.848 1.848 0 0 1 1.838-1.363c.268-.012.535.023.792.101.44.123.775.48.868.928a1.468 1.468 0 0 1 0 .587.983.983 0 0 1-.535.704 2.166 2.166 0 0 1-.891.23 4.15 4.15 0 0 1-1.055-.067zm-3.133-2.202c.027-.037.012-.075.012-.112V9.847c0-.202.037-.238.238-.238h.734c.161.006.207.044.207.208v5.586c0 .147-.049.201-.196.201h-.69a.19.19 0 0 1-.186-.146.82.82 0 0 0-.057-.185c-.048.008-.069.045-.107.067a1.714 1.714 0 0 1-1.615.276 1.526 1.526 0 0 1-.917-.812 2.495 2.495 0 0 1-.266-1.13 2.999 2.999 0 0 1 .187-1.225 1.66 1.66 0 0 1 .826-.945c.552-.263 1.2-.22 1.713.111a.294.294 0 0 0 .117.059zm-.797-3.817h-.733a.32.32 0 0 1-.075 0 .147.147 0 0 1-.147-.137V3.893c0-.127.054-.176.18-.18a19.455 19.455 0 0 1 .828 0c.122 0 .159.037.17.158v3.67a.982.982 0 0 1-.01.176.134.134 0 0 1-.128.12.456.456 0 0 1-.089 0zm-1.045-5.45a.616.616 0 0 1 .642-.586h.064a.649.649 0 0 1 .248.036.6.6 0 0 1 .411.67.587.587 0 0 1-.506.534.963.963 0 0 1-.355 0 .587.587 0 0 1-.504-.66Zm-3.092 5.2V3.983c0-.244.026-.27.27-.27h.51a.211.211 0 0 1 .238.179c.037.132.07.264.1.408a.161.161 0 0 0 .091-.065 3.514 3.514 0 0 1 .303-.27 1.41 1.41 0 0 1 .964-.293c.138 0 .186.048.197.18.01.18 0 .367 0 .546a.985.985 0 0 1-.012.22.147.147 0 0 1-.147.146 1.812 1.812 0 0 1-.22 0 2.523 2.523 0 0 0-1.027.147c-.074.026-.074.079-.074.138v2.678a.13.13 0 0 1-.128.122.992.992 0 0 1-.132 0v.01h-.69a.784.784 0 0 1-.117 0 .147.147 0 0 1-.126-.132zm.904 3.228a.604.604 0 0 1-.192 0 .998.998 0 0 1-.176-.02.6.6 0 0 1-.466-.7.587.587 0 0 1 .567-.536.473.473 0 0 1 .111 0 .638.638 0 0 1 .313.054c.208.078.35.272.361.494a.624.624 0 0 1-.518.716zm.44.855v3.764a.147.147 0 0 1-.133.159h-.88a.147.147 0 0 1-.162-.128v-.026a.567.567 0 0 1 0-.1v-3.67c0-.164.045-.21.21-.21h.751c.164.007.211.054.211.218zm-1.711.047-.317.844-1.067 2.774c-.01.032-.027.063-.037.095a.261.261 0 0 1-.265.175h-.702a.294.294 0 0 1-.318-.218c-.133-.349-.27-.704-.403-1.055-.318-.832-.641-1.666-.96-2.504a.928.928 0 0 1-.069-.207c-.016-.105.021-.158.128-.158h.901c.128 0 .185.085.218.196.058.201.117.408.18.61.217.733.43 1.479.646 2.217h.01l.096-.308.733-2.46.031-.095a.214.214 0 0 1 .213-.147h.812c.2-.003.243.054.176.245zM1.786 3.82a.377.377 0 0 1 .318-.107h.488a.21.21 0 0 1 .234.18c.01.053.02.106.037.16a.022.022 0 0 0 .02.015.429.429 0 0 0 .11-.08 1.87 1.87 0 0 1 1.586-.354c.48.115.874.454 1.061.91a2.451 2.451 0 0 1 .205.798h-.008c.051.444.011.893-.118 1.321a1.942 1.942 0 0 1-.55.88c-.34.306-.795.448-1.248.388A1.776 1.776 0 0 1 3 7.564c-.039.033-.022.074-.022.113v1.506c0 .329 0 .329-.334.329h-.572a.294.294 0 0 1-.294-.126Zm19.37 15.225a.587.587 0 0 1-.176.2 11.64 11.64 0 0 1-1.962 1.247 15.499 15.499 0 0 1-4.152 1.406 18.226 18.226 0 0 1-2.51.27v.022h-.649v-.018c-.293-.014-.578-.026-.868-.047a15.349 15.349 0 0 1-2.296-.352 15.558 15.558 0 0 1-6.885-3.59c-.185-.164-.36-.333-.54-.503a.405.405 0 0 1-.101-.146.195.195 0 0 1 .098-.256.2.2 0 0 1 .147 0 1.21 1.21 0 0 1 .138.069 20.566 20.566 0 0 0 6.164 2.546 22.087 22.087 0 0 0 2.212.398 20.441 20.441 0 0 0 3.213.146 16.97 16.97 0 0 0 1.724-.146 20.908 20.908 0 0 0 3.935-.896 18.627 18.627 0 0 0 1.973-.776.44.44 0 0 1 .318-.043.33.33 0 0 1 .24.398.578.578 0 0 1-.022.066zm1.028 1.488a3.547 3.547 0 0 1-.615.757.432.432 0 0 1-.17.107.123.123 0 0 1-.169-.124.608.608 0 0 1 .038-.162c.185-.496.366-.99.51-1.504a5.346 5.346 0 0 0 .18-.859 1.65 1.65 0 0 0 0-.318.412.412 0 0 0-.294-.388 2.068 2.068 0 0 0-.509-.095 8.356 8.356 0 0 0-1.459.064l-.641.08c-.07 0-.132 0-.17-.065a.18.18 0 0 1 .014-.19.546.546 0 0 1 .162-.148 3.67 3.67 0 0 1 1.299-.562 6.412 6.412 0 0 1 1.097-.121c.346.001.691.042 1.028.121a1.515 1.515 0 0 1 .276.102c.121.05.206.162.219.293a2.157 2.157 0 0 1 .014.455 5.856 5.856 0 0 1-.806 2.55zm-2.55-5.72a.995.995 0 0 0 .301.01.691.691 0 0 0 .505-.293 1.01 1.01 0 0 0 .147-.308l-.009.014a1.924 1.924 0 0 0 .074-.678 2.449 2.449 0 0 0 0-.293 1.64 1.64 0 0 0-.147-.6.685.685 0 0 0-.483-.376.908.908 0 0 0-.302-.01.694.694 0 0 0-.542.328 1.163 1.163 0 0 0-.147.35 2.89 2.89 0 0 0-.042.933 1.494 1.494 0 0 0 .147.525c.09.207.276.355.497.397zm-3.523-1.96a.473.473 0 0 0-.394-.64c-.026 0-.047-.01-.073-.01a.797.797 0 0 0-.775.302 1.321 1.321 0 0 0-.211.578c-.015.047.01.069.058.073a4.705 4.705 0 0 0 .642.053c.11.006.22-.003.328-.026a.465.465 0 0 0 .425-.33zm-5.981-.255a1.174 1.174 0 0 0-.106.26 2.683 2.683 0 0 0-.065.997 1.48 1.48 0 0 0 .147.536.734.734 0 0 0 .568.391 1.306 1.306 0 0 0 .832-.158.147.147 0 0 0 .086-.147v-.966h.007c0-.323-.01-.641 0-.968a.147.147 0 0 0-.096-.156 1.614 1.614 0 0 0-.817-.147.678.678 0 0 0-.556.358zM3.855 7.051a.747.747 0 0 0 .488-.188.807.807 0 0 0 .243-.425 2.654 2.654 0 0 0 .065-1.002 1.505 1.505 0 0 0-.135-.54.653.653 0 0 0-.505-.382 1.44 1.44 0 0 0-.912.137.16.16 0 0 0-.105.164v1.917a.147.147 0 0 0 .09.147 1.468 1.468 0 0 0 .771.17"
   ),
-  youtube: R(
+  youtube: D(
     "M18.43 4.216H5.57A4.57 4.57 0 0 0 1 8.786v6.429a4.57 4.57 0 0 0 4.57 4.569h12.86a4.57 4.57 0 0 0 4.57-4.57V8.786a4.57 4.57 0 0 0-4.57-4.569zm-3.09 8.097-6.015 2.869a.241.241 0 0 1-.346-.218V9.046c0-.18.19-.297.351-.215l6.016 3.048a.242.242 0 0 1-.005.434z"
   )
 };
@@ -1275,22 +1284,22 @@ const Y = (t, e) => {
     let i = e._$AN;
     if (i === void 0) e._$AN = i = /* @__PURE__ */ new Set();
     else if (i.has(t)) break;
-    i.add(t), Pi(e);
+    i.add(t), Ci(e);
   }
 };
-function Si(t) {
+function Ei(t) {
   this._$AN !== void 0 ? (ot(this), this._$AM = t, we(this)) : this._$AM = t;
 }
-function Ei(t, e = !1, i = 0) {
+function Pi(t, e = !1, i = 0) {
   const o = this._$AH, n = this._$AN;
   if (n !== void 0 && n.size !== 0) if (e) if (Array.isArray(o)) for (let a = i; a < o.length; a++) Y(o[a], !1), ot(o[a]);
   else o != null && (Y(o, !1), ot(o));
   else Y(this, t);
 }
-const Pi = (t) => {
-  t.type == xt.CHILD && (t._$AP ??= Ei, t._$AQ ??= Si);
+const Ci = (t) => {
+  t.type == xt.CHILD && (t._$AP ??= Pi, t._$AQ ??= Ei);
 };
-class Ci extends pe {
+class Oi extends pe {
   constructor() {
     super(...arguments), this._$AN = void 0;
   }
@@ -1312,8 +1321,8 @@ class Ci extends pe {
   reconnected() {
   }
 }
-const Xt = 500, Zt = 220, Gt = 40, Jt = 500, Oi = 250, Qt = 12;
-class Mi extends Ci {
+const Xt = 500, Zt = 220, Gt = 40, Jt = 500, Mi = 250, Qt = 12;
+class zi extends Oi {
   constructor(e) {
     if (super(e), this._repeats = 0, this._inFlight = !1, this._bound = !1, this._active = !1, this._resolved = !1, this._startX = 0, this._startY = 0, this._awaitingSecondTap = !1, this._onPointerDown = (i) => {
       if (i.button !== 0) return;
@@ -1396,7 +1405,7 @@ class Mi extends Ci {
       }
       this._awaitingSecondTap = !0, this._tapTimer = window.setTimeout(() => {
         this._awaitingSecondTap = !1, this._fire(e.onPress);
-      }, Oi);
+      }, Mi);
     }
   }
   _fire(e, i = "light") {
@@ -1412,7 +1421,7 @@ class Mi extends Ci {
     this._reset(), this._tapTimer !== void 0 && (window.clearTimeout(this._tapTimer), this._tapTimer = void 0), this._awaitingSecondTap = !1;
   }
 }
-const O = he(Mi), $e = _t`
+const O = he(zi), $e = _t`
   /*
    * Every section pads its own bottom and relies on the header for the top.
    * With the header hidden the first row sat flush against the card edge, so
@@ -2428,10 +2437,10 @@ const O = he(Mi), $e = _t`
     }
   }
 `;
-var zi = Object.defineProperty, Li = Object.getOwnPropertyDescriptor, D = (t, e, i, o) => {
-  for (var n = o > 1 ? void 0 : o ? Li(e, i) : e, a = t.length - 1, s; a >= 0; a--)
+var Li = Object.defineProperty, Ri = Object.getOwnPropertyDescriptor, H = (t, e, i, o) => {
+  for (var n = o > 1 ? void 0 : o ? Ri(e, i) : e, a = t.length - 1, s; a >= 0; a--)
     (s = t[a]) && (n = (o ? s(e, i, n) : s(n)) || n);
-  return o && n && zi(e, i, n), n;
+  return o && n && Li(e, i, n), n;
 };
 const te = 0.06, Hi = {
   ArrowUp: "up",
@@ -2564,33 +2573,33 @@ let k = class extends z {
   }
 };
 k.styles = [Et, $e];
-D([
+H([
   j({ type: String })
 ], k.prototype, "pad", 2);
-D([
+H([
   j({ type: Boolean })
 ], k.prototype, "repeat", 2);
-D([
+H([
   j({ type: Boolean })
 ], k.prototype, "haptics", 2);
-D([
+H([
   de(".touchpad")
 ], k.prototype, "_touchpad", 2);
-D([
+H([
   de(".touchpad-dot")
 ], k.prototype, "_dot", 2);
-D([
-  H()
+H([
+  R()
 ], k.prototype, "_tracking", 2);
-k = D([
+k = H([
   $t("polr-atv-nav-pad")
 ], k);
-var Di = Object.defineProperty, Ri = Object.getOwnPropertyDescriptor, G = (t, e, i, o) => {
-  for (var n = o > 1 ? void 0 : o ? Ri(e, i) : e, a = t.length - 1, s; a >= 0; a--)
+var Di = Object.defineProperty, Ni = Object.getOwnPropertyDescriptor, G = (t, e, i, o) => {
+  for (var n = o > 1 ? void 0 : o ? Ni(e, i) : e, a = t.length - 1, s; a >= 0; a--)
     (s = t[a]) && (n = (o ? s(e, i, n) : s(n)) || n);
   return o && n && Di(e, i, n), n;
 };
-const Ni = {
+const Ui = {
   pad: { label: "Remote pad", icon: "mdi:gesture-tap-button", settings: "Pad" },
   navigation: { label: "Back / home / menu", icon: "mdi:arrow-u-left-top" },
   transport: { label: "Playback", icon: "mdi:play-pause", settings: "Playback" },
@@ -2602,9 +2611,9 @@ const Ni = {
   { value: "app", label: "Open app id", hint: "Android package id, e.g. com.netflix.ninja. Needs a paired media player." },
   { value: "key", label: "Send a key", hint: "Android key code, e.g. GUIDE or MEDIA_REWIND" },
   { value: "action", label: "Call an action", hint: "" }
-], Ui = [
-  { name: "app_columns", selector: { number: { min: 1, max: 8, mode: "box" } } }
 ], Ii = [
+  { name: "app_columns", selector: { number: { min: 1, max: 8, mode: "box" } } }
+], Vi = [
   {
     type: "expandable",
     name: "",
@@ -2615,7 +2624,7 @@ const Ni = {
       { name: "haptics", selector: { boolean: {} } }
     ]
   }
-], Vi = () => [
+], Bi = () => [
   {
     name: "entity",
     required: !0,
@@ -2706,9 +2715,9 @@ const Ni = {
       }))
     ]
   }
-], Bi = [
+], ji = [
   { name: "action", selector: { ui_action: {} } }
-], ji = {
+], Ki = {
   entity: "Remote entity",
   volume_entity: "Volume on another media player",
   power_action: "Power",
@@ -2723,7 +2732,7 @@ const Ni = {
   app_columns: "Buttons per row",
   hold_repeat: "Hold to repeat",
   haptics: "Haptic feedback"
-}, Ki = {
+}, Wi = {
   show_power: "In the header, or in the back / home / menu row when the header is hidden — that row then has to be in the layout for it to have anywhere to go.",
   volume_entity: "Point this at a soundbar or receiver that exposes a media player. A TV passing audio through reports no volume level, so the card shows no level bar for it.",
   power_action: "Leave empty to toggle the TV itself. Set it when something else does the switching — an IR or RF blaster, or a script that also powers a receiver.",
@@ -2731,7 +2740,7 @@ const Ni = {
 };
 let w = class extends z {
   constructor() {
-    super(...arguments), this._editing = null, this._openSection = null, this._computeLabel = (t) => ji[t.name] ?? t.name, this._computeHelper = (t) => Ki[t.name];
+    super(...arguments), this._editing = null, this._openSection = null, this._computeLabel = (t) => Ki[t.name] ?? t.name, this._computeHelper = (t) => Wi[t.name];
   }
   setConfig(t) {
     this._config = be(t);
@@ -2815,6 +2824,18 @@ let w = class extends z {
   }
   _isEditing(t, e) {
     return this._editing?.path === t && this._editing.index === e;
+  }
+  /**
+   * The reading that lights this tile, as typed.
+   *
+   * A comma separates several, because a box that takes one name and a box that
+   * takes a list are the same box to everyone who is not writing YAML.
+   */
+  _setActiveWhen(t, e, i) {
+    const o = i.split(",").map((n) => n.trim()).filter(Boolean);
+    this._updateTile(t, e, {
+      active_when: o.length === 0 ? void 0 : o.length === 1 ? o[0] : o
+    });
   }
   /** Change the action kind, carrying the old value across where it makes sense. */
   _setActionKind(t, e, i) {
@@ -2934,7 +2955,7 @@ let w = class extends z {
         <div class="tile-icon">${this._renderIcon(e)}</div>
         <div class="tile-info">
           <div class="primary"><span>${e.name ?? "Untitled app"}</span></div>
-          <div class="secondary"><span>${Ti(e.action, e.entity)}</span></div>
+          <div class="secondary"><span>${Si(e.action, e.entity)}</span></div>
         </div>
         <button
           class="icon-button"
@@ -2968,7 +2989,7 @@ let w = class extends z {
     `;
   }
   _renderAppForm(t, e, i) {
-    const o = mt(e.action), n = ee.find((s) => s.value === o), a = Wi(e.action);
+    const o = mt(e.action), n = ee.find((s) => s.value === o), a = Yi(e.action);
     return c`
       <li class="form-host">
         <div class="form">
@@ -3007,7 +3028,7 @@ let w = class extends z {
 
             ${t !== "apps" ? c`
                   <label class="field">
-                    <span>Lights up when this entity is on</span>
+                    <span>Lights up with this entity</span>
                     <ha-entity-picker
                       .hass=${this.hass}
                       .value=${e.entity ?? ""}
@@ -3017,6 +3038,43 @@ let w = class extends z {
     })}
                     ></ha-entity-picker>
                   </label>
+
+                  <!--
+                    Only once there is an entity to read: these two say how to
+                    read it, and mean nothing on their own.
+                  -->
+                  ${e.entity ? c`
+                        <label class="field">
+                          <span>Lit when it reads</span>
+                          <input
+                            type="text"
+                            .value=${Fi(e)}
+                            @change=${(s) => this._setActiveWhen(
+      t,
+      i,
+      s.target.value
+    )}
+                          />
+                        </label>
+                        <label class="field">
+                          <span>Read from</span>
+                          <input
+                            type="text"
+                            .value=${e.attribute ?? ""}
+                            placeholder="state"
+                            @change=${(s) => this._updateTile(t, i, {
+      attribute: s.target.value.trim() || void 0
+    })}
+                          />
+                        </label>
+                        <div class="hint">
+                          Leave the reading empty to light whenever the entity is
+                          on. For one button per receiver input, put the input's
+                          name in it and <code>source</code> in “Read from”;
+                          for a hub activity, the activity's name and nothing
+                          else. Separate several with a comma.
+                        </div>
+                      ` : d}
                 ` : d}
 
             <!-- Streaming logos are app suggestions; a section button is a
@@ -3063,7 +3121,7 @@ let w = class extends z {
                   <ha-form
                     .hass=${this.hass}
                     .data=${{ action: a }}
-                    .schema=${Bi}
+                    .schema=${ji}
                     .computeLabel=${() => "Action"}
                     @value-changed=${(s) => {
       s.stopPropagation();
@@ -3138,7 +3196,7 @@ let w = class extends z {
                 class="chip accent"
                 @click=${() => this._addTile("apps", {
       name: n ?? o,
-      icon: Fi(n ?? o),
+      icon: qi(n ?? o),
       action: { action: "app", app_id: o }
     })}
               >
@@ -3173,7 +3231,7 @@ let w = class extends z {
     </ul>`;
   }
   _renderLayoutRow(t, e, i, o) {
-    const n = t.type === "section" ? t : void 0, a = t.type === "section" ? void 0 : Ni[t.type], s = n?.buttons.length ?? 0, r = t.hidden ? "Hidden" : n ? `${s} ${s === 1 ? "button" : "buttons"}` : "";
+    const n = t.type === "section" ? t : void 0, a = t.type === "section" ? void 0 : Ui[t.type], s = n?.buttons.length ?? 0, r = t.hidden ? "Hidden" : n ? `${s} ${s === 1 ? "button" : "buttons"}` : "";
     return c`
       <li class="row ${t.hidden ? "inactive" : ""}">
         <div class="tile-icon">
@@ -3286,7 +3344,7 @@ let w = class extends z {
       <ha-form
         .hass=${this.hass}
         .data=${this._formData}
-        .schema=${Vi()}
+        .schema=${Bi()}
         .computeLabel=${this._computeLabel}
         .computeHelper=${this._computeHelper}
         @value-changed=${this._formChanged}
@@ -3341,7 +3399,7 @@ let w = class extends z {
         <ha-form
           .hass=${this.hass}
           .data=${this._formData}
-          .schema=${Ui}
+          .schema=${Ii}
           .computeLabel=${this._computeLabel}
           .computeHelper=${this._computeHelper}
           @value-changed=${this._formChanged}
@@ -3393,7 +3451,7 @@ let w = class extends z {
       <ha-form
         .hass=${this.hass}
         .data=${this._formData}
-        .schema=${Ii}
+        .schema=${Vi}
         .computeLabel=${this._computeLabel}
         .computeHelper=${this._computeHelper}
         @value-changed=${this._formChanged}
@@ -3664,18 +3722,21 @@ G([
   j({ attribute: !1 })
 ], w.prototype, "hass", 2);
 G([
-  H()
+  R()
 ], w.prototype, "_config", 2);
 G([
-  H()
+  R()
 ], w.prototype, "_editing", 2);
 G([
-  H()
+  R()
 ], w.prototype, "_openSection", 2);
 w = G([
   $t("polr-android-tv-remote-card-editor")
 ], w);
-const mt = (t) => t.action === "activity" || t.action === "app" || t.action === "key" ? t.action : "action", ie = (t) => {
+const mt = (t) => t.action === "activity" || t.action === "app" || t.action === "key" ? t.action : "action", Fi = (t) => {
+  const e = t.active_when;
+  return e === void 0 ? "" : Array.isArray(e) ? e.join(", ") : e;
+}, ie = (t) => {
   switch (t.action) {
     case "activity":
       return t.activity;
@@ -3686,7 +3747,7 @@ const mt = (t) => t.action === "activity" || t.action === "app" || t.action === 
     default:
       return "";
   }
-}, Wi = (t) => t.action === "service" ? ht(t.service, t.data, t.target) : mt(t) === "action" ? t : void 0, oe = (t, e) => {
+}, Yi = (t) => t.action === "service" ? ht(t.service, t.data, t.target) : mt(t) === "action" ? t : void 0, oe = (t, e) => {
   switch (t) {
     case "activity":
       return { action: "activity", activity: e };
@@ -3697,16 +3758,16 @@ const mt = (t) => t.action === "activity" || t.action === "app" || t.action === 
     case "action":
       return { action: "perform-action", perform_action: e };
   }
-}, Fi = (t) => {
+}, qi = (t) => {
   const e = Tt(t);
   return e ? `brand:${e}` : "mdi:application";
 };
-var Yi = Object.defineProperty, qi = Object.getOwnPropertyDescriptor, J = (t, e, i, o) => {
-  for (var n = o > 1 ? void 0 : o ? qi(e, i) : e, a = t.length - 1, s; a >= 0; a--)
+var Xi = Object.defineProperty, Zi = Object.getOwnPropertyDescriptor, J = (t, e, i, o) => {
+  for (var n = o > 1 ? void 0 : o ? Zi(e, i) : e, a = t.length - 1, s; a >= 0; a--)
     (s = t[a]) && (n = (o ? s(e, i, n) : s(n)) || n);
-  return o && n && Yi(e, i, n), n;
+  return o && n && Xi(e, i, n), n;
 };
-const Xi = "2.1.1-beta.11", rt = "polr-android-tv-remote-card";
+const Gi = "2.1.1-beta.11", rt = "polr-android-tv-remote-card";
 let T = class extends z {
   constructor() {
     super(...arguments), this._text = "", this._sending = !1;
@@ -3778,7 +3839,7 @@ let T = class extends z {
   }
   _press(t) {
     const e = this._device;
-    !this.hass || !this._config || !e || this._run(Ai(this.hass, this._config, e, t, this));
+    !this.hass || !this._config || !e || this._run(ki(this.hass, this._config, e, t, this));
   }
   /**
    * Press options for a button, folding in any configured interactions.
@@ -3804,14 +3865,14 @@ let T = class extends z {
   }
   _launch(t) {
     const e = this._device;
-    !this.hass || !e || this._run(ki(this.hass, e, t, this));
+    !this.hass || !e || this._run(Ti(this.hass, e, t, this));
   }
   async _sendText() {
     const t = this._device, e = this._text.trim();
     if (!(!this.hass || !t || !e)) {
       this._sending = !0;
       try {
-        await xi(this.hass, t, e), this._text = "";
+        await Ai(this.hass, t, e), this._text = "";
       } finally {
         this._sending = !1;
       }
@@ -3995,7 +4056,7 @@ let T = class extends z {
       t,
       (n, a) => `${i}:${a}:${n.icon ?? ""}`,
       (n) => {
-        const a = this.hass ? bi(this.hass, n.entity) : !1;
+        const a = this.hass ? yi(this.hass, n) : !1;
         return c`
               <button
                 class="app-tile ${a ? "active" : ""}"
@@ -4078,7 +4139,7 @@ let T = class extends z {
    * follows when the card is on.
    */
   _renderLayout(t) {
-    const e = this._config, i = t.on, o = (n) => n.hidden ? !1 : i || n.type === "section" || n.type === "apps" ? !0 : n.type === "volume" && wi(e, t);
+    const e = this._config, i = t.on, o = (n) => n.hidden ? !1 : i || n.type === "section" || n.type === "apps" ? !0 : n.type === "volume" && $i(e, t);
     return c`
       ${e.layout.map((n, a) => {
       if (!o(n)) return d;
@@ -4144,13 +4205,13 @@ J([
   j({ attribute: !1 })
 ], T.prototype, "hass", 2);
 J([
-  H()
+  R()
 ], T.prototype, "_config", 2);
 J([
-  H()
+  R()
 ], T.prototype, "_text", 2);
 J([
-  H()
+  R()
 ], T.prototype, "_sending", 2);
 T = J([
   $t(rt)
@@ -4163,9 +4224,9 @@ window.customCards.push({
   preview: !0,
   documentationURL: "https://github.com/pathofleastresistor/polr-android-tv-remote-card"
 });
-console.info(`%c ${rt} %c ${Xi} `, "background:#555;color:#fff", "background:#3f51b5;color:#fff");
+console.info(`%c ${rt} %c ${Gi} `, "background:#555;color:#fff", "background:#3f51b5;color:#fff");
 export {
-  Xi as CARD_VERSION,
+  Gi as CARD_VERSION,
   T as PolrAndroidTvRemoteCard
 };
 //# sourceMappingURL=polr-android-tv-remote-card.js.map
