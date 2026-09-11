@@ -232,6 +232,14 @@ If a soundbar or receiver exposes a media player, point the card at it:
 volume_entity: media_player.living_room_soundbar
 ```
 
+**The row outlives the TV.** A soundbar does not sleep when the set does, so
+when volume is routed away from the TV — `volume_entity` set to another entity,
+or a `tap_action` override on any of the three buttons — the row stays on an
+off TV, which is the only way to turn down music playing through it. On a plain
+TV it still disappears with the set, because the keys would reach a sleeping
+one. An off TV's own last-known level is never shown: it says nothing about what
+an IR bridge is driving, so there the row is three buttons and no readout.
+
 If volume goes through an **IR bridge**, there is usually no media player at all
 — instead you get one pressable entity per command. A Sofabaton X1S, for
 instance, exposes `button.<name>_volume_up`, `_volume_down` and `_volume_mute`:

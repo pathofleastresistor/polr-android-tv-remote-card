@@ -13,6 +13,7 @@ import { repeat } from "lit/directives/repeat.js";
 import {
   FEATURE,
   can,
+  hasExternalVolume,
   hasVolumeState,
   isActive,
   pressButton,
@@ -349,8 +350,15 @@ export class PolrAndroidTvRemoteCard extends LitElement {
    * When that is the case the control is just its icon.
    */
   private _renderVolume(device: DeviceState): TemplateResult {
-    const muted = device.muted === true;
-    const percent = hasVolumeState(device) ? Math.round(device.volume! * 100) : undefined;
+    // On an off TV the level and mute flag still sitting on its own player are
+    // the last thing it knew before it slept, and they say nothing about what
+    // an IR bridge is driving. Only a separately addressed volume entity -- a
+    // soundbar that is awake -- is reporting on the sound in the room.
+    const reported = device.on || device.volumeId !== device.playerId;
+    const muted = reported && device.muted === true;
+    const mutedKnown = reported && device.muted !== undefined;
+    const percent =
+      reported && hasVolumeState(device) ? Math.round(device.volume! * 100) : undefined;
 
     return html`
       <div class="features">
@@ -359,7 +367,7 @@ export class PolrAndroidTvRemoteCard extends LitElement {
           class="control-button volume-level ${muted ? "muted" : ""}"
           type="button"
           aria-label=${muted ? "Unmute" : "Mute"}
-          aria-pressed=${device.muted === undefined ? "undefined" : muted ? "true" : "false"}
+          aria-pressed=${mutedKnown ? (muted ? "true" : "false") : "undefined"}
           ${press(this._pressOptions("volume_mute"))}
         >
           <!-- Read-only by design: androidtv_remote supports VOLUME_STEP but
@@ -540,6 +548,12 @@ export class PolrAndroidTvRemoteCard extends LitElement {
                     <ha-icon icon="mdi:power"></ha-icon><span>Turn on</span>
                   </button>
                 </div>
+                <!-- A soundbar does not go to sleep with the TV: when volume is
+                     routed to one, the row is the only way to turn down music
+                     playing through it, so it outlives the set's power state. -->
+                ${config.show_volume && hasExternalVolume(config, device)
+                  ? this._renderVolume(device)
+                  : nothing}
                 ${this._renderCustomSections()}
                 ${config.show_apps ? this._renderApps() : nothing}
               `
