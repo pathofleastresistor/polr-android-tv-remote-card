@@ -400,6 +400,14 @@ Worth knowing, because it shapes the card:
 - **No volume setting.** Volume *steps* work, `volume_set` does not, so the
   level is read-only and often absent — see [Volume](#volume).
 - **No media title or artwork.** Only the app name is reported.
+- **App names are package ids** unless you have named the app in the
+  integration's own options, so the header would read `com.netflix.ninja` on a
+  TV that is plainly playing Netflix. The card translates the ones it knows —
+  the bundled brands and a short list of what actually runs on an Android TV,
+  the launcher included, which reads as "Home screen". An id it does not know
+  is left as it is rather than guessed at: "Android" for
+  `com.google.android.tv` would read as a name and be wrong. The id is also
+  exactly what you type into the integration's options to name it yourself.
 
 ## Migrating
 
