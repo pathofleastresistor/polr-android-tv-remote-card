@@ -210,6 +210,11 @@
         { title: "audio on a soundbar (no volume state)", config: { entity: "remote.main_tv", apps: APPS.slice(0, 5) }, hass: { playerAttrs: { volume_level: null, is_volume_muted: null } } },
         { title: "volume_entity -> soundbar", config: { entity: "remote.main_tv", volume_entity: "media_player.soundbar", apps: APPS.slice(0, 5) }, hass: { playerAttrs: { volume_level: null, is_volume_muted: null } } },
         { title: "TV off", config: { entity: "remote.main_tv", apps: APPS.slice(0, 4) }, hass: { playerState: "off" } },
+        // A soundbar does not sleep with the TV, so volume routed to one keeps
+        // its row on an off set -- the only way to turn down music playing
+        // through it. A plain TV off (above) still shows no volume row.
+        { title: "TV off, volume on the soundbar", config: { entity: "remote.main_tv", volume_entity: "media_player.soundbar", apps: APPS.slice(0, 4) }, hass: { playerState: "off" } },
+        { title: "TV off, IR volume buttons", config: { entity: "remote.main_tv", overrides: { volume_up: "button.baton_volume_up", volume_down: "button.baton_volume_down", volume_mute: "button.baton_volume_mute" }, apps: APPS.slice(0, 4) }, hass: { playerState: "off" } },
         { title: "custom section (labels on)", config: { entity: "remote.main_tv", show_section_labels: true, show_nav: false, show_transport: false, show_volume: false, apps: APPS.slice(0, 3), sections: [{ name: "Home theater", buttons: [
           { name: "Movie mode", icon: "mdi:theater", entity: "select.baton_activity", action: { action: "service", service: "select.select_option" } },
           { name: "Projector", icon: "mdi:projector", entity: "media_player.projector", action: { action: "service", service: "media_player.toggle" } },

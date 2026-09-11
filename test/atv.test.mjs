@@ -14,6 +14,7 @@ import {
   KEYS,
   can,
   canVolume,
+  hasExternalVolume,
   hasVolumeState,
   isActive,
   describeAction,
@@ -489,6 +490,79 @@ test("a volume override still beats volume_entity", async () => {
   assert.deepEqual(hass.calls, [
     { domain: "script", service: "louder", data: {}, target: undefined },
   ]);
+});
+
+/* ------------------------------------------------------------------------ *
+ * Volume that outlives the TV.
+ *
+ * A soundbar does not sleep when the set does, so the card keeps the volume row
+ * on an off TV -- but only where volume demonstrably goes somewhere other than
+ * the TV. On a plain TV the keys would reach a sleeping set, and a row that
+ * cannot work is worse than no row.
+ * ------------------------------------------------------------------------ */
+
+test("volume routed to the TV's own player is not external", () => {
+  const hass = fixture();
+  assert.equal(hasExternalVolume(config(), readDevice(hass, config())), false);
+});
+
+test("volume_entity pointing elsewhere is external", () => {
+  const hass = fixture();
+  hass.states["media_player.soundbar"] = {
+    entity_id: "media_player.soundbar",
+    state: "on",
+    attributes: { supported_features: FEATURE.VOLUME_STEP, volume_level: 0.62 },
+  };
+  const cfg = config({ volume_entity: "media_player.soundbar" });
+  assert.equal(hasExternalVolume(cfg, readDevice(hass, cfg)), true);
+});
+
+test("volume_entity aimed back at the paired player is not external", () => {
+  // Spelling out the player the card would have chosen anyway changes nothing:
+  // the keys still go to the TV, so an off TV still has no volume row.
+  const hass = fixture();
+  const cfg = config({ volume_entity: "media_player.main_tv" });
+  assert.equal(hasExternalVolume(cfg, readDevice(hass, cfg)), false);
+});
+
+test("an IR bridge on one volume button is external", () => {
+  // The Sofabaton case: three pressable entities, no media player in sight.
+  const hass = fixture();
+  const cfg = config({ overrides: { volume_up: "button.baton_volume_up" } });
+  assert.equal(hasExternalVolume(cfg, readDevice(hass, cfg)), true);
+});
+
+test("an override the card would not run does not make volume external", () => {
+  // A hold-only override still leaves the tap sending a key code to the TV, and
+  // `action: none` deliberately does nothing at all. Neither reaches a soundbar.
+  const hass = fixture();
+  const holdOnly = config({ overrides: { volume_up: { hold_action: { action: "more-info" } } } });
+  assert.equal(hasExternalVolume(holdOnly, readDevice(hass, holdOnly)), false);
+
+  const inert = config({ overrides: { volume_mute: { tap_action: { action: "none" } } } });
+  assert.equal(hasExternalVolume(inert, readDevice(hass, inert)), false);
+});
+
+test("external volume is readable while the TV is off", () => {
+  // The whole point: the soundbar is playing, the set is not, and the card can
+  // still show and change the level.
+  const hass = fixture({ playerState: "off", remoteState: "off" });
+  hass.states["media_player.soundbar"] = {
+    entity_id: "media_player.soundbar",
+    state: "playing",
+    attributes: {
+      supported_features: FEATURE.VOLUME_STEP,
+      volume_level: 0.31,
+      is_volume_muted: false,
+    },
+  };
+  const cfg = config({ volume_entity: "media_player.soundbar" });
+  const device = readDevice(hass, cfg);
+
+  assert.equal(device.on, false);
+  assert.equal(hasExternalVolume(cfg, device), true);
+  assert.equal(hasVolumeState(device), true);
+  assert.equal(device.volume, 0.31);
 });
 
 test("app_id is exposed so the editor can capture the running app", () => {

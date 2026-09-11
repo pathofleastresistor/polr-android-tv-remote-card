@@ -238,6 +238,30 @@ export const canVolume = (device: DeviceState, feature: number): boolean =>
 export const hasVolumeState = (device: DeviceState): boolean =>
   device.volume !== undefined;
 
+/** The three buttons the volume row draws. */
+const VOLUME_BUTTONS: ButtonId[] = ["volume_up", "volume_down", "volume_mute"];
+
+/**
+ * Does volume reach the speakers by some route other than the TV?
+ *
+ * It matters because a TV that is off still has a soundbar next to it: music
+ * from a Chromecast, a turntable through the receiver, anything at all. When
+ * volume is the TV's own, the keys go to a sleeping set and the row is dead
+ * weight; when it is not, the row is the only way to turn the music down.
+ *
+ * Two configurations say so and the card can see both: `volume_entity` pointing
+ * somewhere other than the paired player, and an override on any of the three
+ * buttons, which is how an IR bridge is wired. The override test matches what
+ * pressButton actually does — a tap_action it would run, not merely a key in
+ * the map — so a button that only carries a hold_action does not count.
+ */
+export const hasExternalVolume = (
+  config: ResolvedConfig,
+  device: DeviceState,
+): boolean =>
+  (config.volume_entity !== undefined && config.volume_entity !== device.playerId) ||
+  VOLUME_BUTTONS.some((button) => isActionable(config.overrides[button]?.tap_action));
+
 const callService = (
   hass: HomeAssistant,
   action: ServiceAction,
