@@ -114,6 +114,23 @@ export interface TileConfig {
    * no entity, so its tile is simply never lit rather than shown as off.
    */
   entity?: string;
+  /**
+   * The reading that counts as lit, when "on" is not the question.
+   *
+   * A receiver is on whichever input it is on, so a row of input buttons is
+   * three tiles all lit at once by the same entity being on -- which tells you
+   * nothing about which input is selected. Naming the reading makes the tile
+   * light for its own input and no other. Several may be named, for a thing
+   * that answers to more than one word.
+   */
+  active_when?: string | string[];
+  /**
+   * Where to read it. Defaults to the entity's state.
+   *
+   * A receiver's input is an attribute (`source`), not its state -- its state
+   * is "on". A hub activity is the state. Both are common, so both work.
+   */
+  attribute?: string;
   action: AppAction;
 }
 

@@ -201,6 +201,31 @@ optional **`entity`**: name one and the tile lights up while that entity is on,
 using the same colour the header does. Name none and the tile is simply never
 lit — the card will not claim to know a state it cannot see.
 
+**One button per input.** "Is it on" is the wrong question for a row of
+receiver inputs: the receiver is on for every one of them, so every tile lights
+at once and none of them tells you which input is selected. Name the reading
+that counts instead:
+
+```yaml
+- name: Google TV
+  icon: mdi:cast
+  entity: media_player.living_room_avr
+  attribute: source          # where to read it; omit for the entity's state
+  active_when: Google TV     # lit only while that is what it reads
+  action:
+    action: perform-action
+    perform_action: media_player.select_source
+    target: { entity_id: media_player.living_room_avr }
+    data: { source: Google TV }
+```
+
+`attribute` is for readings that are not the state — a receiver's input is its
+`source` attribute, while a hub activity *is* the state, so that one needs no
+attribute at all. `active_when` takes a list for anything that answers to more
+than one name (`[Cable, CBL/SAT]`), and readings match however they were typed:
+the name is written twice, once in the integration that publishes it and once
+here, and a stray capital is not a different input.
+
 A real example. Turning this home theatre on is four controls: a hub activity, a
 projector, a soundbar reachable only over IR, and the streamer itself. The
 activity fires all of them, but IR is one-way, so a device can miss the command

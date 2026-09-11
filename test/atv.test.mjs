@@ -17,6 +17,7 @@ import {
   hasExternalVolume,
   hasVolumeState,
   isActive,
+  isTileActive,
   describeAction,
   pressButton,
   readDevice,
@@ -724,6 +725,98 @@ test("sendKey targets the remote entity", async () => {
 /* ------------------------------------------------------------------------ *
  * Tile state.
  * ------------------------------------------------------------------------ */
+
+/* ------------------------------------------------------------------------ *
+ * Which tile in a row is lit.
+ *
+ * A receiver is on whichever input it is on, so a row of input buttons sharing
+ * one entity lit all of them at once -- three tiles claiming to be the current
+ * source. `active_when` names the reading that counts as lit instead.
+ * ------------------------------------------------------------------------ */
+
+/** A hass double holding one entity, with attributes. */
+const holding = (entity_id, state, attributes = {}) => ({
+  states: { [entity_id]: { entity_id, state, attributes } },
+});
+
+test("a tile without active_when is lit by the old question: is it on", () => {
+  const hass = holding("media_player.avr", "on");
+  assert.equal(isTileActive(hass, { entity: "media_player.avr", action: { action: "none" } }), true);
+  const off = holding("media_player.avr", "off");
+  assert.equal(isTileActive(off, { entity: "media_player.avr", action: { action: "none" } }), false);
+});
+
+test("active_when lights the input that is selected, and only that one", () => {
+  const hass = holding("media_player.avr", "on", { source: "Google TV" });
+  const tile = (source) => ({
+    entity: "media_player.avr",
+    attribute: "source",
+    active_when: source,
+    action: { action: "none" },
+  });
+  assert.equal(isTileActive(hass, tile("Google TV")), true);
+  assert.equal(isTileActive(hass, tile("Radio")), false, "the receiver is on for this one too");
+});
+
+test("without an attribute it reads the state, which is what a hub activity is", () => {
+  const hass = holding("select.baton_activity", "Google TV");
+  assert.equal(
+    isTileActive(hass, {
+      entity: "select.baton_activity",
+      active_when: "Google TV",
+      action: { action: "none" },
+    }),
+    true,
+  );
+});
+
+test("several readings can count, for a thing with more than one name", () => {
+  const hass = holding("media_player.avr", "on", { source: "CBL/SAT" });
+  assert.equal(
+    isTileActive(hass, {
+      entity: "media_player.avr",
+      attribute: "source",
+      active_when: ["Cable", "CBL/SAT"],
+      action: { action: "none" },
+    }),
+    true,
+  );
+});
+
+test("readings match however they were typed", () => {
+  // The name is written twice -- once in the integration, once here -- and a
+  // stray capital or space is not a different input.
+  const hass = holding("media_player.avr", "on", { source: "Google TV" });
+  for (const want of ["google tv", "  Google TV  ", "GOOGLE TV"]) {
+    assert.equal(
+      isTileActive(hass, {
+        entity: "media_player.avr",
+        attribute: "source",
+        active_when: want,
+        action: { action: "none" },
+      }),
+      true,
+      want,
+    );
+  }
+});
+
+test("a reading the card cannot see is not lit rather than guessed at", () => {
+  const missing = holding("media_player.avr", "on");
+  const tile = {
+    entity: "media_player.avr",
+    attribute: "source",
+    active_when: "Google TV",
+    action: { action: "none" },
+  };
+  assert.equal(isTileActive(missing, tile), false, "no such attribute");
+  assert.equal(isTileActive({ states: {} }, tile), false, "no such entity");
+  assert.equal(
+    isTileActive(missing, { active_when: "Google TV", action: { action: "none" } }),
+    false,
+    "no entity named at all, as an IR button has none",
+  );
+});
 
 test("isActive treats the usual off-ish states as off", () => {
   const hass = makeHass({

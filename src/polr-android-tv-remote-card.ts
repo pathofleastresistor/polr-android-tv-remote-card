@@ -15,7 +15,7 @@ import {
   can,
   hasExternalVolume,
   hasVolumeState,
-  isActive,
+  isTileActive,
   pressButton,
   readDevice,
   runAppAction,
@@ -470,7 +470,7 @@ export class PolrAndroidTvRemoteCard extends LitElement {
           (tile) => {
             // A tile with no entity is never lit: an IR command has no state,
             // and showing it as off would be a claim the card cannot make.
-            const active = this.hass ? isActive(this.hass, tile.entity) : false;
+            const active = this.hass ? isTileActive(this.hass, tile) : false;
             return html`
               <button
                 class="app-tile ${active ? "active" : ""}"
