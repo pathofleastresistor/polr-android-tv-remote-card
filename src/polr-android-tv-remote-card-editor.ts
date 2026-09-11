@@ -897,8 +897,68 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
       ha-expansion-panel > ha-icon[slot="leading-icon"] {
         color: var(--secondary-text-color);
       }
+      ha-icon-picker,
+      ha-entity-picker {
+        display: block;
+      }
+
+      /* ------------------------------------------------------- rhythm -- */
+      /*
+       * One vertical rhythm for the whole editor.
+       *
+       * Every part of these panels comes from the card kit, where an element
+       * pads itself because it sits straight on a card. Stacked inside a panel
+       * that already pads its content, those paddings disagreed: a section head
+       * inset 12px, the list under it 8px, a form 8px again -- so a section's
+       * name, the rows beneath it and the button below them each started at a
+       * different x. Vertically it was worse, because nothing owned the gaps at
+       * all: a name field sat flush against its first row, and the last row
+       * flush against "Add button".
+       *
+       * The rule is now: the panel owns the inset, the stack owns the gaps, and
+       * the parts own neither. One 4 / 8 / 16 scale -- rows within a list, parts
+       * within a section, blocks within the panel.
+       */
       ha-expansion-panel .content {
-        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: var(--ha-space-4, 16px);
+        padding: var(--ha-space-3, 12px);
+      }
+      ha-expansion-panel .content ha-form {
+        display: block;
+        margin-bottom: 0;
+      }
+      /* The parts stop insetting themselves; the panel and the block do it. */
+      ha-expansion-panel .content .section-head,
+      ha-expansion-panel .content ul.list,
+      ha-expansion-panel .content .chips,
+      ha-expansion-panel .content .hint,
+      ha-expansion-panel .content .empty-state,
+      ha-expansion-panel .content .form {
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 0;
+        padding-right: 0;
+      }
+      /* The kit gives whatever ends a card its breathing room; here the panel
+         padding already is that room, and the two stacked to 24px. */
+      ha-expansion-panel .content .chips,
+      ha-expansion-panel .content .hint,
+      ha-expansion-panel .content ul.list,
+      ha-expansion-panel .content .empty-state,
+      ha-expansion-panel .content .form {
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+      /*
+       * A heading belongs to what follows it, so it sits nearer that than the
+       * block above -- otherwise "Apps" floated equidistant between its own
+       * list and the settings above, attached to neither. Direct children only:
+       * inside a section block the gap is already 8px.
+       */
+      ha-expansion-panel .content > .section-head + * {
+        margin-top: calc(-1 * var(--ha-space-2, 8px));
       }
       /*
        * A section owns its name, its buttons and its "Add button" control, so
@@ -906,25 +966,22 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
        * section" sat flush against each other and read as one pair of controls
        * at the same level, which they are not.
        */
-      ha-icon-picker,
-      ha-entity-picker {
-        display: block;
-      }
       .section-block {
+        display: flex;
+        flex-direction: column;
+        gap: var(--ha-space-2, 8px);
         padding: var(--ha-space-3, 12px);
-        margin-bottom: var(--ha-space-3, 12px);
         border-radius: var(--radius-md);
         background-color: rgba(var(--rgb-primary-text-color, 0, 0, 0), 0.04);
       }
+      /*
+       * This head holds the name field rather than a label, so its button lines
+       * up with the input and not with the caption above it, and it drops the
+       * 40px floor that would otherwise pad a two-line control.
+       */
       .section-block .section-head {
-        margin-top: 0;
-      }
-      .form-actions.add-section {
-        margin-top: var(--ha-space-4, 16px);
-      }
-      ha-expansion-panel .content ha-form {
-        display: block;
-        margin-bottom: 0;
+        align-items: flex-end;
+        min-height: 0;
       }
       /* The kit sizes icon buttons for a card; an editor row is tighter. */
       .icon-button {
