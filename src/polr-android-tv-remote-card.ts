@@ -43,7 +43,7 @@ import { stateColor, type HomeAssistant } from "./kit/types";
 import "./nav-pad";
 import "./polr-android-tv-remote-card-editor";
 
-export const CARD_VERSION = "2.1.1-beta.10";
+export const CARD_VERSION = "2.1.1-beta.11";
 
 const CARD_TYPE = "polr-android-tv-remote-card";
 
