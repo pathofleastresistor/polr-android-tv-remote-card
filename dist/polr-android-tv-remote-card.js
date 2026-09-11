@@ -3374,7 +3374,7 @@ var Io = Object.defineProperty, Ho = Object.getOwnPropertyDescriptor, Z = (t, e,
     (a = t[s]) && (n = (i ? a(e, o, n) : a(n)) || n);
   return i && n && Io(e, o, n), n;
 };
-const Lo = "2.1.1-beta.4", st = "polr-android-tv-remote-card";
+const Lo = "2.1.1-beta.5", st = "polr-android-tv-remote-card";
 let z = class extends C {
   constructor() {
     super(...arguments), this._text = "", this._sending = !1;
