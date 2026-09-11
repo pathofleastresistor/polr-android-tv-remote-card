@@ -40,8 +40,13 @@ const DOUBLE_TAP_MS = 250;
  * Beyond this the gesture is a scroll or a drag, and the press is abandoned.
  * Chrome's own touch slop is 8px; a little more is forgiving of thumbs without
  * making a deliberate tap hard to land.
+ *
+ * Exported because the volume bar is both a button and a slider, and the two
+ * have to agree about where one gesture stops being the other: the drag starts
+ * on the pixel the tap is abandoned on, or there is a band where a finger does
+ * both or neither.
  */
-const SLOP_PX = 12;
+export const SLOP_PX = 12;
 
 export interface PressOptions {
   /** Runs on release, and on every repeat while held. */

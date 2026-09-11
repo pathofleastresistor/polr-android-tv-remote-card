@@ -13,8 +13,10 @@
  *      system `remote.gym_tv` pairs with `media_player.gym_tv_2` — so they are
  *      paired by device_id, never by string manipulation.
  *   2. The media_player supports neither SELECT_SOURCE nor VOLUME_SET. There is
- *      no source list to read apps from, and volume is step-only, which is why
- *      the card renders a volume *bar* and not a slider.
+ *      no source list to read apps from, and the TV's own volume is step-only,
+ *      which is why the volume control is a bar with arrows either side. A
+ *      soundbar or receiver named by `volume_entity` usually does advertise
+ *      VOLUME_SET, and then the same bar can be dragged -- see setVolume.
  */
 
 import { isActionable, runAction, splitService, type ActionConfig } from "./actions";
@@ -317,6 +319,37 @@ export const sendKey = (
     entity_id: device.remoteId,
     command,
   });
+
+/**
+ * Set the volume outright, where the target can be told a level.
+ *
+ * The TV's own player cannot: androidtv_remote exposes VOLUME_STEP and nothing
+ * else, so volume there is arrows-only and always will be. A soundbar or
+ * receiver named by `volume_entity` is a different device with a different
+ * feature mask, and those usually do advertise VOLUME_SET -- so whether the bar
+ * can be dragged is read off the capability bit, never off config.
+ *
+ * Refuses rather than guesses when the bit is absent: media_player.volume_set
+ * against a target that does not support it is an error in the HA log on every
+ * drag, and the alternative -- converting a level into a burst of steps -- is
+ * the card inventing a capability the device declined to offer.
+ *
+ * Clamped because the level comes from a pointer against a box: a finger past
+ * the left edge of the bar is asking for zero, not for -0.04.
+ */
+export const setVolume = (
+  hass: HomeAssistant,
+  device: DeviceState,
+  level: number,
+): Promise<unknown> => {
+  if (!device.volumeId || !canVolume(device, FEATURE.VOLUME_SET)) {
+    return Promise.resolve();
+  }
+  return hass.callService("media_player", "volume_set", {
+    entity_id: device.volumeId,
+    volume_level: Math.min(1, Math.max(0, level)),
+  });
+};
 
 /**
  * Type text on the TV.

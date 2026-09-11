@@ -290,6 +290,42 @@ export const remoteStyles = css`
     filter: grayscale(1);
     opacity: 0.2;
   }
+  /*
+   * The same bar, where the target can be told a level outright.
+   *
+   * pan-y is the whole of the gesture negotiation: vertical stays the
+   * browser's, so the dashboard scrolls off this control as it does off any
+   * other, and horizontal is left to the card, so a drag along the bar is
+   * never stolen as a page pan halfway through.
+   */
+  .volume-level.settable {
+    cursor: ew-resize;
+    touch-action: pan-y;
+  }
+  /* The only affordance it gets: a lit edge where the fill ends, which reads
+     as something to take hold of without adding a knob to a 40px bar.
+     Inside the width rather than added to it, or the fill would sit two
+     pixels past the level it is claiming. */
+  .volume-level.settable .level {
+    box-sizing: border-box;
+    border-right: 2px solid var(--tile-color);
+  }
+  /*
+   * No press-shrink on a bar you drag along.
+   *
+   * .pressed scales the control, which moves the box the pointer is measured
+   * against -- so the level would jump by a couple of percent the instant a
+   * finger landed, before it had moved at all. The mute state flipping is
+   * feedback enough for the tap, and the fill is feedback for the drag.
+   */
+  .volume-level.settable.pressed {
+    transform: none;
+  }
+  /* A transition here is a lag between the finger and the fill, which reads as
+     a bar that does not quite believe you. */
+  .volume-level.dragging .level {
+    transition: none;
+  }
 
   /* ------------------------------------------------------------ app grid -- */
   /*
