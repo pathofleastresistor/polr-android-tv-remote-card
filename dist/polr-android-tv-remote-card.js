@@ -3605,7 +3605,7 @@ var Ki = Object.defineProperty, Wi = Object.getOwnPropertyDescriptor, J = (t, e,
     (a = t[s]) && (n = (o ? a(e, i, n) : a(n)) || n);
   return o && n && Ki(e, i, n), n;
 };
-const Fi = "2.1.1-beta.7", rt = "polr-android-tv-remote-card";
+const Fi = "2.1.1-beta.8", rt = "polr-android-tv-remote-card";
 let S = class extends z {
   constructor() {
     super(...arguments), this._text = "", this._sending = !1;
