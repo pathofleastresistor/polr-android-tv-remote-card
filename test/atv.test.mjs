@@ -335,8 +335,7 @@ test("text is sent as a text:-prefixed command", async () => {
 test("an activity app launches via remote.turn_on", async () => {
   const hass = fixture();
   await runAppAction(hass, readDevice(hass, config()), {
-    action: "activity",
-    activity: "https://www.netflix.com/title",
+    action: { action: "activity", activity: "https://www.netflix.com/title" },
   });
   assert.deepEqual(hass.calls[0], {
     domain: "remote",
@@ -349,8 +348,7 @@ test("an activity app launches via remote.turn_on", async () => {
 test("an app-id app launches via media_player.play_media", async () => {
   const hass = fixture();
   await runAppAction(hass, readDevice(hass, config()), {
-    action: "app",
-    app_id: "com.netflix.ninja",
+    action: { action: "app", app_id: "com.netflix.ninja" },
   });
   assert.deepEqual(hass.calls[0].data, {
     entity_id: "media_player.main_tv",
@@ -363,7 +361,7 @@ test("an app-id app without a paired player rejects rather than calling nothing"
   const hass = fixture();
   const cfg = config({ entity: "remote.orphan_tv" });
   await assert.rejects(
-    () => runAppAction(hass, readDevice(hass, cfg), { action: "app", app_id: "x" }),
+    () => runAppAction(hass, readDevice(hass, cfg), { action: { action: "app", app_id: "x" } }),
     /media_player/,
   );
   assert.equal(hass.calls.length, 0);
@@ -372,9 +370,7 @@ test("an app-id app without a paired player rejects rather than calling nothing"
 test("a service app calls the service it names", async () => {
   const hass = fixture();
   await runAppAction(hass, readDevice(hass, config()), {
-    action: "service",
-    service: "script.movie_night",
-    data: { brightness: 10 },
+    action: { action: "service", service: "script.movie_night", data: { brightness: 10 } },
   });
   assert.deepEqual(hass.calls[0], {
     domain: "script",
@@ -387,7 +383,10 @@ test("a service app calls the service it names", async () => {
 test("a malformed service name rejects instead of calling a wrong service", async () => {
   const hass = fixture();
   await assert.rejects(
-    () => runAppAction(hass, readDevice(hass, config()), { action: "service", service: "oops" }),
+    () =>
+      runAppAction(hass, readDevice(hass, config()), {
+        action: { action: "service", service: "oops" },
+      }),
     /invalid service/,
   );
   assert.equal(hass.calls.length, 0);
@@ -734,10 +733,12 @@ test("a tile can perform any HA action, with data and a target", async () => {
   const hass = fixture();
   const device = readDevice(hass, config());
   await runAppAction(hass, device, {
-    action: "perform-action",
-    perform_action: "select.select_option",
-    target: { entity_id: "select.baton_activity" },
-    data: { option: "Google TV" },
+    action: {
+      action: "perform-action",
+      perform_action: "select.select_option",
+      target: { entity_id: "select.baton_activity" },
+      data: { option: "Google TV" },
+    },
   }, node());
   assert.deepEqual(hass.calls[0], {
     domain: "select",
@@ -751,9 +752,7 @@ test("v1's bare {action: service} tiles still run", async () => {
   const hass = fixture();
   const device = readDevice(hass, config());
   await runAppAction(hass, device, {
-    action: "service",
-    service: "script.movie_night",
-    data: { room: "media" },
+    action: { action: "service", service: "script.movie_night", data: { room: "media" } },
   }, node());
   assert.deepEqual(hass.calls[0], {
     domain: "script",
@@ -766,18 +765,95 @@ test("v1's bare {action: service} tiles still run", async () => {
 test("a tile can toggle, which needs the fallback entity", async () => {
   const hass = fixture();
   const device = readDevice(hass, config());
-  await runAppAction(hass, device, { action: "toggle" }, node());
+  await runAppAction(hass, device, { action: { action: "toggle" } }, node());
   assert.deepEqual(hass.calls[0].data, { entity_id: "remote.main_tv" });
+});
+
+/* ------------------------------------------------------------------------ *
+ * Which entity a bare action lands on.
+ *
+ * HA's interactions editor has no entity field for "more info": in HA's own
+ * cards the dialog is always the card's entity. Here the card's entity is a
+ * remote, so a section button's dialog opened the one thing the button was
+ * certainly not about -- never the receiver it lights up for.
+ * ------------------------------------------------------------------------ */
+
+/** A node double that records the more-info dialogs it is asked to open. */
+const dialogNode = () => {
+  const opened = [];
+  return {
+    opened,
+    dispatchEvent(event) {
+      if (event.type === "hass-more-info") opened.push(event.detail.entityId);
+      return true;
+    },
+  };
+};
+
+test("more info on a tile opens the tile's own entity", async () => {
+  const hass = fixture();
+  const device = readDevice(hass, config());
+  const el = dialogNode();
+  await runAppAction(
+    hass,
+    device,
+    { entity: "media_player.soundbar", action: { action: "more-info" } },
+    el,
+  );
+  assert.deepEqual(el.opened, ["media_player.soundbar"]);
+});
+
+test("an entity on the action beats the tile's own", async () => {
+  const hass = fixture();
+  const device = readDevice(hass, config());
+  const el = dialogNode();
+  await runAppAction(
+    hass,
+    device,
+    {
+      entity: "media_player.soundbar",
+      action: { action: "more-info", entity: "media_player.projector" },
+    },
+    el,
+  );
+  assert.deepEqual(el.opened, ["media_player.projector"]);
+});
+
+test("a tile with nothing to name falls back to the card's remote", async () => {
+  const hass = fixture();
+  const device = readDevice(hass, config());
+  const el = dialogNode();
+  await runAppAction(hass, device, { action: { action: "more-info" } }, el);
+  assert.deepEqual(el.opened, ["remote.main_tv"]);
+});
+
+test("toggle follows the same order as more info", async () => {
+  // Same reasoning, and HA's config has nowhere to name an entity for toggle at
+  // all -- so the tile's own is the only way to mean anything but the remote.
+  const hass = fixture();
+  const device = readDevice(hass, config());
+  await runAppAction(
+    hass,
+    device,
+    { entity: "media_player.projector", action: { action: "toggle" } },
+    node(),
+  );
+  assert.deepEqual(hass.calls[0], {
+    domain: "homeassistant",
+    service: "toggle",
+    data: { entity_id: "media_player.projector" },
+    target: undefined,
+  });
 });
 
 test("the three shorthands are untouched", async () => {
   const hass = fixture();
   const device = readDevice(hass, config());
-  await runAppAction(hass, device, { action: "key", key: "GUIDE" }, node());
+  await runAppAction(hass, device, { action: { action: "key", key: "GUIDE" } }, node());
   assert.equal(hass.calls[0].data.command, "GUIDE");
 
   hass.calls.length = 0;
-  await runAppAction(hass, device, { action: "activity", activity: "HULU" }, node());
+  await runAppAction(hass, device, { action: { action: "activity", activity: "HULU" } }, node());
   assert.equal(hass.calls[0].data.activity, "HULU");
 });
 
@@ -789,4 +865,24 @@ test("describeAction summarises the new kinds for the editor list", () => {
   assert.equal(describeAction({ action: "navigate", navigation_path: "/tv" }), "Go to /tv");
   assert.equal(describeAction({ action: "toggle" }), "Toggle the TV");
   assert.equal(describeAction({ action: "none" }), "Do nothing");
+});
+
+test("the list row names the entity a bare action will land on", () => {
+  // "Toggle the TV" on a button that toggles a projector is a row lying about
+  // what it does, and the row is all the editor shows until you open it.
+  assert.equal(
+    describeAction({ action: "toggle" }, "media_player.projector"),
+    "Toggle media_player.projector",
+  );
+  assert.equal(
+    describeAction({ action: "more-info" }, "media_player.soundbar"),
+    "Show media_player.soundbar",
+  );
+  assert.equal(
+    describeAction({ action: "more-info", entity: "media_player.turntable" }, "media_player.soundbar"),
+    "Show media_player.turntable",
+    "the action's own entity wins, as it does when the button is pressed",
+  );
+  // A tile with nothing to name keeps the old wording: the card's remote.
+  assert.equal(describeAction({ action: "more-info" }), "Show more info");
 });

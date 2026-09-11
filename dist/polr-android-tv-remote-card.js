@@ -75,7 +75,7 @@ const { is: $e, defineProperty: xe, getOwnPropertyDescriptor: Ae, getOwnProperty
   return o;
 } }, gt = (t, e) => !$e(t, e), Mt = { attribute: !0, type: String, converter: J, reflect: !1, useDefault: !1, hasChanged: gt };
 Symbol.metadata ??= Symbol("metadata"), ot.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
-let D = class extends HTMLElement {
+let U = class extends HTMLElement {
   static addInitializer(e) {
     this._$Ei(), (this.l ??= []).push(e);
   }
@@ -256,18 +256,18 @@ let D = class extends HTMLElement {
   firstUpdated(e) {
   }
 };
-D.elementStyles = [], D.shadowRootOptions = { mode: "open" }, D[W("elementProperties")] = /* @__PURE__ */ new Map(), D[W("finalized")] = /* @__PURE__ */ new Map(), Pe?.({ ReactiveElement: D }), (ot.reactiveElementVersions ??= []).push("2.1.2");
+U.elementStyles = [], U.shadowRootOptions = { mode: "open" }, U[W("elementProperties")] = /* @__PURE__ */ new Map(), U[W("finalized")] = /* @__PURE__ */ new Map(), Pe?.({ ReactiveElement: U }), (ot.reactiveElementVersions ??= []).push("2.1.2");
 /**
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const bt = globalThis, zt = (t) => t, Q = bt.trustedTypes, Rt = Q ? Q.createPolicy("lit-html", { createHTML: (t) => t }) : void 0, ne = "$lit$", A = `lit$${Math.random().toFixed(9).slice(2)}$`, ae = "?" + A, Ce = `<${ae}>`, M = document, Y = () => M.createComment(""), q = (t) => t === null || typeof t != "object" && typeof t != "function", yt = Array.isArray, Oe = (t) => yt(t) || typeof t?.[Symbol.iterator] == "function", ct = `[ 	
-\f\r]`, B = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Ut = /-->/g, Dt = />/g, k = RegExp(`>|${ct}(?:([^\\s"'>=/]+)(${ct}*=${ct}*(?:[^ 	
-\f\r"'\`<>=]|("|')|))|$)`, "g"), Nt = /'/g, It = /"/g, se = /^(?:script|style|textarea|title)$/i, re = (t) => (e, ...o) => ({ _$litType$: t, strings: e, values: o }), h = re(1), Me = re(2), w = Symbol.for("lit-noChange"), d = Symbol.for("lit-nothing"), Ht = /* @__PURE__ */ new WeakMap(), P = M.createTreeWalker(M, 129);
+const bt = globalThis, zt = (t) => t, Q = bt.trustedTypes, Dt = Q ? Q.createPolicy("lit-html", { createHTML: (t) => t }) : void 0, ne = "$lit$", A = `lit$${Math.random().toFixed(9).slice(2)}$`, ae = "?" + A, Ce = `<${ae}>`, M = document, Y = () => M.createComment(""), q = (t) => t === null || typeof t != "object" && typeof t != "function", yt = Array.isArray, Oe = (t) => yt(t) || typeof t?.[Symbol.iterator] == "function", ct = `[ 	
+\f\r]`, B = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Rt = /-->/g, Ut = />/g, k = RegExp(`>|${ct}(?:([^\\s"'>=/]+)(${ct}*=${ct}*(?:[^ 	
+\f\r"'\`<>=]|("|')|))|$)`, "g"), Nt = /'/g, Ht = /"/g, se = /^(?:script|style|textarea|title)$/i, re = (t) => (e, ...o) => ({ _$litType$: t, strings: e, values: o }), l = re(1), Me = re(2), w = Symbol.for("lit-noChange"), d = Symbol.for("lit-nothing"), It = /* @__PURE__ */ new WeakMap(), P = M.createTreeWalker(M, 129);
 function ce(t, e) {
   if (!yt(t) || !t.hasOwnProperty("raw")) throw Error("invalid template strings array");
-  return Rt !== void 0 ? Rt.createHTML(e) : e;
+  return Dt !== void 0 ? Dt.createHTML(e) : e;
 }
 const ze = (t, e) => {
   const o = t.length - 1, i = [];
@@ -275,9 +275,9 @@ const ze = (t, e) => {
   for (let c = 0; c < o; c++) {
     const r = t[c];
     let m, f, p = -1, u = 0;
-    for (; u < r.length && (a.lastIndex = u, f = a.exec(r), f !== null); ) u = a.lastIndex, a === B ? f[1] === "!--" ? a = Ut : f[1] !== void 0 ? a = Dt : f[2] !== void 0 ? (se.test(f[2]) && (n = RegExp("</" + f[2], "g")), a = k) : f[3] !== void 0 && (a = k) : a === k ? f[0] === ">" ? (a = n ?? B, p = -1) : f[1] === void 0 ? p = -2 : (p = a.lastIndex - f[2].length, m = f[1], a = f[3] === void 0 ? k : f[3] === '"' ? It : Nt) : a === It || a === Nt ? a = k : a === Ut || a === Dt ? a = B : (a = k, n = void 0);
-    const l = a === k && t[c + 1].startsWith("/>") ? " " : "";
-    s += a === B ? r + Ce : p >= 0 ? (i.push(m), r.slice(0, p) + ne + r.slice(p) + A + l) : r + A + (p === -2 ? c : l);
+    for (; u < r.length && (a.lastIndex = u, f = a.exec(r), f !== null); ) u = a.lastIndex, a === B ? f[1] === "!--" ? a = Rt : f[1] !== void 0 ? a = Ut : f[2] !== void 0 ? (se.test(f[2]) && (n = RegExp("</" + f[2], "g")), a = k) : f[3] !== void 0 && (a = k) : a === k ? f[0] === ">" ? (a = n ?? B, p = -1) : f[1] === void 0 ? p = -2 : (p = a.lastIndex - f[2].length, m = f[1], a = f[3] === void 0 ? k : f[3] === '"' ? Ht : Nt) : a === Ht || a === Nt ? a = k : a === Rt || a === Ut ? a = B : (a = k, n = void 0);
+    const h = a === k && t[c + 1].startsWith("/>") ? " " : "";
+    s += a === B ? r + Ce : p >= 0 ? (i.push(m), r.slice(0, p) + ne + r.slice(p) + A + h) : r + A + (p === -2 ? c : h);
   }
   return [ce(t, s + (t[o] || "<?>") + (e === 2 ? "</svg>" : e === 3 ? "</math>" : "")), i];
 };
@@ -294,14 +294,14 @@ class X {
     for (; (n = P.nextNode()) !== null && r.length < c; ) {
       if (n.nodeType === 1) {
         if (n.hasAttributes()) for (const p of n.getAttributeNames()) if (p.endsWith(ne)) {
-          const u = f[a++], l = n.getAttribute(p).split(A), v = /([.?@])?(.*)/.exec(u);
-          r.push({ type: 1, index: s, name: v[2], strings: l, ctor: v[1] === "." ? Ue : v[1] === "?" ? De : v[1] === "@" ? Ne : it }), n.removeAttribute(p);
+          const u = f[a++], h = n.getAttribute(p).split(A), v = /([.?@])?(.*)/.exec(u);
+          r.push({ type: 1, index: s, name: v[2], strings: h, ctor: v[1] === "." ? Re : v[1] === "?" ? Ue : v[1] === "@" ? Ne : it }), n.removeAttribute(p);
         } else p.startsWith(A) && (r.push({ type: 6, index: s }), n.removeAttribute(p));
         if (se.test(n.tagName)) {
           const p = n.textContent.split(A), u = p.length - 1;
           if (u > 0) {
             n.textContent = Q ? Q.emptyScript : "";
-            for (let l = 0; l < u; l++) n.append(p[l], Y()), P.nextNode(), r.push({ type: 2, index: ++s });
+            for (let h = 0; h < u; h++) n.append(p[h], Y()), P.nextNode(), r.push({ type: 2, index: ++s });
             n.append(p[u], Y());
           }
         }
@@ -318,13 +318,13 @@ class X {
     return i.innerHTML = e, i;
   }
 }
-function H(t, e, o = t, i) {
+function I(t, e, o = t, i) {
   if (e === w) return e;
   let n = i !== void 0 ? o._$Co?.[i] : o._$Cl;
   const s = q(e) ? void 0 : e._$litDirective$;
-  return n?.constructor !== s && (n?._$AO?.(!1), s === void 0 ? n = void 0 : (n = new s(t), n._$AT(t, o, i)), i !== void 0 ? (o._$Co ??= [])[i] = n : o._$Cl = n), n !== void 0 && (e = H(t, n._$AS(t, e.values), n, i)), e;
+  return n?.constructor !== s && (n?._$AO?.(!1), s === void 0 ? n = void 0 : (n = new s(t), n._$AT(t, o, i)), i !== void 0 ? (o._$Co ??= [])[i] = n : o._$Cl = n), n !== void 0 && (e = I(t, n._$AS(t, e.values), n, i)), e;
 }
-class Re {
+class De {
   constructor(e, o) {
     this._$AV = [], this._$AN = void 0, this._$AD = e, this._$AM = o;
   }
@@ -341,7 +341,7 @@ class Re {
     for (; r !== void 0; ) {
       if (a === r.index) {
         let m;
-        r.type === 2 ? m = new L(s, s.nextSibling, this, e) : r.type === 1 ? m = new r.ctor(s, r.name, r.strings, this, e) : r.type === 6 && (m = new Ie(s, this, e)), this._$AV.push(m), r = i[++c];
+        r.type === 2 ? m = new L(s, s.nextSibling, this, e) : r.type === 1 ? m = new r.ctor(s, r.name, r.strings, this, e) : r.type === 6 && (m = new He(s, this, e)), this._$AV.push(m), r = i[++c];
       }
       a !== r?.index && (s = P.nextNode(), a++);
     }
@@ -371,7 +371,7 @@ class L {
     return this._$AB;
   }
   _$AI(e, o = this) {
-    e = H(this, e, o), q(e) ? e === d || e == null || e === "" ? (this._$AH !== d && this._$AR(), this._$AH = d) : e !== this._$AH && e !== w && this._(e) : e._$litType$ !== void 0 ? this.$(e) : e.nodeType !== void 0 ? this.T(e) : Oe(e) ? this.k(e) : this._(e);
+    e = I(this, e, o), q(e) ? e === d || e == null || e === "" ? (this._$AH !== d && this._$AR(), this._$AH = d) : e !== this._$AH && e !== w && this._(e) : e._$litType$ !== void 0 ? this.$(e) : e.nodeType !== void 0 ? this.T(e) : Oe(e) ? this.k(e) : this._(e);
   }
   O(e) {
     return this._$AA.parentNode.insertBefore(e, this._$AB);
@@ -386,13 +386,13 @@ class L {
     const { values: o, _$litType$: i } = e, n = typeof i == "number" ? this._$AC(e) : (i.el === void 0 && (i.el = X.createElement(ce(i.h, i.h[0]), this.options)), i);
     if (this._$AH?._$AD === n) this._$AH.p(o);
     else {
-      const s = new Re(n, this), a = s.u(this.options);
+      const s = new De(n, this), a = s.u(this.options);
       s.p(o), this.T(a), this._$AH = s;
     }
   }
   _$AC(e) {
-    let o = Ht.get(e.strings);
-    return o === void 0 && Ht.set(e.strings, o = new X(e)), o;
+    let o = It.get(e.strings);
+    return o === void 0 && It.set(e.strings, o = new X(e)), o;
   }
   k(e) {
     yt(this._$AH) || (this._$AH = [], this._$AR());
@@ -424,11 +424,11 @@ class it {
   _$AI(e, o = this, i, n) {
     const s = this.strings;
     let a = !1;
-    if (s === void 0) e = H(this, e, o, 0), a = !q(e) || e !== this._$AH && e !== w, a && (this._$AH = e);
+    if (s === void 0) e = I(this, e, o, 0), a = !q(e) || e !== this._$AH && e !== w, a && (this._$AH = e);
     else {
       const c = e;
       let r, m;
-      for (e = s[0], r = 0; r < s.length - 1; r++) m = H(this, c[i + r], o, r), m === w && (m = this._$AH[r]), a ||= !q(m) || m !== this._$AH[r], m === d ? e = d : e !== d && (e += (m ?? "") + s[r + 1]), this._$AH[r] = m;
+      for (e = s[0], r = 0; r < s.length - 1; r++) m = I(this, c[i + r], o, r), m === w && (m = this._$AH[r]), a ||= !q(m) || m !== this._$AH[r], m === d ? e = d : e !== d && (e += (m ?? "") + s[r + 1]), this._$AH[r] = m;
     }
     a && !n && this.j(e);
   }
@@ -436,7 +436,7 @@ class it {
     e === d ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, e ?? "");
   }
 }
-class Ue extends it {
+class Re extends it {
   constructor() {
     super(...arguments), this.type = 3;
   }
@@ -444,7 +444,7 @@ class Ue extends it {
     this.element[this.name] = e === d ? void 0 : e;
   }
 }
-class De extends it {
+class Ue extends it {
   constructor() {
     super(...arguments), this.type = 4;
   }
@@ -457,7 +457,7 @@ class Ne extends it {
     super(e, o, i, n, s), this.type = 5;
   }
   _$AI(e, o = this) {
-    if ((e = H(this, e, o, 0) ?? d) === w) return;
+    if ((e = I(this, e, o, 0) ?? d) === w) return;
     const i = this._$AH, n = e === d && i !== d || e.capture !== i.capture || e.once !== i.once || e.passive !== i.passive, s = e !== d && (i === d || n);
     n && this.element.removeEventListener(this.name, this, i), s && this.element.addEventListener(this.name, this, e), this._$AH = e;
   }
@@ -465,7 +465,7 @@ class Ne extends it {
     typeof this._$AH == "function" ? this._$AH.call(this.options?.host ?? this.element, e) : this._$AH.handleEvent(e);
   }
 }
-class Ie {
+class He {
   constructor(e, o, i) {
     this.element = e, this.type = 6, this._$AN = void 0, this._$AM = o, this.options = i;
   }
@@ -473,10 +473,10 @@ class Ie {
     return this._$AM._$AU;
   }
   _$AI(e) {
-    H(this, e);
+    I(this, e);
   }
 }
-const He = { I: L }, Le = bt.litHtmlPolyfillSupport;
+const Ie = { I: L }, Le = bt.litHtmlPolyfillSupport;
 Le?.(X, L), (bt.litHtmlVersions ??= []).push("3.3.3");
 const Ve = (t, e, o) => {
   const i = o?.renderBefore ?? e;
@@ -493,7 +493,7 @@ const Ve = (t, e, o) => {
  * SPDX-License-Identifier: BSD-3-Clause
  */
 const wt = globalThis;
-let C = class extends D {
+let C = class extends U {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
   }
@@ -615,7 +615,7 @@ let de = class {
  * Copyright 2020 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const { I: Fe } = He, Lt = (t) => t, Ye = (t) => t.strings === void 0, Vt = () => document.createComment(""), K = (t, e, o) => {
+const { I: Fe } = Ie, Lt = (t) => t, Ye = (t) => t.strings === void 0, Vt = () => document.createComment(""), K = (t, e, o) => {
   const i = t._$AA.parentNode, n = e === void 0 ? t._$AB : e._$AA;
   if (o === void 0) {
     const s = i.insertBefore(Vt(), n), a = i.insertBefore(Vt(), n);
@@ -666,25 +666,25 @@ const jt = (t, e, o) => {
     const n = Ze(t), { values: s, keys: a } = this.dt(e, o, i);
     if (!Array.isArray(n)) return this.ut = a, s;
     const c = this.ut ??= [], r = [];
-    let m, f, p = 0, u = n.length - 1, l = 0, v = s.length - 1;
-    for (; p <= u && l <= v; ) if (n[p] === null) p++;
+    let m, f, p = 0, u = n.length - 1, h = 0, v = s.length - 1;
+    for (; p <= u && h <= v; ) if (n[p] === null) p++;
     else if (n[u] === null) u--;
-    else if (c[p] === a[l]) r[l] = T(n[p], s[l]), p++, l++;
+    else if (c[p] === a[h]) r[h] = T(n[p], s[h]), p++, h++;
     else if (c[u] === a[v]) r[v] = T(n[u], s[v]), u--, v--;
     else if (c[p] === a[v]) r[v] = T(n[p], s[v]), K(t, r[v + 1], n[p]), p++, v--;
-    else if (c[u] === a[l]) r[l] = T(n[u], s[l]), K(t, n[p], n[u]), u--, l++;
-    else if (m === void 0 && (m = jt(a, l, v), f = jt(c, p, u)), m.has(c[p])) if (m.has(c[u])) {
-      const _ = f.get(a[l]), rt = _ !== void 0 ? n[_] : null;
+    else if (c[u] === a[h]) r[h] = T(n[u], s[h]), K(t, n[p], n[u]), u--, h++;
+    else if (m === void 0 && (m = jt(a, h, v), f = jt(c, p, u)), m.has(c[p])) if (m.has(c[u])) {
+      const _ = f.get(a[h]), rt = _ !== void 0 ? n[_] : null;
       if (rt === null) {
         const St = K(t, n[p]);
-        T(St, s[l]), r[l] = St;
-      } else r[l] = T(rt, s[l]), K(t, n[p], rt), n[_] = null;
-      l++;
+        T(St, s[h]), r[h] = St;
+      } else r[h] = T(rt, s[h]), K(t, n[p], rt), n[_] = null;
+      h++;
     } else lt(n[u]), u--;
     else lt(n[p]), p++;
-    for (; l <= v; ) {
+    for (; h <= v; ) {
       const _ = K(t, r[v + 1]);
-      T(_, s[l]), r[l++] = _;
+      T(_, s[h]), r[h++] = _;
     }
     for (; p <= u; ) {
       const _ = n[p++];
@@ -804,7 +804,7 @@ const jt = (t, e, o) => {
   if (!e) return !1;
   const o = t.states?.[e]?.state;
   return o === void 0 ? !1 : !no.has(o.toLowerCase());
-}, I = (t, e) => (t.features & e) !== 0, Bt = (t, e) => (t.volumeFeatures & e) !== 0, Kt = (t) => t.volume !== void 0, so = ["volume_up", "volume_down", "volume_mute"], ro = (t, e) => t.volume_entity !== void 0 && t.volume_entity !== e.playerId || so.some((o) => tt(t.overrides[o]?.tap_action)), co = (t, e) => {
+}, H = (t, e) => (t.features & e) !== 0, Bt = (t, e) => (t.volumeFeatures & e) !== 0, Kt = (t) => t.volume !== void 0, so = ["volume_up", "volume_down", "volume_mute"], ro = (t, e) => t.volume_entity !== void 0 && t.volume_entity !== e.playerId || so.some((o) => tt(t.overrides[o]?.tap_action)), co = (t, e) => {
   const o = At(e.service);
   return o ? t.callService(o[0], o[1], e.data ?? {}, e.target) : Promise.reject(
     new Error(`polr-android-tv-remote-card: invalid service "${e.service}"`)
@@ -820,7 +820,7 @@ const jt = (t, e, o) => {
   const a = o.playerId;
   switch (i) {
     case "power":
-      return a && I(o, o.on ? y.TURN_OFF : y.TURN_ON) ? t.callService(
+      return a && H(o, o.on ? y.TURN_OFF : y.TURN_ON) ? t.callService(
         "media_player",
         o.on ? "turn_off" : "turn_on",
         { entity_id: a }
@@ -828,19 +828,19 @@ const jt = (t, e, o) => {
         entity_id: o.remoteId
       });
     case "play_pause":
-      if (a && I(o, y.PAUSE))
+      if (a && H(o, y.PAUSE))
         return t.callService("media_player", "media_play_pause", {
           entity_id: a
         });
       break;
     case "next":
-      if (a && I(o, y.NEXT_TRACK))
+      if (a && H(o, y.NEXT_TRACK))
         return t.callService("media_player", "media_next_track", {
           entity_id: a
         });
       break;
     case "previous":
-      if (a && I(o, y.PREVIOUS_TRACK))
+      if (a && H(o, y.PREVIOUS_TRACK))
         return t.callService("media_player", "media_previous_track", {
           entity_id: a
         });
@@ -865,33 +865,51 @@ const jt = (t, e, o) => {
   const c = eo[i];
   return c ? Tt(t, o, c) : Promise.resolve();
 }, po = (t, e, o, i) => {
-  switch (o.action) {
+  const n = o.action;
+  switch (n.action) {
     case "activity":
       return t.callService("remote", "turn_on", {
         entity_id: e.remoteId,
-        activity: o.activity
+        activity: n.activity
       });
     case "app":
       return e.playerId ? t.callService("media_player", "play_media", {
         entity_id: e.playerId,
         media_content_type: "app",
-        media_content_id: o.app_id
+        media_content_id: n.app_id
       }) : Promise.reject(
         new Error(
           "polr-android-tv-remote-card: launching by app id needs the device's media_player, which was not found"
         )
       );
     case "key":
-      return Tt(t, e, o.key);
+      return Tt(t, e, n.key);
     // v1's shape.
     case "service":
-      return co(t, o);
-    // Everything else is a Home Assistant action, run exactly as an override
-    // would run it.
+      return co(t, n);
+    /*
+     * Everything else is a Home Assistant action, run exactly as an override
+     * would run it -- except for which entity a bare one lands on.
+     *
+     * A section button names the thing it is about: the receiver it lights up
+     * for, the projector it toggles. "More info" on that button means that
+     * receiver, and HA's own action editor has no field to say so -- it has
+     * never had one, because in HA's cards the answer is always the card's
+     * entity. Here the card's entity is a remote, so the dialog it opened was
+     * the one thing the button was certainly not about.
+     *
+     * So the tile's entity stands in first, the card's remains the last
+     * resort, and an explicit `entity:` on the action still beats both.
+     */
     default:
-      return kt(i, t, o, e.remoteId);
+      return kt(
+        i,
+        t,
+        n,
+        o.entity ?? e.remoteId
+      );
   }
-}, uo = (t) => {
+}, uo = (t, e) => {
   switch (t.action) {
     case "activity":
       return `Launch ${t.activity}`;
@@ -910,9 +928,11 @@ const jt = (t, e, o) => {
     case "url":
       return `Open ${t.url_path}`;
     case "toggle":
-      return "Toggle the TV";
-    case "more-info":
-      return "Show more info";
+      return e ? `Toggle ${e}` : "Toggle the TV";
+    case "more-info": {
+      const o = t.entity ?? e;
+      return o ? `Show ${o}` : "Show more info";
+    }
     case "none":
       return "Do nothing";
   }
@@ -1060,30 +1080,30 @@ const O = (t) => {
   typeof t.remote == "string" && !o && O(`unknown remote style "${t.remote}" — falling back to ${g.pad}`);
   const i = mo.includes(t.pad) ? t.pad : o ?? g.pad, n = typeof t.volume == "boolean" ? t.volume : void 0, s = {};
   if (b(t.overrides))
-    for (const [l, v] of Object.entries(t.overrides)) {
-      const _ = Wt(v, l);
-      _ && (s[l] = _);
+    for (const [h, v] of Object.entries(t.overrides)) {
+      const _ = Wt(v, h);
+      _ && (s[h] = _);
     }
-  for (const [l, v] of Object.entries(me)) {
+  for (const [h, v] of Object.entries(me)) {
     if (s[v]) continue;
-    const _ = Wt(t[l], l);
+    const _ = Wt(t[h], h);
     _ && (s[v] = _);
   }
   const a = {};
-  for (const [l, v] of Object.entries(ve))
-    typeof t[l] == "boolean" && (a[v] = t[l]);
+  for (const [h, v] of Object.entries(ve))
+    typeof t[h] == "boolean" && (a[v] = t[h]);
   const c = Array.isArray(t.transport_buttons) ? t.transport_buttons : Array.isArray(t.media_controls) ? t.media_controls : void 0, r = c ? c.filter(
-    (l) => typeof l == "string" && g.transport_buttons.includes(l)
-  ) : g.transport_buttons, m = (Array.isArray(t.sections) ? t.sections : []).map((l) => {
-    if (!b(l))
-      return O(`section is not an object and was skipped: ${JSON.stringify(l)}`), null;
-    const v = (Array.isArray(l.buttons) ? l.buttons : []).map(Yt).filter((_) => _ !== null);
+    (h) => typeof h == "string" && g.transport_buttons.includes(h)
+  ) : g.transport_buttons, m = (Array.isArray(t.sections) ? t.sections : []).map((h) => {
+    if (!b(h))
+      return O(`section is not an object and was skipped: ${JSON.stringify(h)}`), null;
+    const v = (Array.isArray(h.buttons) ? h.buttons : []).map(Yt).filter((_) => _ !== null);
     return {
-      ...typeof l.name == "string" ? { name: l.name } : {},
-      ...typeof l.columns == "number" && l.columns > 0 ? { columns: l.columns } : {},
+      ...typeof h.name == "string" ? { name: h.name } : {},
+      ...typeof h.columns == "number" && h.columns > 0 ? { columns: h.columns } : {},
       buttons: v
     };
-  }).filter((l) => l !== null), p = (Array.isArray(t.apps) ? t.apps : []).map(Yt).filter((l) => l !== null), u = (l, v) => l === void 0 ? v : l;
+  }).filter((h) => h !== null), p = (Array.isArray(t.apps) ? t.apps : []).map(Yt).filter((h) => h !== null), u = (h, v) => h === void 0 ? v : h;
   return {
     ...t,
     type: t.type,
@@ -1132,27 +1152,27 @@ const O = (t) => {
   for (const [i, n] of Object.entries(t))
     e.has(i) || (o[i] = n);
   return o;
-}, U = (t) => Me`
+}, R = (t) => Me`
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="${t}" />
   </svg>
 `, ut = {
-  disneyplus: U(
+  disneyplus: R(
     "M2.056 6.834C1.572 6.834 1 6.77 1 6.483c0-2.023 3.562-2.11 5.08-2.11 1.978 0 4.506.614 6.66 1.384 3.277 1.188 9.917 5.145 9.917 9.674 0 4.001-4.31 5.914-8.311 5.914a22.376 22.376 0 0 1-3.21-.33c-.066.243-.11.418-.264.924-.253.052-.511.081-.77.087l-.505-.043c-.33-.396-.44-1.033-.572-1.715-2-1.165-3.298-2.155-3.891-2.836-.506-.528-1.078-1.232-1.078-1.913 0-.351.22-.66.726-1.01 1.034-.77 2.352-1.188 4.507-1.563l.044-.9c.022-.22.242-2.573.748-3.013.813.66.901 1.341.967 2.353.022.44.044.901.11 1.385h.308c1.539 0 6.244.395 6.244 2.616 0 .528-.77 1.517-1.518 1.517a1.9 1.9 0 0 1-.966-.285c.329-.375.813-.704.945-.99-.44-.528-2.814-1.143-4.551-1.143a4.043 4.043 0 0 0-.572.022l.022 4.815c.703.44 1.561.483 2.11.483 2.42 0 7.431-.417 7.431-4.331 0-3.87-4.946-6.86-8.64-8.266a21.394 21.394 0 0 0-7.937-1.496 7.22 7.22 0 0 0-1.803.198c-.373.088-.505.176-.505.264 0 .153.747.242.836.286a.221.221 0 0 1 .11.175.26.26 0 0 1-.088.176c-.089 0-.286.022-.528.022zM9.2 14.551c-2.176.177-4.595.397-4.595 1.166 0 .594 1.012 1.32 1.627 1.781a7.052 7.052 0 0 0 2.77 1.319zm11.155-9.85c-.02.428-.042.942-.042 1.723 0 .3 0 .642.01 1.027-.042.193-.32.214-.46.278a1.148 1.148 0 0 1-.256-.192V4.83c0-.29.01-.588.01-1.038 0-.225 0-.482-.01-.792 0-.192.032-.374.15-.802a.342.342 0 0 1 .3-.224c.245.064.491.17.577.374-.257.76-.235 1.594-.279 2.353zm-.384-.085c.428.021.941.042 1.722.042.3 0 .643 0 1.027-.01.193.041.215.32.279.459-.052.094-.116.18-.193.257H20.1c-.289 0-.589-.01-1.037-.01-.225 0-.482 0-.792.01-.193.002-.375-.03-.803-.149a.346.346 0 0 1-.225-.299c.064-.246.172-.492.374-.578.76.257 1.595.235 2.355.278z"
   ),
-  hbomax: U(
+  hbomax: R(
     "M8.844 4.249h3.205a2.013 2.013 0 0 1 1.848 1.876c1.607-3.368 6.667-2.217 6.658 1.515.045 3.744-5.026 4.939-6.658 1.568a2.077 2.077 0 0 1-2.07 1.947H8.845Zm-5.395 0h1.92v2.58h1.213V4.253H8.46v6.902H6.586V8.48H5.373v2.676H3.449ZM9.872 19.83h-.576a.603.603 0 0 1-.6-.57c0-.013-.007-.023-.007-.035v-3.667a1.192 1.192 0 0 0-1.279-1.21 1.192 1.192 0 0 0-1.279 1.211v4.167a.103.103 0 0 1-.102.103h-.575a.61.61 0 0 1-.61-.611v-3.666a1.319 1.319 0 0 0-.066-.296 1.176 1.176 0 0 0-1.213-.913 1.19 1.19 0 0 0-1.183.817c-.05.131-.079.267-.087.406v4.17a.104.104 0 0 1-.104.102h-.579a.61.61 0 0 1-.61-.61V15.56a2.322 2.322 0 0 1 1.68-2.32c.285-.088.584-.133.883-.133a2.584 2.584 0 0 1 1.92.752 2.588 2.588 0 0 1 1.921-.752 2.608 2.608 0 0 1 1.872.715c.451.465.7 1.09.692 1.738v4.171a.103.103 0 0 1-.098.103zm.428-3.35a3.76 3.76 0 0 1 .568-2.102c.133-.2.29-.38.47-.539a2.958 2.958 0 0 1 2.013-.744 3.014 3.014 0 0 1 1.845.59.61.61 0 0 1 .597-.48h.574a.107.107 0 0 1 .105.103v6.427a.104.104 0 0 1-.104.103h-.573a.61.61 0 0 1-.612-.553c-2.16 1.55-5.14-.164-4.887-2.811Zm12.623 3.35h-.977a.813.813 0 0 1-.675-.357l-1.079-1.6a.356.356 0 0 0-.588 0l-1.08 1.6a.825.825 0 0 1-.245.22.803.803 0 0 1-.43.137h-.978a.075.075 0 0 1-.063-.121l1.18-1.752.744-1.1a.61.61 0 0 0 0-.682l-.05-.075-1.872-2.773a.077.077 0 0 1 .062-.121h.978a.813.813 0 0 1 .674.36l.826 1.221.254.376a.355.355 0 0 0 .59 0l1.08-1.597a.82.82 0 0 1 .673-.36h.978a.077.077 0 0 1 .06.122l-1.925 2.855a.61.61 0 0 0 0 .682l1.929 2.853a.076.076 0 0 1-.066.116zM17.068 9.403c1.567.002 2.356-1.89 1.25-3-1.103-1.11-3-.33-3.003 1.237A1.756 1.756 0 0 0 17.068 9.4zm0-3.14c1.23.003 1.843 1.493.97 2.36-.872.866-2.358.246-2.354-.983a1.38 1.38 0 0 1 1.38-1.378zm-3.719 8.1a1.77 1.77 0 0 0-1.783 1.63 3.15 3.15 0 0 0-.037.489 1.867 1.867 0 0 0 1.82 2.123 1.696 1.696 0 0 0 1.455-.764c.253-.407.381-.88.367-1.36a1.867 1.867 0 0 0-1.822-2.118zm.227-6.191a2.976 2.976 0 0 1 0-.954 1.475 1.475 0 0 1-.723.422c.29.096.544.283.722.533zm-1.486.785a.548.548 0 0 0-.5-.577h-.954v1.17h.954a.553.553 0 0 0 .5-.593zm0-2.595a.55.55 0 0 0-.5-.577h-.954V6.94h.954a.548.548 0 0 0 .5-.578z"
   ),
-  hulu: U(
+  hulu: R(
     "m 14.248,8.7019997 h 1.59 V 15.298 h -1.59 z M 5.143,10.764 H 4.124 a 1.4,1.4 0 0 0 -0.36,0.037 C 3.673,10.826 3.615,10.843 3.59,10.851 V 8.7 H 2 v 6.6 h 1.59 v -2.66 a 0.428,0.428 0 0 1 0.124,-0.3 0.4,0.4 0 0 1 0.3,-0.13 h 0.92 a 0.446,0.446 0 0 1 0.435,0.435 V 15.3 h 1.575 v -2.871 a 1.53,1.53 0 0 0 -0.5,-1.261 2,2 0 0 0 -1.301,-0.404 z m 15.267,0 v 2.658 a 0.423,0.423 0 0 1 -0.422,0.423 h -0.932 a 0.423,0.423 0 0 1 -0.422,-0.423 v -2.658 h -1.59 v 2.783 a 1.679,1.679 0 0 0 0.49,1.3 1.874,1.874 0 0 0 1.323,0.453 H 20.41 A 1.47,1.47 0 0 0 21.571,14.816 1.842,1.842 0 0 0 22,13.547 v -2.783 z m -8.957,2.658 a 0.4,0.4 0 0 1 -0.13,0.3 0.43,0.43 0 0 1 -0.3,0.124 H 10.1 A 0.423,0.423 0 0 1 9.678,13.423 V 10.764 H 8.087 v 2.783 a 1.676,1.676 0 0 0 0.491,1.3 1.855,1.855 0 0 0 1.31,0.453 h 1.565 a 1.473,1.473 0 0 0 1.162,-0.484 1.842,1.842 0 0 0 0.429,-1.267 v -2.785 h -1.591 z"
   ),
-  netflix: U(
+  netflix: R(
     "M5.94 1v10.994c0 6.045.006 10.996.014 11.004.01.01.382-.029.834-.078a73.701 73.701 0 0 1 1.383-.139 80.63 80.628 0 0 1 2.06-.133c.05 0 .052-.246.058-4.655l.01-4.645.34.964c1.406 3.979 1.77 5.004 2.166 6.117v.002l.206.581.575 1.624c.003.003.292.02.642.038a48.332 48.33 0 0 1 3.37.29c.12.014.227.024.307.03.038.002.044 0 .067 0 .023 0 .062.003.067 0h.006c.003 0 .003-.967.005-1.382l.002-.435c.007-1.783.01-4.836.007-9.181l-.01-10.979h-4.311L13.73 5.88l-.01 4.859v.003l-.398-1.13V9.61v.002l-2.04-5.765v-.013l-.177-.501c-.422-1.195-.781-2.205-.795-2.251L10.28 1H8.107Z"
   ),
-  prime: U(
+  prime: R(
     "M20.182 5.404a4.05 4.05 0 0 0 .625.05 1.116 1.116 0 0 0 .342-.03.474.474 0 0 0 .404-.306.605.605 0 0 0 .015-.276.4.4 0 0 0-.243-.334.88.88 0 0 0-.281-.064.791.791 0 0 0-.833.499 1.438 1.438 0 0 0-.102.367c-.006.088-.006.088.073.094zm-1.074-.4a1.808 1.808 0 0 1 1.633-1.359 2.38 2.38 0 0 1 1.057.102c.655.224 1.009.932.794 1.59a.986.986 0 0 1-.489.588 1.986 1.986 0 0 1-.66.211 3.534 3.534 0 0 1-1.207-.016 1.221 1.221 0 0 0-.146-.023.88.88 0 0 0 .716.954 2.58 2.58 0 0 0 .995 0c.154-.033.302-.065.456-.102.154-.036.218.012.218.17v.392a.242.242 0 0 1-.18.26 3.082 3.082 0 0 1-.626.17 3.247 3.247 0 0 1-1.214-.01 1.663 1.663 0 0 1-1.36-1.272 2.935 2.935 0 0 1 .016-1.656zm.317 6.367a2.588 2.588 0 0 1 1.012.039 1.936 1.936 0 0 1 1.41 1.635v.011h-.014v.1a.078.078 0 0 0 .024.08v-.021l.007.01v.61l-.012.021v-.01c-.03.02-.02.047-.02.08V14c-.048.9-.747 1.63-1.644 1.717a2.627 2.627 0 0 1-.998-.052 1.694 1.694 0 0 1-1.246-1.114 2.825 2.825 0 0 1 0-2.005c.219-.65.8-1.11 1.482-1.175zM12 3.946c0-.043.006-.086.016-.127a.156.156 0 0 1 .147-.102h.67a.19.19 0 0 1 .184.147c.028.075.044.147.07.223.053 0 .086-.036.122-.057a2.743 2.743 0 0 1 .946-.398 1.962 1.962 0 0 1 .795 0c.25.054.47.202.615.413a.25.25 0 0 0 .03.038v.014c.132-.079.271-.164.415-.237a2.382 2.382 0 0 1 1.203-.266 1.061 1.061 0 0 1 1.095 1.027v2.964c0 .238-.03.27-.27.27h-.647a.906.906 0 0 1-.126 0 .147.147 0 0 1-.128-.122.994.994 0 0 1-.01-.175V5.101a.944.944 0 0 0-.033-.293.4.4 0 0 0-.36-.294 1.861 1.861 0 0 0-.912.176.087.087 0 0 0-.063.096v2.788a.774.774 0 0 1-.01.155c0 .07-.058.127-.128.127h-.81c-.197 0-.24-.047-.24-.243V5.1a1.24 1.24 0 0 0-.026-.276.4.4 0 0 0-.371-.318 1.874 1.874 0 0 0-.928.18.085.085 0 0 0-.059.103v2.833c0 .195-.044.236-.239.236h-.704c-.188 0-.235-.053-.235-.232zm2.71 9.92a.178.178 0 0 0-.074-.011 2 2 0 0 0 .057.324c.08.337.358.59.7.636a2.664 2.664 0 0 0 1.088-.037c.117-.026.229-.053.345-.085.154-.037.223.023.223.17v.385a.235.235 0 0 1-.19.271 3.36 3.36 0 0 1-1.141.217 2.901 2.901 0 0 1-.796-.079 1.63 1.63 0 0 1-1.215-1.136 2.946 2.946 0 0 1-.02-1.776 1.848 1.848 0 0 1 1.838-1.363c.268-.012.535.023.792.101.44.123.775.48.868.928a1.468 1.468 0 0 1 0 .587.983.983 0 0 1-.535.704 2.166 2.166 0 0 1-.891.23 4.15 4.15 0 0 1-1.055-.067zm-3.133-2.202c.027-.037.012-.075.012-.112V9.847c0-.202.037-.238.238-.238h.734c.161.006.207.044.207.208v5.586c0 .147-.049.201-.196.201h-.69a.19.19 0 0 1-.186-.146.82.82 0 0 0-.057-.185c-.048.008-.069.045-.107.067a1.714 1.714 0 0 1-1.615.276 1.526 1.526 0 0 1-.917-.812 2.495 2.495 0 0 1-.266-1.13 2.999 2.999 0 0 1 .187-1.225 1.66 1.66 0 0 1 .826-.945c.552-.263 1.2-.22 1.713.111a.294.294 0 0 0 .117.059zm-.797-3.817h-.733a.32.32 0 0 1-.075 0 .147.147 0 0 1-.147-.137V3.893c0-.127.054-.176.18-.18a19.455 19.455 0 0 1 .828 0c.122 0 .159.037.17.158v3.67a.982.982 0 0 1-.01.176.134.134 0 0 1-.128.12.456.456 0 0 1-.089 0zm-1.045-5.45a.616.616 0 0 1 .642-.586h.064a.649.649 0 0 1 .248.036.6.6 0 0 1 .411.67.587.587 0 0 1-.506.534.963.963 0 0 1-.355 0 .587.587 0 0 1-.504-.66Zm-3.092 5.2V3.983c0-.244.026-.27.27-.27h.51a.211.211 0 0 1 .238.179c.037.132.07.264.1.408a.161.161 0 0 0 .091-.065 3.514 3.514 0 0 1 .303-.27 1.41 1.41 0 0 1 .964-.293c.138 0 .186.048.197.18.01.18 0 .367 0 .546a.985.985 0 0 1-.012.22.147.147 0 0 1-.147.146 1.812 1.812 0 0 1-.22 0 2.523 2.523 0 0 0-1.027.147c-.074.026-.074.079-.074.138v2.678a.13.13 0 0 1-.128.122.992.992 0 0 1-.132 0v.01h-.69a.784.784 0 0 1-.117 0 .147.147 0 0 1-.126-.132zm.904 3.228a.604.604 0 0 1-.192 0 .998.998 0 0 1-.176-.02.6.6 0 0 1-.466-.7.587.587 0 0 1 .567-.536.473.473 0 0 1 .111 0 .638.638 0 0 1 .313.054c.208.078.35.272.361.494a.624.624 0 0 1-.518.716zm.44.855v3.764a.147.147 0 0 1-.133.159h-.88a.147.147 0 0 1-.162-.128v-.026a.567.567 0 0 1 0-.1v-3.67c0-.164.045-.21.21-.21h.751c.164.007.211.054.211.218zm-1.711.047-.317.844-1.067 2.774c-.01.032-.027.063-.037.095a.261.261 0 0 1-.265.175h-.702a.294.294 0 0 1-.318-.218c-.133-.349-.27-.704-.403-1.055-.318-.832-.641-1.666-.96-2.504a.928.928 0 0 1-.069-.207c-.016-.105.021-.158.128-.158h.901c.128 0 .185.085.218.196.058.201.117.408.18.61.217.733.43 1.479.646 2.217h.01l.096-.308.733-2.46.031-.095a.214.214 0 0 1 .213-.147h.812c.2-.003.243.054.176.245zM1.786 3.82a.377.377 0 0 1 .318-.107h.488a.21.21 0 0 1 .234.18c.01.053.02.106.037.16a.022.022 0 0 0 .02.015.429.429 0 0 0 .11-.08 1.87 1.87 0 0 1 1.586-.354c.48.115.874.454 1.061.91a2.451 2.451 0 0 1 .205.798h-.008c.051.444.011.893-.118 1.321a1.942 1.942 0 0 1-.55.88c-.34.306-.795.448-1.248.388A1.776 1.776 0 0 1 3 7.564c-.039.033-.022.074-.022.113v1.506c0 .329 0 .329-.334.329h-.572a.294.294 0 0 1-.294-.126Zm19.37 15.225a.587.587 0 0 1-.176.2 11.64 11.64 0 0 1-1.962 1.247 15.499 15.499 0 0 1-4.152 1.406 18.226 18.226 0 0 1-2.51.27v.022h-.649v-.018c-.293-.014-.578-.026-.868-.047a15.349 15.349 0 0 1-2.296-.352 15.558 15.558 0 0 1-6.885-3.59c-.185-.164-.36-.333-.54-.503a.405.405 0 0 1-.101-.146.195.195 0 0 1 .098-.256.2.2 0 0 1 .147 0 1.21 1.21 0 0 1 .138.069 20.566 20.566 0 0 0 6.164 2.546 22.087 22.087 0 0 0 2.212.398 20.441 20.441 0 0 0 3.213.146 16.97 16.97 0 0 0 1.724-.146 20.908 20.908 0 0 0 3.935-.896 18.627 18.627 0 0 0 1.973-.776.44.44 0 0 1 .318-.043.33.33 0 0 1 .24.398.578.578 0 0 1-.022.066zm1.028 1.488a3.547 3.547 0 0 1-.615.757.432.432 0 0 1-.17.107.123.123 0 0 1-.169-.124.608.608 0 0 1 .038-.162c.185-.496.366-.99.51-1.504a5.346 5.346 0 0 0 .18-.859 1.65 1.65 0 0 0 0-.318.412.412 0 0 0-.294-.388 2.068 2.068 0 0 0-.509-.095 8.356 8.356 0 0 0-1.459.064l-.641.08c-.07 0-.132 0-.17-.065a.18.18 0 0 1 .014-.19.546.546 0 0 1 .162-.148 3.67 3.67 0 0 1 1.299-.562 6.412 6.412 0 0 1 1.097-.121c.346.001.691.042 1.028.121a1.515 1.515 0 0 1 .276.102c.121.05.206.162.219.293a2.157 2.157 0 0 1 .014.455 5.856 5.856 0 0 1-.806 2.55zm-2.55-5.72a.995.995 0 0 0 .301.01.691.691 0 0 0 .505-.293 1.01 1.01 0 0 0 .147-.308l-.009.014a1.924 1.924 0 0 0 .074-.678 2.449 2.449 0 0 0 0-.293 1.64 1.64 0 0 0-.147-.6.685.685 0 0 0-.483-.376.908.908 0 0 0-.302-.01.694.694 0 0 0-.542.328 1.163 1.163 0 0 0-.147.35 2.89 2.89 0 0 0-.042.933 1.494 1.494 0 0 0 .147.525c.09.207.276.355.497.397zm-3.523-1.96a.473.473 0 0 0-.394-.64c-.026 0-.047-.01-.073-.01a.797.797 0 0 0-.775.302 1.321 1.321 0 0 0-.211.578c-.015.047.01.069.058.073a4.705 4.705 0 0 0 .642.053c.11.006.22-.003.328-.026a.465.465 0 0 0 .425-.33zm-5.981-.255a1.174 1.174 0 0 0-.106.26 2.683 2.683 0 0 0-.065.997 1.48 1.48 0 0 0 .147.536.734.734 0 0 0 .568.391 1.306 1.306 0 0 0 .832-.158.147.147 0 0 0 .086-.147v-.966h.007c0-.323-.01-.641 0-.968a.147.147 0 0 0-.096-.156 1.614 1.614 0 0 0-.817-.147.678.678 0 0 0-.556.358zM3.855 7.051a.747.747 0 0 0 .488-.188.807.807 0 0 0 .243-.425 2.654 2.654 0 0 0 .065-1.002 1.505 1.505 0 0 0-.135-.54.653.653 0 0 0-.505-.382 1.44 1.44 0 0 0-.912.137.16.16 0 0 0-.105.164v1.917a.147.147 0 0 0 .09.147 1.468 1.468 0 0 0 .771.17"
   ),
-  youtube: U(
+  youtube: R(
     "M18.43 4.216H5.57A4.57 4.57 0 0 0 1 8.786v6.429a4.57 4.57 0 0 0 4.57 4.569h12.86a4.57 4.57 0 0 0 4.57-4.57V8.786a4.57 4.57 0 0 0-4.57-4.569zm-3.09 8.097-6.015 2.869a.241.241 0 0 1-.346-.218V9.046c0-.18.19-.297.351-.215l6.016 3.048a.242.242 0 0 1-.005.434z"
   )
 };
@@ -2330,7 +2350,7 @@ const S = he(Ao), be = _t`
     }
   }
 `;
-var ko = Object.defineProperty, To = Object.getOwnPropertyDescriptor, R = (t, e, o, i) => {
+var ko = Object.defineProperty, To = Object.getOwnPropertyDescriptor, D = (t, e, o, i) => {
   for (var n = i > 1 ? void 0 : i ? To(e, o) : e, s = t.length - 1, a; s >= 0; s--)
     (a = t[s]) && (n = (i ? a(e, o, n) : a(n)) || n);
   return i && n && ko(e, o, n), n;
@@ -2371,7 +2391,7 @@ let $ = class extends C {
     nt(this, "atv-nav", { direction: t });
   }
   _key(t, e, o, i = "") {
-    return h`
+    return l`
       <button
         class="pad-key ${i}"
         type="button"
@@ -2387,7 +2407,7 @@ let $ = class extends C {
     `;
   }
   _blank() {
-    return h`<span class="pad-key blank" aria-hidden="true"></span>`;
+    return l`<span class="pad-key blank" aria-hidden="true"></span>`;
   }
   /**
    * A plus-shaped button pad.
@@ -2398,7 +2418,7 @@ let $ = class extends C {
    * setting to reconcile the two.
    */
   _renderButtons() {
-    return h`
+    return l`
       <div class="button-pad" role="group" aria-label="Directional pad">
         ${this._blank()} ${this._key("up", "mdi:chevron-up", "Up")} ${this._blank()}
         ${this._key("left", "mdi:chevron-left", "Left")}
@@ -2409,7 +2429,7 @@ let $ = class extends C {
     `;
   }
   _renderDpad() {
-    return h`
+    return l`
       <div class="dpad" role="group" aria-label="Directional pad">
         ${this._key("up", "mdi:chevron-up", "Up", "up")}
         ${this._key("left", "mdi:chevron-left", "Left", "left")}
@@ -2433,7 +2453,7 @@ let $ = class extends C {
    * otherwise completely unusable from a keyboard — which is what v1 shipped.
    */
   _renderTouchpad() {
-    return h`
+    return l`
       <div
         class="touchpad"
         role="application"
@@ -2458,7 +2478,7 @@ let $ = class extends C {
     o.style.transform = `translate(${t.clientX - i.left}px, ${t.clientY - i.top}px)`;
   }
   render() {
-    return h`
+    return l`
       <div class="pad">
         ${this.pad === "touchpad" ? this._renderTouchpad() : this.pad === "dpad" ? this._renderDpad() : this._renderButtons()}
       </div>
@@ -2466,25 +2486,25 @@ let $ = class extends C {
   }
 };
 $.styles = [Et, be];
-R([
+D([
   V({ type: String })
 ], $.prototype, "pad", 2);
-R([
+D([
   V({ type: Boolean })
 ], $.prototype, "repeat", 2);
-R([
+D([
   V({ type: Boolean })
 ], $.prototype, "haptics", 2);
-R([
+D([
   le(".touchpad")
 ], $.prototype, "_touchpad", 2);
-R([
+D([
   le(".touchpad-dot")
 ], $.prototype, "_dot", 2);
-R([
+D([
   j()
 ], $.prototype, "_tracking", 2);
-$ = R([
+$ = D([
   $t("polr-atv-nav-pad")
 ], $);
 var So = Object.defineProperty, Po = Object.getOwnPropertyDescriptor, at = (t, e, o, i) => {
@@ -2619,7 +2639,7 @@ const te = [
   }
 ], zo = [
   { name: "action", selector: { ui_action: {} } }
-], Ro = {
+], Do = {
   entity: "Remote entity",
   volume_entity: "Volume on another media player",
   power_action: "Power",
@@ -2640,7 +2660,7 @@ const te = [
   hold_repeat: "Hold to repeat",
   haptics: "Haptic feedback",
   show_section_labels: "Section labels"
-}, Uo = {
+}, Ro = {
   show_power: "In the header, or in the back / home / menu row when the header is hidden.",
   volume_entity: "Point this at a soundbar or receiver that exposes a media player. A TV passing audio through reports no volume level, so the card shows no level bar for it.",
   power_action: "Leave empty to toggle the TV itself. Set it when something else does the switching — an IR or RF blaster, or a script that also powers a receiver.",
@@ -2651,7 +2671,7 @@ const te = [
 };
 let x = class extends C {
   constructor() {
-    super(...arguments), this._editing = null, this._computeLabel = (t) => Ro[t.name] ?? t.name, this._computeHelper = (t) => Uo[t.name];
+    super(...arguments), this._editing = null, this._computeLabel = (t) => Do[t.name] ?? t.name, this._computeHelper = (t) => Ro[t.name];
   }
   setConfig(t) {
     this._config = _e(t);
@@ -2768,9 +2788,9 @@ let x = class extends C {
     const e = t.icon ?? "mdi:application";
     if (e.startsWith("brand:")) {
       const o = ut[e.slice(6)];
-      if (o) return h`<span class="brand">${o}</span>`;
+      if (o) return l`<span class="brand">${o}</span>`;
     }
-    return e.startsWith("/") || e.startsWith("http") ? h`<img class="brand" src=${e} alt="" />` : h`<ha-icon .icon=${e}></ha-icon>`;
+    return e.startsWith("/") || e.startsWith("http") ? l`<img class="brand" src=${e} alt="" />` : l`<ha-icon .icon=${e}></ha-icon>`;
   }
   /**
    * One list row.
@@ -2787,23 +2807,23 @@ let x = class extends C {
    * here rather than returned together — see _renderAppRow.
    */
   _renderTileList(t, e, o) {
-    return e.length ? h`<ul class="list">
+    return e.length ? l`<ul class="list">
       ${e.flatMap(
       (i, n) => this._isEditing(t, n) ? [
         this._renderAppRow(t, i, n, e.length),
         this._renderAppForm(t, i, n)
       ] : [this._renderAppRow(t, i, n, e.length)]
     )}
-    </ul>` : h`<div class="empty-state">${o}</div>`;
+    </ul>` : l`<div class="empty-state">${o}</div>`;
   }
   _renderAppRow(t, e, o, i) {
     const n = this._isEditing(t, o);
-    return h`
+    return l`
       <li class="row">
         <div class="tile-icon">${this._renderIcon(e)}</div>
         <div class="tile-info">
           <div class="primary"><span>${e.name ?? "Untitled app"}</span></div>
-          <div class="secondary"><span>${uo(e.action)}</span></div>
+          <div class="secondary"><span>${uo(e.action, e.entity)}</span></div>
         </div>
         <button
           class="icon-button"
@@ -2837,8 +2857,8 @@ let x = class extends C {
     `;
   }
   _renderAppForm(t, e, o) {
-    const i = mt(e.action), n = te.find((a) => a.value === i), s = Do(e.action);
-    return h`
+    const i = mt(e.action), n = te.find((a) => a.value === i), s = Uo(e.action);
+    return l`
       <li class="form-host">
         <div class="form">
           <div class="fields">
@@ -2868,7 +2888,7 @@ let x = class extends C {
     }}
             ></ha-icon-picker>
 
-            ${t !== "apps" ? h`
+            ${t !== "apps" ? l`
                   <ha-entity-picker
                     .hass=${this.hass}
                     .value=${e.entity ?? ""}
@@ -2882,10 +2902,10 @@ let x = class extends C {
 
             <!-- Streaming logos are app suggestions; a section button is a
                  projector or a receiver, so they are only offered for apps. -->
-            ${t === "apps" ? h`
+            ${t === "apps" ? l`
                   <div class="chips">
                     ${pt.map(
-      (a) => h`
+      (a) => l`
                         <button
                           class="chip ${e.icon === `brand:${a}` ? "accent" : ""}"
                           title=${`Use the ${E[a].label} logo`}
@@ -2905,7 +2925,7 @@ let x = class extends C {
                 @change=${(a) => this._setActionKind(t, o, a.target.value)}
               >
                 ${te.map(
-      (a) => h`
+      (a) => l`
                     <option value=${a.value} ?selected=${a.value === i}>
                       ${a.label}
                     </option>
@@ -2914,7 +2934,7 @@ let x = class extends C {
               </select>
             </label>
 
-            ${i === "action" ? h`
+            ${i === "action" ? l`
                   <!--
                     HA's own interactions editor, the same control the button
                     overrides use. It carries a service picker, a target and
@@ -2932,7 +2952,34 @@ let x = class extends C {
       N(c) && this._updateTile(t, o, { action: c });
     }}
                   ></ha-form>
-                ` : h`
+
+                  <!--
+                    HA's interactions editor has no entity field for "more
+                    info" -- in HA's own cards the dialog is always the card's
+                    entity, and there was nothing to choose. Here the card's
+                    entity is a remote, so without this the one dialog the
+                    button could open was the one it was not about.
+                  -->
+                  ${s?.action === "more-info" ? l`
+                        <ha-entity-picker
+                          .hass=${this.hass}
+                          .value=${s.entity ?? ""}
+                          label="Dialog to open"
+                          allow-custom-entity
+                          @value-changed=${(a) => this._updateTile(t, o, {
+      action: {
+        action: "more-info",
+        ...a.detail?.value ? { entity: a.detail.value } : {}
+      }
+    })}
+                        ></ha-entity-picker>
+                        <div class="hint">
+                          ${e.entity ? l`Leave empty to open ${e.entity}, the entity
+                              this button lights up for.` : l`Leave empty and it opens the card's remote,
+                              which is rarely what a button is about.`}
+                        </div>
+                      ` : d}
+                ` : l`
                   <label class="field wide">
                     <span>${n.label}</span>
                     <input
@@ -2962,9 +3009,9 @@ let x = class extends C {
     const s = t.apps.some(
       (a) => a.action.action === "app" && a.action.app_id === i
     );
-    return h`
+    return l`
       <div class="section-head"><span class="grow">Playing right now</span></div>
-      ${s ? h`<div class="hint">${n ?? i} is already in the list.</div>` : h`
+      ${s ? l`<div class="hint">${n ?? i} is already in the list.</div>` : l`
             <div class="chips">
               <button
                 class="chip accent"
@@ -2987,7 +3034,7 @@ let x = class extends C {
   render() {
     if (!this.hass || !this._config) return d;
     const t = this._config, e = t.apps;
-    return h`
+    return l`
       <ha-form
         .hass=${this.hass}
         .data=${this._formData}
@@ -3017,7 +3064,7 @@ let x = class extends C {
           @value-changed=${this._formChanged}
         ></ha-form>
 
-        ${t.show_apps ? h`
+        ${t.show_apps ? l`
               <div class="section-head">
                 <span class="grow">Apps</span>
                 <span class="count">${e.length}</span>
@@ -3028,7 +3075,7 @@ let x = class extends C {
               <div class="section-head"><span class="grow">Add a known app</span></div>
               <div class="chips">
                 ${pt.map(
-      (o) => h`
+      (o) => l`
                     <button
                       class="chip"
                       @click=${() => this._addTile("apps", {
@@ -3072,7 +3119,7 @@ let x = class extends C {
           </div>
 
           ${t.sections.map(
-      (o, i) => h`
+      (o, i) => l`
               <div class="section-block">
               <div class="section-head">
                 <!--
@@ -3354,7 +3401,7 @@ const mt = (t) => t.action === "activity" || t.action === "app" || t.action === 
     default:
       return "";
   }
-}, Do = (t) => t.action === "service" ? dt(t.service, t.data, t.target) : mt(t) === "action" ? t : void 0, oe = (t, e) => {
+}, Uo = (t) => t.action === "service" ? dt(t.service, t.data, t.target) : mt(t) === "action" ? t : void 0, oe = (t, e) => {
   switch (t) {
     case "activity":
       return { action: "activity", activity: e };
@@ -3369,10 +3416,10 @@ const mt = (t) => t.action === "activity" || t.action === "app" || t.action === 
   const e = ue(t);
   return e ? `brand:${e}` : "mdi:application";
 };
-var Io = Object.defineProperty, Ho = Object.getOwnPropertyDescriptor, Z = (t, e, o, i) => {
-  for (var n = i > 1 ? void 0 : i ? Ho(e, o) : e, s = t.length - 1, a; s >= 0; s--)
+var Ho = Object.defineProperty, Io = Object.getOwnPropertyDescriptor, Z = (t, e, o, i) => {
+  for (var n = i > 1 ? void 0 : i ? Io(e, o) : e, s = t.length - 1, a; s >= 0; s--)
     (a = t[s]) && (n = (i ? a(e, o, n) : a(n)) || n);
-  return i && n && Io(e, o, n), n;
+  return i && n && Ho(e, o, n), n;
 };
 const Lo = "2.1.1-beta.5", st = "polr-android-tv-remote-card";
 let z = class extends C {
@@ -3464,7 +3511,7 @@ let z = class extends C {
   }
   _launch(t) {
     const e = this._device;
-    !this.hass || !e || this._run(po(this.hass, e, t.action, this));
+    !this.hass || !e || this._run(po(this.hass, e, t, this));
   }
   async _sendText() {
     const t = this._device, e = this._text.trim();
@@ -3480,18 +3527,18 @@ let z = class extends C {
   /* ------------------------------------------------------------- header -- */
   _renderHeader(t) {
     const e = this._config, o = t.available ? t.on ? t.appName ?? "On" : "Off" : "Unavailable", i = t.on && t.available ? ue(t.appName) : void 0;
-    return h`
+    return l`
       <div class="tile">
         <!-- Not interactive: the icon shows what is playing, and tapping it
              opened a more-info dialog nobody wanted from a remote. -->
         <div class="tile-icon">
-          ${i ? h`<span class="brand-mark">${ut[i]}</span>` : h`<ha-icon icon="mdi:television"></ha-icon>`}
+          ${i ? l`<span class="brand-mark">${ut[i]}</span>` : l`<ha-icon icon="mdi:television"></ha-icon>`}
         </div>
         <div class="tile-info">
           <div class="primary"><span>${t.name}</span></div>
           <div class="secondary" aria-live="polite"><span>${o}</span></div>
         </div>
-        ${e.show_power ? h`
+        ${e.show_power ? l`
               <button
                 class="icon-button"
                 type="button"
@@ -3516,13 +3563,13 @@ let z = class extends C {
   _renderChips(t) {
     if (!t.on || !t.available || this._config.show_volume) return d;
     const e = [];
-    return t.muted === !0 ? e.push(h`<span class="chip warn"><ha-icon icon="mdi:volume-off"></ha-icon>Muted</span>`) : Kt(t) && e.push(h`<span class="chip accent">${Math.round(t.volume * 100)}%</span>`), e.length ? h`<div class="tile" style="padding-top:0;min-height:0">
+    return t.muted === !0 ? e.push(l`<span class="chip warn"><ha-icon icon="mdi:volume-off"></ha-icon>Muted</span>`) : Kt(t) && e.push(l`<span class="chip accent">${Math.round(t.volume * 100)}%</span>`), e.length ? l`<div class="tile" style="padding-top:0;min-height:0">
       <div class="chips">${e}</div>
     </div>` : d;
   }
   /* -------------------------------------------------------------- rows -- */
   _button(t, e, o, i = {}) {
-    return h`
+    return l`
       <button
         class="control-button"
         type="button"
@@ -3536,7 +3583,7 @@ let z = class extends C {
   }
   _renderNavigationRow() {
     const t = this._config, e = t.show_power && !t.show_header;
-    return h`
+    return l`
       <div class="features">
         ${e ? this._button("power", "mdi:power", "Power") : d}
         ${this._button("back", "mdi:arrow-u-left-top", "Back")}
@@ -3553,7 +3600,7 @@ let z = class extends C {
    * codes work regardless — it is only the *player* route that needs the bit.
    */
   _renderTransport(t) {
-    const e = t.playerId === null, o = e || I(t, y.PREVIOUS_TRACK), i = e || I(t, y.NEXT_TRACK), n = new Set(this._config.transport_buttons), s = [
+    const e = t.playerId === null, o = e || H(t, y.PREVIOUS_TRACK), i = e || H(t, y.NEXT_TRACK), n = new Set(this._config.transport_buttons), s = [
       n.has("previous") && o ? this._button("previous", "mdi:skip-previous", "Previous") : d,
       n.has("rewind") ? this._button("rewind", "mdi:rewind", "Rewind", { repeat: !0 }) : d,
       n.has("play_pause") ? this._button(
@@ -3564,7 +3611,7 @@ let z = class extends C {
       n.has("fast_forward") ? this._button("fast_forward", "mdi:fast-forward", "Fast forward", { repeat: !0 }) : d,
       n.has("next") && i ? this._button("next", "mdi:skip-next", "Next") : d
     ];
-    return h`<div class="features">${s}</div>`;
+    return l`<div class="features">${s}</div>`;
   }
   /**
    * Volume: one control, not three.
@@ -3583,7 +3630,7 @@ let z = class extends C {
    */
   _renderVolume(t) {
     const e = t.on || t.volumeId !== t.playerId, o = e && t.muted === !0, i = e && t.muted !== void 0, n = e && Kt(t) ? Math.round(t.volume * 100) : void 0;
-    return h`
+    return l`
       <div class="features">
         ${this._button("volume_down", "mdi:volume-minus", "Volume down", { repeat: !0 })}
         <button
@@ -3595,16 +3642,16 @@ let z = class extends C {
         >
           <!-- Read-only by design: androidtv_remote supports VOLUME_STEP but
                not VOLUME_SET, so there is nothing to drag to. -->
-          ${n === void 0 ? d : h`<span class="level" style="width:${n}%"></span>`}
+          ${n === void 0 ? d : l`<span class="level" style="width:${n}%"></span>`}
           <ha-icon icon=${o ? "mdi:volume-off" : "mdi:volume-high"}></ha-icon>
-          ${o ? h`<span class="value">Muted</span>` : n === void 0 ? d : h`<span class="value">${n}%</span>`}
+          ${o ? l`<span class="value">Muted</span>` : n === void 0 ? d : l`<span class="value">${n}%</span>`}
         </button>
         ${this._button("volume_up", "mdi:volume-plus", "Volume up", { repeat: !0 })}
       </div>
     `;
   }
   _renderTextInput() {
-    return h`
+    return l`
       <div class="text-row">
         <input
           type="text"
@@ -3635,9 +3682,9 @@ let z = class extends C {
     const e = t.icon ?? "mdi:application";
     if (e.startsWith("brand:")) {
       const o = ut[e.slice(6)];
-      if (o) return h`${o}`;
+      if (o) return l`${o}`;
     }
-    return e.startsWith("/") || e.startsWith("http") ? h`<img src=${e} alt="" />` : h`<ha-icon icon=${e}></ha-icon>`;
+    return e.startsWith("/") || e.startsWith("http") ? l`<img src=${e} alt="" />` : l`<ha-icon icon=${e}></ha-icon>`;
   }
   /**
    * One row of tiles.
@@ -3648,8 +3695,8 @@ let z = class extends C {
    */
   _renderSection(t, e, o, i) {
     const n = this._config;
-    return t.length ? h`
-      ${n.show_section_labels && e ? h`<div class="section-head">
+    return t.length ? l`
+      ${n.show_section_labels && e ? l`<div class="section-head">
             ${e}<span class="grow"></span><span class="count">${t.length}</span>
           </div>` : d}
       <div class="app-grid" style="--app-per-row: ${o}">
@@ -3658,7 +3705,7 @@ let z = class extends C {
       (s, a) => `${i}:${a}:${s.icon ?? ""}`,
       (s) => {
         const a = this.hass ? ao(this.hass, s.entity) : !1;
-        return h`
+        return l`
               <button
                 class="app-tile ${a ? "active" : ""}"
                 type="button"
@@ -3683,7 +3730,7 @@ let z = class extends C {
   /** User-defined rows, in declared order, ahead of the app launcher. */
   _renderCustomSections() {
     const t = this._config;
-    return t.sections.length ? h`
+    return t.sections.length ? l`
       ${t.sections.map(
       (e, o) => this._renderSection(
         e.buttons,
@@ -3699,7 +3746,7 @@ let z = class extends C {
     if (!this.hass || !this._config) return d;
     const t = this._config, e = this._device;
     if (!e.found)
-      return h`
+      return l`
         <ha-card>
           <div class="notice error">
             <ha-icon icon="mdi:alert-circle"></ha-icon>
@@ -3708,18 +3755,18 @@ let z = class extends C {
         </ha-card>
       `;
     const o = Qe("media_player", e.on ? "on" : "off"), i = e.available;
-    return h`
+    return l`
       <ha-card class=${t.show_header ? "" : "headerless"} style="--tile-color:${o}">
         ${t.show_header ? this._renderHeader(e) : d}
-        ${t.show_header && e.playerId === null ? h`<div class="notice warn">
+        ${t.show_header && e.playerId === null ? l`<div class="notice warn">
               <ha-icon icon="mdi:information-outline"></ha-icon>
               <span class="grow">
                 This device has no media player, so power state, transport and
                 volume level are unavailable.
               </span>
             </div>` : d}
-        ${i ? e.on ? h`
-                ${t.show_nav ? h`<polr-atv-nav-pad
+        ${i ? e.on ? l`
+                ${t.show_nav ? l`<polr-atv-nav-pad
                       .pad=${t.pad}
                       .repeat=${t.hold_repeat}
                       .haptics=${t.haptics}
@@ -3731,7 +3778,7 @@ let z = class extends C {
                 ${t.show_text_input ? this._renderTextInput() : d}
                 ${this._renderCustomSections()}
                 ${t.show_apps ? this._renderApps() : d}
-              ` : h`
+              ` : l`
                 <!-- No "the TV is off" line: the header secondary already says
                      Off, and the button says Turn on. -->
                 <div class="features">
@@ -3749,7 +3796,7 @@ let z = class extends C {
                 ${t.show_volume && ro(t, e) ? this._renderVolume(e) : d}
                 ${this._renderCustomSections()}
                 ${t.show_apps ? this._renderApps() : d}
-              ` : h`<div class="empty-state">This device is unavailable.</div>`}
+              ` : l`<div class="empty-state">This device is unavailable.</div>`}
       </ha-card>
     `;
   }

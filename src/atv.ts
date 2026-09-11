@@ -18,7 +18,7 @@
  */
 
 import { isActionable, runAction, splitService, type ActionConfig } from "./actions";
-import type { AppAction, ButtonId, ResolvedConfig, ServiceAction } from "./config";
+import type { AppAction, ButtonId, ResolvedConfig, ServiceAction, TileConfig } from "./config";
 import type { HassEntity, HomeAssistant } from "./kit/types";
 
 /** MediaPlayerEntityFeature, the bits this card cares about. */
@@ -395,13 +395,20 @@ export const pressButton = (
   return sendKey(hass, device, key);
 };
 
-/** Launch an app tile. */
+/**
+ * Run a tile's action: an app in the launcher, or a button in a section.
+ *
+ * Takes the whole tile rather than its action, because the tile's own entity is
+ * part of what the action means -- see the default branch.
+ */
 export const runAppAction = (
   hass: HomeAssistant,
   device: DeviceState,
-  action: AppAction,
+  tile: TileConfig,
   node?: HTMLElement,
 ): Promise<unknown> => {
+  const action = tile.action;
+
   switch (action.action) {
     case "activity":
       return hass.callService("remote", "turn_on", {
@@ -430,15 +437,37 @@ export const runAppAction = (
     case "service":
       return callService(hass, action);
 
-    // Everything else is a Home Assistant action, run exactly as an override
-    // would run it.
+    /*
+     * Everything else is a Home Assistant action, run exactly as an override
+     * would run it -- except for which entity a bare one lands on.
+     *
+     * A section button names the thing it is about: the receiver it lights up
+     * for, the projector it toggles. "More info" on that button means that
+     * receiver, and HA's own action editor has no field to say so -- it has
+     * never had one, because in HA's cards the answer is always the card's
+     * entity. Here the card's entity is a remote, so the dialog it opened was
+     * the one thing the button was certainly not about.
+     *
+     * So the tile's entity stands in first, the card's remains the last
+     * resort, and an explicit `entity:` on the action still beats both.
+     */
     default:
-      return runAction(node, hass, action as ActionConfig, device.remoteId);
+      return runAction(
+        node,
+        hass,
+        action as ActionConfig,
+        tile.entity ?? device.remoteId,
+      );
   }
 };
 
 /** A one-line human description of an action, for the editor's app list. */
-export const describeAction = (action: AppAction): string => {
+/**
+ * `tileEntity` is what a bare more-info or toggle will land on, which the
+ * action alone cannot say -- the list row would otherwise promise "the TV" for
+ * a button that toggles a projector.
+ */
+export const describeAction = (action: AppAction, tileEntity?: string): string => {
   switch (action.action) {
     case "activity":
       return `Launch ${action.activity}`;
@@ -457,9 +486,11 @@ export const describeAction = (action: AppAction): string => {
     case "url":
       return `Open ${action.url_path}`;
     case "toggle":
-      return "Toggle the TV";
-    case "more-info":
-      return "Show more info";
+      return tileEntity ? `Toggle ${tileEntity}` : "Toggle the TV";
+    case "more-info": {
+      const entity = action.entity ?? tileEntity;
+      return entity ? `Show ${entity}` : "Show more info";
+    }
     case "none":
       return "Do nothing";
   }

@@ -485,7 +485,7 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
         <div class="tile-icon">${this._renderIcon(app)}</div>
         <div class="tile-info">
           <div class="primary"><span>${app.name ?? "Untitled app"}</span></div>
-          <div class="secondary"><span>${describeAction(app.action)}</span></div>
+          <div class="secondary"><span>${describeAction(app.action, app.entity)}</span></div>
         </div>
         <button
           class="icon-button"
@@ -635,6 +635,40 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
                       }
                     }}
                   ></ha-form>
+
+                  <!--
+                    HA's interactions editor has no entity field for "more
+                    info" -- in HA's own cards the dialog is always the card's
+                    entity, and there was nothing to choose. Here the card's
+                    entity is a remote, so without this the one dialog the
+                    button could open was the one it was not about.
+                  -->
+                  ${haAction?.action === "more-info"
+                    ? html`
+                        <ha-entity-picker
+                          .hass=${this.hass}
+                          .value=${haAction.entity ?? ""}
+                          label="Dialog to open"
+                          allow-custom-entity
+                          @value-changed=${(event: CustomEvent) =>
+                            this._updateTile(path, index, {
+                              action: {
+                                action: "more-info",
+                                ...((event.detail?.value as string)
+                                  ? { entity: event.detail.value as string }
+                                  : {}),
+                              },
+                            })}
+                        ></ha-entity-picker>
+                        <div class="hint">
+                          ${app.entity
+                            ? html`Leave empty to open ${app.entity}, the entity
+                              this button lights up for.`
+                            : html`Leave empty and it opens the card's remote,
+                              which is rarely what a button is about.`}
+                        </div>
+                      `
+                    : nothing}
                 `
               : html`
                   <label class="field wide">

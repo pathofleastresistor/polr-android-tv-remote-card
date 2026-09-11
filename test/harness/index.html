@@ -276,6 +276,14 @@
         ["editor: no apps yet", { entity: "remote.main_tv" }],
         // The spacing case: a name field, rows and "Add button" stacked inside
         // a section block, and two blocks stacked inside the panel.
+        // A section button whose action is "more info": the picker for which
+        // dialog it opens is the card's own, because HA's action editor has
+        // none.
+        ["editor: more-info target", { entity: "remote.main_tv", apps: [], sections: [
+          { name: "Source", buttons: [
+            { name: "Info", icon: "mdi:information-outline", entity: "media_player.soundbar", action: { action: "more-info" } },
+          ] },
+        ] }],
         ["editor: sections", { entity: "remote.main_tv", apps: APPS.slice(0, 2), sections: [
           { name: "Home Theater", buttons: [
             { name: "TV", icon: "mdi:television", action: { action: "service", service: "remote.toggle" } },

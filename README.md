@@ -251,6 +251,39 @@ overrides:
   volume_mute: button.media_room_baton_volume_mute
 ```
 
+### More info, and which entity it opens
+
+Home Assistant's interactions editor has no entity field for **more info** — in
+HA's own cards the dialog is always the card's entity, so there was never
+anything to choose. This card's entity is a *remote*, which is rarely what a
+button is about, so a section button's dialog used to open the one thing it
+certainly was not about.
+
+A tile's action now lands on its own entity first:
+
+```yaml
+sections:
+  - name: Source
+    buttons:
+      # Lights up with the receiver, and opens the receiver's dialog.
+      - name: Receiver
+        icon: mdi:audio-video
+        entity: media_player.living_room_avr
+        action: { action: more-info }
+
+      # Unless the action names one, which beats both.
+      - name: Now playing
+        icon: mdi:information-outline
+        entity: media_player.living_room_avr
+        action: { action: more-info, entity: media_player.turntable }
+```
+
+The editor offers that entity as **Dialog to open** whenever the action is more
+info. Leave it empty and the tile's own entity is used; a tile with neither
+falls back to the card's remote, as before. `toggle` follows the same order,
+and since HA's config has nowhere to name an entity for it, the tile's own is
+the only way to mean anything but the remote.
+
 ### Text input
 
 `show_text_input: true` adds a field that types on the TV, which beats entering
