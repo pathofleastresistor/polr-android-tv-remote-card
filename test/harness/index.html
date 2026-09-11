@@ -217,6 +217,13 @@
           ] },
           "volume", "pad", "navigation", "transport", "apps",
         ] } },
+        // Titles: any block can have a heading, and it shows because it is set.
+        { title: "layout: titled blocks", config: { entity: "remote.main_tv", apps: APPS.slice(0, 4), layout: [
+          { type: "volume", title: "Sound" },
+          { type: "pad", title: "Remote" },
+          "navigation",
+          { type: "apps", title: "Streaming" },
+        ] } },
         { title: "layout: volume first, no pad", config: { entity: "remote.main_tv", apps: APPS.slice(0, 3), layout: ["volume", "transport", "navigation", "apps"] } },
         { title: "TV off", config: { entity: "remote.main_tv", apps: APPS.slice(0, 4) }, hass: { playerState: "off" } },
         // A soundbar does not sleep with the TV, so volume routed to one keeps
@@ -296,7 +303,7 @@
         // The Layout panel: every block in one ordered list, hidden ones struck
         // through and still in place.
         ["editor: layout", { entity: "remote.main_tv", apps: APPS.slice(0, 2), layout: [
-          "volume",
+          { type: "volume", title: "Sound" },
           { type: "section", name: "Home Theater", buttons: [
             { name: "TV", icon: "mdi:television", action: { action: "service", service: "remote.toggle" } },
             { name: "AVR", icon: "mdi:audio-video", action: { action: "service", service: "media_player.toggle" } },

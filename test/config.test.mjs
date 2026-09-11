@@ -785,6 +785,36 @@ test("a layout survives the round-trip HA performs on every edit", () => {
   assert.deepEqual(orderOf(normalizeConfig(stripLegacyKeys(after))), orderOf(before));
 });
 
+test("any block can carry a title", () => {
+  const config = normalizeConfig(
+    base({
+      entity: "remote.atv",
+      layout: [
+        { type: "volume", title: "Sound" },
+        { type: "pad", title: "" },
+        { type: "section", title: "Home theater", name: "ht", buttons: [] },
+        "apps",
+      ],
+    }),
+  );
+  const titles = config.layout.map((block) => block.title);
+  assert.equal(titles[0], "Sound");
+  assert.equal(titles[1], undefined, "an empty title is no title");
+  assert.equal(titles[2], "Home theater");
+  assert.equal(titles[3], undefined);
+  // A title does not disturb what the block is or what it holds.
+  assert.equal(config.layout[2].name, "ht");
+  assert.equal(sectionsOf(config)[0].buttons.length, 0);
+});
+
+test("a title survives the round-trip HA performs", () => {
+  const before = normalizeConfig(
+    base({ entity: "remote.atv", layout: [{ type: "volume", title: "Sound" }] }),
+  );
+  const after = normalizeConfig(stripLegacyKeys(before));
+  assert.equal(after.layout[0].title, "Sound");
+});
+
 test("brandFor matches the names a TV actually reports", () => {
   // app_name is whatever the TV feels like calling the app, so matching is
   // normalised to letters: "Disney+" and "Prime Video" have to land.

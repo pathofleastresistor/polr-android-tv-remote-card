@@ -456,19 +456,13 @@ export class PolrAndroidTvRemoteCard extends LitElement {
    */
   private _renderSection(
     tiles: TileConfig[],
-    label: string,
     columns: number,
     key: string,
   ): TemplateResult | typeof nothing {
-    const config = this._config!;
     if (!tiles.length) return nothing;
+    const config = this._config!;
 
     return html`
-      ${config.show_section_labels && label
-        ? html`<div class="section-head">
-            ${label}<span class="grow"></span><span class="count">${tiles.length}</span>
-          </div>`
-        : nothing}
       <div class="app-grid" style="--app-per-row: ${columns}">
         ${repeat(
           tiles,
@@ -533,16 +527,51 @@ export class PolrAndroidTvRemoteCard extends LitElement {
         return this._renderTextInput();
 
       case "apps":
-        return this._renderSection(config.apps, "Apps", config.app_columns, "apps");
+        return this._renderSection(config.apps, config.app_columns, "apps");
 
       case "section":
         return this._renderSection(
           block.buttons,
-          block.name ?? "",
           block.columns ?? config.app_columns,
           `s${index}`,
         );
     }
+  }
+
+  /**
+   * The heading above a block, if it has earned one.
+   *
+   * `title` draws because it is set -- that is what setting it means. The older
+   * rule still holds underneath it: with section labels on, a section falls
+   * back to its name and the launcher to "Apps", so a card written before
+   * titles existed looks exactly as it did.
+   *
+   * The count belongs to lists of tiles. "Volume 1" would be counting nothing.
+   */
+  private _renderHeading(block: LayoutBlock): TemplateResult | typeof nothing {
+    const config = this._config!;
+    const tiles =
+      block.type === "section"
+        ? block.buttons
+        : block.type === "apps"
+          ? config.apps
+          : undefined;
+
+    const legacy = config.show_section_labels
+      ? block.type === "section"
+        ? block.name
+        : block.type === "apps"
+          ? "Apps"
+          : undefined
+      : undefined;
+
+    const label = block.title ?? legacy;
+    if (!label) return nothing;
+
+    return html`<div class="section-head">
+      ${label}<span class="grow"></span>
+      ${tiles ? html`<span class="count">${tiles.length}</span>` : nothing}
+    </div>`;
   }
 
   /**
@@ -557,17 +586,22 @@ export class PolrAndroidTvRemoteCard extends LitElement {
     const config = this._config!;
     const live = device.on;
 
+    const draws = (block: LayoutBlock): boolean => {
+      if (block.hidden) return false;
+      if (live) return true;
+      // An off TV can still work a soundbar, and still has sections and apps.
+      if (block.type === "section" || block.type === "apps") return true;
+      return block.type === "volume" && hasExternalVolume(config, device);
+    };
+
     return html`
       ${config.layout.map((block, index) => {
-        if (block.hidden) return nothing;
-        if (live) return this._renderBlock(block, index, device);
-        if (block.type === "section" || block.type === "apps") {
-          return this._renderBlock(block, index, device);
-        }
-        if (block.type === "volume" && hasExternalVolume(config, device)) {
-          return this._renderBlock(block, index, device);
-        }
-        return nothing;
+        if (!draws(block)) return nothing;
+        const body = this._renderBlock(block, index, device);
+        // An empty section draws nothing, and a heading over nothing is a
+        // label for a row that is not there.
+        if (body === nothing) return nothing;
+        return html`${this._renderHeading(block)}${body}`;
       })}
     `;
   }

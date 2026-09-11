@@ -65,7 +65,7 @@ entity: remote.living_room_tv
 | `volume_entity`       | player   | What the volume buttons drive. See [Volume](#volume).                   |
 | `apps`                | `[]`     | See [Apps](#apps).                                                      |
 | `app_columns`         | `5`      | Most app buttons on one row before wrapping.                            |
-| `show_section_labels` | `false`  | Small headings above sections.                                          |
+| `show_section_labels` | `false`  | Show section names as headings. Per-block `title` needs no switch.       |
 | `hold_repeat`         | `true`   | Hold a d-pad or volume button to repeat it.                             |
 | `haptics`             | `true`   | Haptic feedback (Companion app only).                                   |
 | `overrides`           | `{}`     | See [Pointing buttons elsewhere](#pointing-buttons-elsewhere).          |
@@ -121,6 +121,23 @@ layout:
 
 That is what the editor's eye toggle writes, which is why hiding a block and
 showing it again does not shuffle the card.
+
+**Any block can carry a title**, which is drawn as a heading above it:
+
+```yaml
+layout:
+  - { type: volume, title: Sound }
+  - { type: pad, title: Remote }
+  - navigation
+  - { type: apps, title: Streaming }
+```
+
+A title shows because it is set — there is no second switch to find. Sections
+predate it and keep their older behaviour: a section's `name` is its heading
+only when `show_section_labels` is on, so no existing card sprouts headings it
+never had. Give a section a `title` and that wins, shown either way.
+
+A heading over nothing is never drawn: an empty section draws neither.
 
 **Without a `layout`** the order is the one the card has always drawn — pad,
 back/home/menu, transport, volume, text input, your sections, apps — with

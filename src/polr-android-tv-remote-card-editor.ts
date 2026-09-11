@@ -239,7 +239,7 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
   @state() private _editing: { path: ListPath; index: number } | null = null;
 
   /**
-   * Which section's own editor is expanded, as a layout index.
+   * Which block's own editor is expanded, as a layout index.
    *
    * Separate from `_editing`, which tracks the open *tile* form: opening a
    * button inside a section must not collapse the section around it.
@@ -459,6 +459,17 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
     // is the bug "Add section" shipped with once already.
     this._openSection = layout.length;
     this._editing = null;
+  }
+
+  /** A heading above the block, or none when the field is emptied. */
+  private _setTitle(index: number, title: string): void {
+    this._setLayout(
+      this._config!.layout.map((block, i) => {
+        if (i !== index) return block;
+        const { title: _old, ...rest } = block;
+        return title ? { ...rest, title } : rest;
+      }),
+    );
   }
 
   private _renameSection(index: number, name: string): void {
@@ -794,13 +805,12 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
     const layout = this._config!.layout;
 
     return html`<ul class="list">
-      ${layout.flatMap((block, index) => {
+      ${layout.flatMap((block, index): Array<TemplateResult | typeof nothing> => {
         const open = this._openSection === index;
-        const rows: Array<TemplateResult | typeof nothing> = [
+        return [
           this._renderLayoutRow(block, index, layout.length, open),
+          this._renderBlockBody(block, index),
         ];
-        if (block.type === "section") rows.push(this._renderSectionBody(block, index));
-        return rows;
       })}
     </ul>`;
   }
@@ -830,7 +840,9 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
         </div>
         <div class="tile-info">
           <div class="primary">
-            <span>${section ? (section.name || "Untitled section") : meta!.label}</span>
+            <span>
+              ${block.title || (section ? section.name || "Untitled section" : meta!.label)}
+            </span>
           </div>
           ${secondary ? html`<div class="secondary"><span>${secondary}</span></div>` : nothing}
         </div>
@@ -858,30 +870,30 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
         >
           <ha-icon icon=${block.hidden ? "mdi:eye-off" : "mdi:eye"}></ha-icon>
         </button>
-        ${section
-          ? html`
-              <button
-                class="icon-button"
-                title=${open ? "Done" : "Edit"}
-                @click=${() => {
-                  this._openSection = open ? null : index;
-                  if (!open) this._editing = null;
-                }}
-              >
-                <ha-icon icon=${open ? "mdi:check" : "mdi:pencil"}></ha-icon>
-              </button>
-            `
-          : nothing}
+        <button
+          class="icon-button"
+          title=${open ? "Done" : "Edit"}
+          @click=${() => {
+            this._openSection = open ? null : index;
+            if (!open) this._editing = null;
+          }}
+        >
+          <ha-icon icon=${open ? "mdi:check" : "mdi:pencil"}></ha-icon>
+        </button>
       </li>
     `;
   }
 
-  /** A section's own editor: its name, its buttons, and a way to add one. */
-  private _renderSectionBody(
-    section: Extract<LayoutBlock, { type: "section" }>,
+  /**
+   * A block's own editor: a title for any of them, and for a section its name,
+   * its buttons, and the way to be rid of it.
+   */
+  private _renderBlockBody(
+    block: LayoutBlock,
     index: number,
   ): TemplateResult | typeof nothing {
     if (this._openSection !== index) return nothing;
+    const section = block.type === "section" ? block : undefined;
 
     return html`
       <li class="form-host">
@@ -890,40 +902,63 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
             <!--
               A plain input, like every other field in this editor. ha-textfield
               is not a component this frontend defines, so it rendered as an
-              inert unknown element and the name could not be typed at all.
+              inert unknown element and could not be typed in at all.
             -->
             <label class="field">
-              <span>Section name</span>
+              <span>Title</span>
               <input
                 type="text"
-                .value=${section.name ?? ""}
+                .value=${block.title ?? ""}
                 @change=${(event: Event) =>
-                  this._renameSection(index, (event.target as HTMLInputElement).value)}
+                  this._setTitle(index, (event.target as HTMLInputElement).value.trim())}
               />
             </label>
+            <div class="hint">A heading above this block. Empty for none.</div>
+
+            ${section
+              ? html`
+                  <label class="field">
+                    <span>Section name</span>
+                    <input
+                      type="text"
+                      .value=${section.name ?? ""}
+                      @change=${(event: Event) =>
+                        this._renameSection(index, (event.target as HTMLInputElement).value)}
+                    />
+                  </label>
+                  <div class="hint">
+                    Names this row in the editor. It is also the heading when
+                    “Section labels” is on under Advanced and no title is set.
+                  </div>
+                `
+              : nothing}
           </div>
 
-          ${this._renderTileList(index, section.buttons, "No buttons yet.")}
+          ${section
+            ? html`
+                ${this._renderTileList(index, section.buttons, "No buttons yet.")}
 
-          <div class="form-actions">
-            <button
-              class="control-button destructive"
-              @click=${() => this._removeSection(index)}
-            >
-              <ha-icon icon="mdi:delete"></ha-icon><span>Remove</span>
-            </button>
-            <button
-              class="control-button"
-              @click=${() =>
-                this._addTile(index, {
-                  name: "New button",
-                  icon: "mdi:power",
-                  action: { action: "service", service: "" },
-                })}
-            >
-              <ha-icon icon="mdi:plus"></ha-icon><span>Add button</span>
-            </button>
-          </div>
+                <div class="form-actions">
+                  <button
+                    class="control-button destructive"
+                    @click=${() => this._removeSection(index)}
+                  >
+                    <ha-icon icon="mdi:delete"></ha-icon><span>Remove</span>
+                  </button>
+                  <button
+                    class="control-button"
+                    @click=${() =>
+                      this._addTile(index, {
+                        name: "New button",
+                        icon: "mdi:power",
+                        action: { action: "service", service: "" },
+                      })}
+                  >
+                    <ha-icon icon="mdi:plus"></ha-icon><span>Add button</span>
+                  </button>
+                </div>
+              `
+            : nothing}
         </div>
       </li>
     `;
@@ -952,8 +987,7 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
           <div class="hint">
             Everything on the card, in the order it is drawn, under the header.
             Move a row to move the block; hide one and it keeps its place for
-            when you bring it back. Section names show only when “Section
-            labels” is on, under Advanced.
+            when you bring it back. Open a row to give the block a heading.
           </div>
 
           ${this._renderLayoutList()}
