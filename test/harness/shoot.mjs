@@ -305,6 +305,63 @@ for (const dark of [false, true]) {
     console.log("editor round-trip: sections survive an edit, apps untouched");
   }
 
+  // The editor's spacing is a claim like any other, and the kind that rots
+  // quietly: every part of these panels is a card component that pads itself,
+  // so a new row added later brings its own inset and its own margin back with
+  // it. What is asserted is the rhythm, not the pixels: one left edge per
+  // stack, and gaps from the 4 / 8 / 16 scale.
+  if (!dark) {
+    const spacing = await page.evaluate(() => {
+      const kase = [...document.querySelectorAll(".case")].find(
+        (c) => c.querySelector("h2")?.textContent === "editor: sections",
+      );
+      const editor = kase.querySelector("polr-android-tv-remote-card-editor");
+      const name = (el) => el.className || el.tagName.toLowerCase();
+
+      // A heading hugs what follows it, so 8 is as legal as the 16 between
+      // blocks; inside a section block everything is 8; rows are 4 apart.
+      const measure = (parent, allowed, label) => {
+        const kids = [...parent.children];
+        const boxes = kids.map((el) => el.getBoundingClientRect());
+        const lefts = new Set(boxes.map((b) => Math.round(b.left)));
+        const bad = [];
+        for (let i = 1; i < kids.length; i += 1) {
+          const gap = Math.round(boxes[i].top - boxes[i - 1].bottom);
+          if (!allowed.includes(gap)) {
+            bad.push(`${label}: ${gap}px above .${name(kids[i])} (want ${allowed.join(" or ")})`);
+          }
+        }
+        if (lefts.size > 1) {
+          bad.push(`${label}: ${lefts.size} different left edges (${[...lefts].join(", ")})`);
+        }
+        return bad;
+      };
+
+      const problems = [];
+      for (const panel of editor.shadowRoot.querySelectorAll("ha-expansion-panel")) {
+        const content = panel.querySelector(".content");
+        problems.push(...measure(content, [8, 16], "panel"));
+        for (const block of content.querySelectorAll(".section-block")) {
+          problems.push(...measure(block, [8], "section"));
+        }
+        for (const list of content.querySelectorAll("ul.list")) {
+          problems.push(...measure(list, [4], "list"));
+        }
+      }
+      return problems;
+    });
+
+    if (spacing.length) {
+      failed = true;
+      for (const problem of spacing) console.error(`[spacing] ${problem}`);
+    }
+    console.log(
+      spacing.length
+        ? `spacing: ${spacing.length} problem(s)`
+        : "spacing: one left edge per stack, gaps on the 4 / 8 / 16 scale",
+    );
+  }
+
   const file = resolve(outDir, dark ? "dark.png" : "light.png");
   await page.screenshot({ path: file, fullPage: true });
   console.log(`wrote ${file}`);

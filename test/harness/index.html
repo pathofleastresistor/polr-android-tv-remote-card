@@ -260,8 +260,11 @@
           const names = (this.schema ?? []).flatMap((s) =>
             s.schema ? s.schema.map((x) => x.name) : [s.name],
           );
+          // No outer margin: the real ha-form has none either (it spaces its
+          // own rows internally), and a stub that invented one would hide
+          // exactly the gaps the editor's own stylesheet is responsible for.
           this.style.cssText =
-            "display:block;padding:12px;margin:8px 12px;border-radius:8px;background:rgba(128,128,128,.12);font-size:12px;color:var(--secondary-text-color)";
+            "display:block;padding:12px;border-radius:8px;background:rgba(128,128,128,.12);font-size:12px;color:var(--secondary-text-color)";
           this.textContent = `[ha-form] ${names.filter(Boolean).join(", ")}`;
         }
       }
@@ -271,6 +274,20 @@
         ["editor: v2 config", { entity: "remote.main_tv", apps: APPS.slice(0, 4) }],
         ["editor: migrating a v1 config", { entity_id: "remote.main_tv", remote: "touch", apps: ["netflix", { icon: "mdi:youtube", url: "https://www.youtube.com" }] }],
         ["editor: no apps yet", { entity: "remote.main_tv" }],
+        // The spacing case: a name field, rows and "Add button" stacked inside
+        // a section block, and two blocks stacked inside the panel.
+        ["editor: sections", { entity: "remote.main_tv", apps: APPS.slice(0, 2), sections: [
+          { name: "Home Theater", buttons: [
+            { name: "TV", icon: "mdi:television", action: { action: "service", service: "remote.toggle" } },
+            { name: "Google", icon: "mdi:cast", action: { action: "service", service: "remote.toggle" } },
+            { name: "AVR", icon: "mdi:audio-video", action: { action: "service", service: "media_player.toggle" } },
+          ] },
+          { name: "Source", buttons: [
+            { name: "Google", icon: "mdi:cast", action: { action: "service", service: "media_player.select_source" } },
+            { name: "Radio", icon: "mdi:radio", action: { action: "service", service: "media_player.select_source" } },
+          ] },
+          { name: "Empty", buttons: [] },
+        ] }],
         ["editor: RF power + IR volume", { entity: "remote.main_tv", overrides: { power: { service: "remote.send_command", data: { command: "power", device: "livingroomtv", entity_id: "remote.living_room_rf" } } } }],
         ["editor: IR volume buttons", { entity: "remote.main_tv", overrides: { volume_up: "button.baton_volume_up", volume_down: "button.baton_volume_down", volume_mute: { tap_action: { action: "perform-action", perform_action: "button.press", target: { entity_id: "button.baton_volume_mute" } }, hold_action: { action: "more-info" } } } }],
       ]) {
