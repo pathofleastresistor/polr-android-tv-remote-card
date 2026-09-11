@@ -311,18 +311,30 @@ for (const dark of [false, true]) {
   // it. What is asserted is the rhythm, not the pixels: one left edge per
   // stack, and gaps from the 4 / 8 / 16 scale.
   if (!dark) {
-    const spacing = await page.evaluate(() => {
+    const spacing = await page.evaluate(async () => {
       const kase = [...document.querySelectorAll(".case")].find(
         (c) => c.querySelector("h2")?.textContent === "editor: sections",
       );
       const editor = kase.querySelector("polr-android-tv-remote-card-editor");
       const name = (el) => el.className || el.tagName.toLowerCase();
 
+      // Open a row's inline form: it is the one surface only reachable by
+      // clicking, and the one whose padding was silently stripped once because
+      // nothing here looked inside it.
+      const pencil = editor.shadowRoot
+        .querySelector(".section-block ul.list > li.row")
+        .querySelector("button[title='Edit']");
+      pencil.click();
+      await editor.updateComplete;
+
       // A heading hugs what follows it, so 8 is as legal as the 16 between
-      // blocks; inside a section block everything is 8; rows are 4 apart.
-      const measure = (parent, allowed, label) => {
+      // blocks; inside a section block everything is 8; rows are 4 apart. The
+      // inset is what each stack owes its children on both sides: 0 where the
+      // parent is a bare stack, 12 where it is a padded surface.
+      const measure = (parent, allowed, inset, label) => {
         const kids = [...parent.children];
         const boxes = kids.map((el) => el.getBoundingClientRect());
+        const box = parent.getBoundingClientRect();
         const lefts = new Set(boxes.map((b) => Math.round(b.left)));
         const bad = [];
         for (let i = 1; i < kids.length; i += 1) {
@@ -334,19 +346,31 @@ for (const dark of [false, true]) {
         if (lefts.size > 1) {
           bad.push(`${label}: ${lefts.size} different left edges (${[...lefts].join(", ")})`);
         }
+        // Widest child, so a deliberately narrow one cannot mask a zero inset.
+        const left = Math.round(Math.min(...boxes.map((b) => b.left)) - box.left);
+        const right = Math.round(box.right - Math.max(...boxes.map((b) => b.right)));
+        if (left !== inset || right !== inset) {
+          bad.push(`${label}: inset ${left}/${right}px, want ${inset} on both sides`);
+        }
         return bad;
       };
 
       const problems = [];
       for (const panel of editor.shadowRoot.querySelectorAll("ha-expansion-panel")) {
         const content = panel.querySelector(".content");
-        problems.push(...measure(content, [8, 16], "panel"));
+        problems.push(...measure(content, [8, 16], 12, "panel"));
         for (const block of content.querySelectorAll(".section-block")) {
-          problems.push(...measure(block, [8], "section"));
+          problems.push(...measure(block, [8], 12, "section"));
         }
         for (const list of content.querySelectorAll("ul.list")) {
-          problems.push(...measure(list, [4], "list"));
+          problems.push(...measure(list, [4, 8], 0, "list"));
         }
+        for (const form of content.querySelectorAll(".form")) {
+          problems.push(...measure(form, [12], 12, "form"));
+        }
+      }
+      if (!editor.shadowRoot.querySelector(".form")) {
+        problems.push("form: no inline form open — the check measured nothing");
       }
       return problems;
     });
