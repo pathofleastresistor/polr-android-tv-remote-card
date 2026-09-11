@@ -158,10 +158,16 @@ export type BlockId = (typeof BLOCK_IDS)[number];
  * `hidden` rather than absence, because a hidden block still has a *place*.
  * Drop it from the list and turning it back on has to guess where it went --
  * the editor's eye toggle would rearrange the card behind the user's back.
+ *
+ * `title` draws a heading above the block, and does so because it is set:
+ * a field that only takes effect once a switch two panels away is found is a
+ * field that reads as broken. A section's `name` keeps its older behaviour --
+ * shown only when `show_section_labels` is on -- so no card that predates this
+ * suddenly sprouts headings.
  */
 export type LayoutBlock =
-  | { type: BlockId; hidden?: boolean }
-  | ({ type: "section"; hidden?: boolean } & SectionConfig);
+  | { type: BlockId; hidden?: boolean; title?: string }
+  | ({ type: "section"; hidden?: boolean; title?: string } & SectionConfig);
 
 export interface PolrAtvRemoteCardConfig {
   type: string;
@@ -459,15 +465,19 @@ const normalizeBlock = (entry: unknown): LayoutBlock | null => {
   }
 
   const hidden = entry["hidden"] === true ? { hidden: true as const } : {};
+  const title =
+    typeof entry["title"] === "string" && entry["title"]
+      ? { title: entry["title"] }
+      : {};
   const type = entry["type"];
 
-  if (isBlockId(type)) return { type, ...hidden };
+  if (isBlockId(type)) return { type, ...hidden, ...title };
 
   // A section says so, or simply carries buttons -- which is what the `sections`
   // shape has always looked like, so one can be pasted straight into a layout.
   if (type === "section" || Array.isArray(entry["buttons"])) {
     const section = normalizeSection(entry);
-    return section ? { type: "section", ...hidden, ...section } : null;
+    return section ? { type: "section", ...hidden, ...title, ...section } : null;
   }
 
   warnOnce(`unknown layout block ${JSON.stringify(entry)} was skipped`);
