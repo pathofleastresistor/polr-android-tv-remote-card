@@ -57,25 +57,85 @@ entity: remote.living_room_tv
 | --------------------- | -------- | ----------------------------------------------------------------------- |
 | `entity`              | required | A `remote` entity from the Android TV Remote integration.               |
 | `name`                | entity   | Header title.                                                           |
-| `show_header`         | `true`   | Now-playing tile with power.                                            |
+| `show_header`         | `true`   | Now-playing tile with power. Always at the top.                         |
 | `show_power`          | `true`   | Power button — in the header, or in the back/home/menu row without one. |
-| `show_nav`            | `true`   | The pad itself.                                                         |
+| `layout`              | see below| What the card draws and in what order. See [Layout](#layout).           |
 | `pad`                 | buttons  | `buttons`, `dpad` or `touchpad`.                                        |
-| `show_transport`      | `true`   | Previous, rewind, play-pause, fast-forward, next.                       |
-| `transport_buttons`   | all five | Which of those to draw; they always render in playback order.           |
-| `show_volume`         | `true`   | Down / mute / up, with the level and mute state shown on the mute key.  |
+| `transport_buttons`   | all five | Which playback buttons to draw; they always render in playback order.   |
 | `volume_entity`       | player   | What the volume buttons drive. See [Volume](#volume).                   |
-| `show_text_input`     | `false`  | Type on the TV. See [Text input](#text-input).                          |
-| `show_apps`           | `true`   | The app launcher.                                                       |
 | `apps`                | `[]`     | See [Apps](#apps).                                                      |
-| `sections`            | `[]`     | Your own rows of buttons. See [Sections](#sections).                    |
 | `app_columns`         | `5`      | Most app buttons on one row before wrapping.                            |
 | `show_section_labels` | `false`  | Small headings above sections.                                          |
 | `hold_repeat`         | `true`   | Hold a d-pad or volume button to repeat it.                             |
 | `haptics`             | `true`   | Haptic feedback (Companion app only).                                   |
 | `overrides`           | `{}`     | See [Pointing buttons elsewhere](#pointing-buttons-elsewhere).          |
 
-The back/home/menu row is always drawn.
+Still read, and still doing what they always did: `show_nav`, `show_transport`,
+`show_volume`, `show_text_input`, `show_apps` and `sections`. A card with no
+`layout` is laid out by those, exactly as before. See [Layout](#layout).
+
+### Layout
+
+Every block below the header is one row of a list, and the list is the order
+they are drawn in. Nothing is pinned there: a receiver's buttons can sit above
+the d-pad, volume can go first, the app launcher can go anywhere.
+
+```yaml
+layout:
+  - name: Home theater        # your own row of buttons
+    buttons:
+      - { name: Receiver, icon: mdi:audio-video, entity: media_player.avr,
+          action: { action: toggle } }
+  - volume
+  - pad
+  - navigation
+  - transport
+  - apps
+```
+
+The six built-in blocks:
+
+| Id           | What it is                                                   |
+| ------------ | ------------------------------------------------------------ |
+| `pad`        | The d-pad, touchpad or button pad — whichever `pad` selects. |
+| `navigation` | Back, home, menu, and favourite when one is configured.       |
+| `transport`  | Previous, rewind, play/pause, fast-forward, next.             |
+| `volume`     | Down, mute, up. See [Volume](#volume).                        |
+| `text`       | The field that types on the TV. See [Text input](#text-input).|
+| `apps`       | The app launcher, filled by `apps`.                           |
+
+Anything else in the list is a section: a `name` and its `buttons`, exactly the
+shape `sections` has always taken — see [Sections](#sections) — so an existing
+section pastes straight in.
+
+**A layout is the whole answer.** A block it does not list is not drawn, and the
+`show_*` flags are not consulted at all. To keep a block's place while hiding
+it, say so rather than removing the line:
+
+```yaml
+layout:
+  - volume
+  - { type: pad, hidden: true }   # still second; showing it puts it back here
+  - navigation
+```
+
+That is what the editor's eye toggle writes, which is why hiding a block and
+showing it again does not shuffle the card.
+
+**Without a `layout`** the order is the one the card has always drawn — pad,
+back/home/menu, transport, volume, text input, your sections, apps — with
+`show_nav`, `show_transport`, `show_volume`, `show_text_input` and `show_apps`
+deciding what appears in it. Nothing to do to an existing card.
+
+**The editor writes a layout the first time you change anything**, and retires
+the keys it replaces: `sections` and those five flags come out of the stored
+YAML, because one card described in two places is a card where the two disagree
+the moment either is edited.
+
+The header is not in the list. It is the card's identity — the name, what is
+playing, and power — so it stays at the top when it is shown at all. One knock-on
+worth knowing: with `show_header: false` the power button moves into the
+back/home/menu row, so hiding **that** row as well leaves it nowhere to go.
 
 ### Apps
 
@@ -107,7 +167,10 @@ Buttons stay the same size whatever the app count, and wrap after
 ### Sections
 
 The app launcher is built in. Beyond it you can declare your own named rows of
-buttons — for the things around the TV that the remote has no concept of.
+buttons — for the things around the TV that the remote has no concept of. A
+section is a row of [the layout](#layout), so it can sit anywhere on the card,
+the remote pad included; `sections:` below is the older spelling, which still
+works and always puts them just above the app launcher.
 
 A button takes the same `name`, `icon`, `color` and `action` as an app, plus an
 optional **`entity`**: name one and the tile lights up while that entity is on,
@@ -341,7 +404,7 @@ working.
 | `showRemote` / `showApps` / `showVolume`  | `show_nav` / `show_apps` / `show_volume`       |
 | `showMedia` / `showURLSearch`             | `show_transport` / `show_text_input`           |
 | `media_controls`                          | `transport_buttons`                            |
-| `showBasic`                               | dropped — back/home/menu is always drawn       |
+| `showBasic`                               | dropped — back/home/menu is a `layout` block   |
 
 The pad is now purely directional. The old default layout packed power, home,
 back and favourite into the corners of the 3×3 grid; those live in the header

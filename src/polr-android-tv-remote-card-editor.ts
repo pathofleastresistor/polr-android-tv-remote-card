@@ -27,8 +27,9 @@ import {
   stripLegacyKeys,
   type AppAction,
   type AppConfig,
+  type BlockId,
   type BrandId,
-  type SectionConfig,
+  type LayoutBlock,
   type TileConfig,
   type PolrAtvRemoteCardConfig,
   type ResolvedConfig,
@@ -41,6 +42,19 @@ type ActionKind = "activity" | "app" | "key" | "action";
 
 /** Which tile list a row belongs to: the app launcher, or a section index. */
 type ListPath = "apps" | number;
+
+/**
+ * What each built-in block is called in the layout list, and where its settings
+ * live now that its on/off switch does not sit beside them.
+ */
+const BLOCKS: Record<BlockId, { label: string; icon: string; settings?: string }> = {
+  pad: { label: "Remote pad", icon: "mdi:gesture-tap-button", settings: "Pad" },
+  navigation: { label: "Back / home / menu", icon: "mdi:arrow-u-left-top" },
+  transport: { label: "Playback", icon: "mdi:play-pause", settings: "Playback" },
+  volume: { label: "Volume", icon: "mdi:volume-high", settings: "Volume" },
+  text: { label: "Text input", icon: "mdi:keyboard" },
+  apps: { label: "App launcher", icon: "mdi:apps", settings: "Apps" },
+};
 
 const ACTION_KINDS: Array<{ value: ActionKind; label: string; hint: string }> = [
   { value: "activity", label: "Launch app or link", hint: "App name from the integration, or a deep link such as https://www.netflix.com/title" },
@@ -62,23 +76,12 @@ const ACTION_KINDS: Array<{ value: ActionKind; label: string; hint: string }> = 
  * cell growing to fit a paragraph misaligns the whole row.
  */
 /** Apps settings, rendered inside the hand-rolled Apps panel. */
-const APPS_SCHEMA = (config: ResolvedConfig) =>
-  [
-    { name: "show_apps", selector: { boolean: {} } },
-    ...(config.show_apps
-      ? [{ name: "app_columns", selector: { number: { min: 1, max: 8, mode: "box" } } }]
-      : []),
-  ] as const;
+const APPS_SCHEMA = [
+  { name: "app_columns", selector: { number: { min: 1, max: 8, mode: "box" } } },
+] as const;
 
 /** Everything after the Apps panel. */
 const TAIL_SCHEMA = [
-  {
-    type: "expandable",
-    name: "",
-    title: "Text input",
-    icon: "mdi:keyboard",
-    schema: [{ name: "show_text_input", selector: { boolean: {} } }],
-  },
   {
     type: "expandable",
     name: "",
@@ -92,7 +95,7 @@ const TAIL_SCHEMA = [
   },
 ] as const;
 
-const SCHEMA = (config: ResolvedConfig) =>
+const SCHEMA = () =>
   [
     {
       name: "entity",
@@ -127,24 +130,19 @@ const SCHEMA = (config: ResolvedConfig) =>
       title: "Pad",
       icon: "mdi:gesture-tap-button",
       schema: [
-        { name: "show_nav", selector: { boolean: {} } },
-        ...(config.show_nav
-          ? [
-              {
-                name: "pad",
-                selector: {
-                  select: {
-                    mode: "dropdown",
-                    options: [
-                      { value: "buttons", label: "Buttons" },
-                      { value: "dpad", label: "D-pad" },
-                      { value: "touchpad", label: "Touchpad" },
-                    ],
-                  },
-                },
-              },
-            ]
-          : []),
+        {
+          name: "pad",
+          selector: {
+            select: {
+              mode: "dropdown",
+              options: [
+                { value: "buttons", label: "Buttons" },
+                { value: "dpad", label: "D-pad" },
+                { value: "touchpad", label: "Touchpad" },
+              ],
+            },
+          },
+        },
       ],
     },
     {
@@ -153,27 +151,22 @@ const SCHEMA = (config: ResolvedConfig) =>
       title: "Playback",
       icon: "mdi:play-pause",
       schema: [
-        { name: "show_transport", selector: { boolean: {} } },
-        ...(config.show_transport
-          ? [
-              {
-                name: "transport_buttons",
-                selector: {
-                  select: {
-                    multiple: true,
-                    mode: "list",
-                    options: [
-                      { value: "previous", label: "Previous" },
-                      { value: "rewind", label: "Rewind" },
-                      { value: "play_pause", label: "Play / pause" },
-                      { value: "fast_forward", label: "Fast forward" },
-                      { value: "next", label: "Next" },
-                    ],
-                  },
-                },
-              },
-            ]
-          : []),
+        {
+          name: "transport_buttons",
+          selector: {
+            select: {
+              multiple: true,
+              mode: "list",
+              options: [
+                { value: "previous", label: "Previous" },
+                { value: "rewind", label: "Rewind" },
+                { value: "play_pause", label: "Play / pause" },
+                { value: "fast_forward", label: "Fast forward" },
+                { value: "next", label: "Next" },
+              ],
+            },
+          },
+        },
       ],
     },
     {
@@ -182,7 +175,6 @@ const SCHEMA = (config: ResolvedConfig) =>
       title: "Volume",
       icon: "mdi:volume-high",
       schema: [
-        { name: "show_volume", selector: { boolean: {} } },
         {
           name: "volume_entity",
           selector: { entity: { filter: [{ domain: "media_player" }] } },
@@ -214,13 +206,8 @@ const LABELS: Record<string, string> = {
   pad: "Pad style",
   show_header: "Show header",
   show_power: "Show power",
-  show_nav: "Show pad",
-  show_transport: "Transport controls",
-  show_volume: "Volume controls",
-  show_apps: "App launcher",
   transport_buttons: "Buttons",
   app_columns: "Buttons per row",
-  show_text_input: "Text input",
   hold_repeat: "Hold to repeat",
   haptics: "Haptic feedback",
   show_section_labels: "Section labels",
@@ -228,16 +215,13 @@ const LABELS: Record<string, string> = {
 
 const HELPERS: Record<string, string> = {
   show_power:
-    "In the header, or in the back / home / menu row when the header is hidden.",
+    "In the header, or in the back / home / menu row when the header is hidden — that row then has to be in the layout for it to have anywhere to go.",
   volume_entity:
     "Point this at a soundbar or receiver that exposes a media player. A TV passing audio through reports no volume level, so the card shows no level bar for it.",
   power_action:
     "Leave empty to toggle the TV itself. Set it when something else does the switching — an IR or RF blaster, or a script that also powers a receiver.",
   volume_up_action:
     "Leave empty to control the TV or the media player above. Set it for IR bridges and the like, which expose one pressable entity per command instead of a media player.",
-  // Kept short: ha-form runs a boolean's helper up against its toggle, and a
-  // long one wraps into it. The full caveats are in the README.
-  show_text_input: "Needs a focused search field on the TV, and Enable IME.",
 };
 
 @customElement("polr-android-tv-remote-card-editor")
@@ -253,6 +237,14 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
    * is expanded.
    */
   @state() private _editing: { path: ListPath; index: number } | null = null;
+
+  /**
+   * Which section's own editor is expanded, as a layout index.
+   *
+   * Separate from `_editing`, which tracks the open *tile* form: opening a
+   * button inside a section must not collapse the section around it.
+   */
+  @state() private _openSection: number | null = null;
 
   public setConfig(config: PolrAtvRemoteCardConfig): void {
     this._config = normalizeConfig(config);
@@ -339,9 +331,9 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
    */
 
   private _tiles(path: ListPath): TileConfig[] {
-    return path === "apps"
-      ? this._config!.apps
-      : (this._config!.sections[path]?.buttons ?? []);
+    if (path === "apps") return this._config!.apps;
+    const block = this._config!.layout[path];
+    return block?.type === "section" ? block.buttons : [];
   }
 
   private _setTiles(path: ListPath, tiles: TileConfig[]): void {
@@ -349,10 +341,11 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
       this._emit({ ...this._config!, apps: tiles });
       return;
     }
-    const sections = this._config!.sections.map((section, i) =>
-      i === path ? { ...section, buttons: tiles } : section,
+    this._setLayout(
+      this._config!.layout.map((block, i) =>
+        i === path && block.type === "section" ? { ...block, buttons: tiles } : block,
+      ),
     );
-    this._emit({ ...this._config!, sections });
   }
 
   private _addTile(path: ListPath, tile: TileConfig): void {
@@ -402,29 +395,83 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
     this._updateTile(path, index, { action: buildAction(actionKind(current), value) });
   }
 
-  /* ---------------------------------------------------------- sections -- */
+  /* ------------------------------------------------------------ layout -- */
 
-  private _setSections(sections: SectionConfig[]): void {
-    this._emit({ ...this._config!, sections });
+  /**
+   * Write the layout, and with it the keys it replaces.
+   *
+   * `sections` and the five `show_*` flags say the same things a layout says,
+   * and a config carrying both is a config where two places disagree the moment
+   * either is edited. Writing a layout therefore retires them from the stored
+   * YAML; the card still reads them, so a hand-written config that never meets
+   * this editor is untouched.
+   */
+  private _setLayout(layout: LayoutBlock[]): void {
+    const next = { ...this._config!, layout } as Record<string, unknown>;
+    for (const key of [
+      "sections",
+      "show_nav",
+      "show_transport",
+      "show_volume",
+      "show_text_input",
+      "show_apps",
+    ]) {
+      delete next[key];
+    }
+    this._emit(next as unknown as PolrAtvRemoteCardConfig);
+  }
+
+  private _moveBlock(index: number, delta: number): void {
+    const layout = [...this._config!.layout];
+    const target = index + delta;
+    if (target < 0 || target >= layout.length) return;
+    [layout[index], layout[target]] = [layout[target]!, layout[index]!];
+    this._setLayout(layout);
+
+    // Both open-state trackers address blocks by position, so a move that does
+    // not carry them leaves a section's editor attached to whatever swapped
+    // into its slot -- the buttons of one section under the name of another.
+    const follow = (at: number | null): number | null =>
+      at === index ? target : at === target ? index : at;
+    this._openSection = follow(this._openSection);
+    if (typeof this._editing?.path === "number") {
+      this._editing = { ...this._editing, path: follow(this._editing.path)! };
+    }
+  }
+
+  private _toggleBlock(index: number): void {
+    this._setLayout(
+      this._config!.layout.map((block, i) => {
+        if (i !== index) return block;
+        const { hidden: _was, ...rest } = block;
+        return block.hidden ? rest : { ...rest, hidden: true };
+      }),
+    );
   }
 
   private _addSection(): void {
-    this._setSections([
-      ...this._config!.sections,
-      { name: "New section", buttons: [] },
+    const layout = this._config!.layout;
+    this._setLayout([
+      ...layout,
+      { type: "section" as const, name: "New section", buttons: [] },
     ]);
+    // Open it: a new section is empty, and a row that does nothing when added
+    // is the bug "Add section" shipped with once already.
+    this._openSection = layout.length;
+    this._editing = null;
   }
 
   private _renameSection(index: number, name: string): void {
-    this._setSections(
-      this._config!.sections.map((section, i) =>
-        i === index ? { ...section, name } : section,
+    this._setLayout(
+      this._config!.layout.map((block, i) =>
+        i === index && block.type === "section" ? { ...block, name } : block,
       ),
     );
   }
 
   private _removeSection(index: number): void {
-    this._setSections(this._config!.sections.filter((_, i) => i !== index));
+    this._setLayout(this._config!.layout.filter((_, i) => i !== index));
+    this._openSection = null;
     this._editing = null;
   }
 
@@ -734,6 +781,154 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
     `;
   }
 
+  /* ------------------------------------------------------------ layout -- */
+
+  /**
+   * The card's blocks, in order, every one of them.
+   *
+   * Hidden blocks are listed too, struck through. A list of only what is on
+   * cannot offer to turn anything back on, and a block dropped from the list
+   * loses the place it should return to.
+   */
+  private _renderLayoutList(): TemplateResult {
+    const layout = this._config!.layout;
+
+    return html`<ul class="list">
+      ${layout.flatMap((block, index) => {
+        const open = this._openSection === index;
+        const rows: Array<TemplateResult | typeof nothing> = [
+          this._renderLayoutRow(block, index, layout.length, open),
+        ];
+        if (block.type === "section") rows.push(this._renderSectionBody(block, index));
+        return rows;
+      })}
+    </ul>`;
+  }
+
+  private _renderLayoutRow(
+    block: LayoutBlock,
+    index: number,
+    total: number,
+    open: boolean,
+  ): TemplateResult {
+    const section = block.type === "section" ? block : undefined;
+    const meta = block.type === "section" ? undefined : BLOCKS[block.type];
+    const count = section?.buttons.length ?? 0;
+
+    // Only when it says something: a row repeating its own title in smaller
+    // type is what squeezed the titles into an ellipsis in the first place.
+    const secondary = block.hidden
+      ? "Hidden"
+      : section
+        ? `${count} ${count === 1 ? "button" : "buttons"}`
+        : "";
+
+    return html`
+      <li class="row ${block.hidden ? "inactive" : ""}">
+        <div class="tile-icon">
+          <ha-icon icon=${section ? "mdi:view-grid-outline" : meta!.icon}></ha-icon>
+        </div>
+        <div class="tile-info">
+          <div class="primary">
+            <span>${section ? (section.name || "Untitled section") : meta!.label}</span>
+          </div>
+          ${secondary ? html`<div class="secondary"><span>${secondary}</span></div>` : nothing}
+        </div>
+        <button
+          class="icon-button"
+          title="Move up"
+          .disabled=${index === 0}
+          @click=${() => this._moveBlock(index, -1)}
+        >
+          <ha-icon icon="mdi:arrow-up"></ha-icon>
+        </button>
+        <button
+          class="icon-button"
+          title="Move down"
+          .disabled=${index === total - 1}
+          @click=${() => this._moveBlock(index, 1)}
+        >
+          <ha-icon icon="mdi:arrow-down"></ha-icon>
+        </button>
+        <button
+          class="icon-button"
+          title=${block.hidden ? "Show" : "Hide"}
+          aria-pressed=${block.hidden ? "true" : "false"}
+          @click=${() => this._toggleBlock(index)}
+        >
+          <ha-icon icon=${block.hidden ? "mdi:eye-off" : "mdi:eye"}></ha-icon>
+        </button>
+        ${section
+          ? html`
+              <button
+                class="icon-button"
+                title=${open ? "Done" : "Edit"}
+                @click=${() => {
+                  this._openSection = open ? null : index;
+                  if (!open) this._editing = null;
+                }}
+              >
+                <ha-icon icon=${open ? "mdi:check" : "mdi:pencil"}></ha-icon>
+              </button>
+            `
+          : nothing}
+      </li>
+    `;
+  }
+
+  /** A section's own editor: its name, its buttons, and a way to add one. */
+  private _renderSectionBody(
+    section: Extract<LayoutBlock, { type: "section" }>,
+    index: number,
+  ): TemplateResult | typeof nothing {
+    if (this._openSection !== index) return nothing;
+
+    return html`
+      <li class="form-host">
+        <div class="form">
+          <div class="fields">
+            <!--
+              A plain input, like every other field in this editor. ha-textfield
+              is not a component this frontend defines, so it rendered as an
+              inert unknown element and the name could not be typed at all.
+            -->
+            <label class="field">
+              <span>Section name</span>
+              <input
+                type="text"
+                .value=${section.name ?? ""}
+                @change=${(event: Event) =>
+                  this._renameSection(index, (event.target as HTMLInputElement).value)}
+              />
+            </label>
+          </div>
+
+          ${this._renderTileList(index, section.buttons, "No buttons yet.")}
+
+          <div class="form-actions">
+            <button
+              class="control-button destructive"
+              @click=${() => this._removeSection(index)}
+            >
+              <ha-icon icon="mdi:delete"></ha-icon><span>Remove</span>
+            </button>
+            <button
+              class="control-button"
+              @click=${() =>
+                this._addTile(index, {
+                  name: "New button",
+                  icon: "mdi:power",
+                  action: { action: "service", service: "" },
+                })}
+            >
+              <ha-icon icon="mdi:plus"></ha-icon><span>Add button</span>
+            </button>
+          </div>
+        </div>
+      </li>
+    `;
+  }
+
   protected override render(): TemplateResult | typeof nothing {
     if (!this.hass || !this._config) return nothing;
     const config = this._config;
@@ -743,11 +938,33 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
       <ha-form
         .hass=${this.hass}
         .data=${this._formData}
-        .schema=${SCHEMA(config)}
+        .schema=${SCHEMA()}
         .computeLabel=${this._computeLabel}
         .computeHelper=${this._computeHelper}
         @value-changed=${this._formChanged}
       ></ha-form>
+
+      <ha-expansion-panel outlined>
+        <ha-icon slot="leading-icon" icon="mdi:view-dashboard-outline"></ha-icon>
+        <div slot="header" role="heading" aria-level="3">Layout</div>
+
+        <div class="content">
+          <div class="hint">
+            Everything on the card, in the order it is drawn, under the header.
+            Move a row to move the block; hide one and it keeps its place for
+            when you bring it back. Section names show only when “Section
+            labels” is on, under Advanced.
+          </div>
+
+          ${this._renderLayoutList()}
+
+          <div class="form-actions add-section">
+            <button class="control-button wide" @click=${() => this._addSection()}>
+              <ha-icon icon="mdi:plus"></ha-icon><span>Add section</span>
+            </button>
+          </div>
+        </div>
+      </ha-expansion-panel>
 
       <!--
         Apps get a hand-rolled panel rather than an ha-form expandable: the
@@ -763,14 +980,13 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
         <ha-form
           .hass=${this.hass}
           .data=${this._formData}
-          .schema=${APPS_SCHEMA(config)}
+          .schema=${APPS_SCHEMA}
           .computeLabel=${this._computeLabel}
           .computeHelper=${this._computeHelper}
           @value-changed=${this._formChanged}
         ></ha-form>
 
-        ${config.show_apps
-          ? html`
+
               <div class="section-head">
                 <span class="grow">Apps</span>
                 <span class="count">${apps.length}</span>
@@ -812,73 +1028,6 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
                   <ha-icon icon="mdi:plus"></ha-icon><span>Custom app</span>
                 </button>
               </div>
-            `
-          : nothing}
-        </div>
-      </ha-expansion-panel>
-
-      <ha-expansion-panel outlined>
-        <ha-icon slot="leading-icon" icon="mdi:view-dashboard-outline"></ha-icon>
-        <div slot="header" role="heading" aria-level="3">Sections</div>
-
-        <div class="content">
-          <div class="hint">
-            Extra rows of buttons, drawn above the app launcher. Names show only
-            when “Section labels” is on, under Advanced.
-          </div>
-
-          ${config.sections.map(
-            (section, i) => html`
-              <div class="section-block">
-              <div class="section-head">
-                <!--
-                  A plain input, like every other field in this editor.
-                  ha-textfield is not a component this frontend defines, so it
-                  rendered as an inert unknown element and the name could not be
-                  typed at all.
-                -->
-                <label class="field grow">
-                  <span>Section name</span>
-                  <input
-                    type="text"
-                    .value=${section.name ?? ""}
-                    @change=${(event: Event) =>
-                      this._renameSection(i, (event.target as HTMLInputElement).value)}
-                  />
-                </label>
-                <button
-                  class="icon-button"
-                  title="Remove section"
-                  @click=${() => this._removeSection(i)}
-                >
-                  <ha-icon icon="mdi:close"></ha-icon>
-                </button>
-              </div>
-
-              ${this._renderTileList(i, section.buttons, "No buttons yet.")}
-
-              <div class="form-actions">
-                <button
-                  class="control-button wide"
-                  @click=${() =>
-                    this._addTile(i, {
-                      name: "New button",
-                      icon: "mdi:power",
-                      action: { action: "service", service: "" },
-                    })}
-                >
-                  <ha-icon icon="mdi:plus"></ha-icon><span>Add button</span>
-                </button>
-              </div>
-              </div>
-            `,
-          )}
-
-          <div class="form-actions add-section">
-            <button class="control-button wide" @click=${() => this._addSection()}>
-              <ha-icon icon="mdi:plus"></ha-icon><span>Add section</span>
-            </button>
-          </div>
         </div>
       </ha-expansion-panel>
 
@@ -1025,6 +1174,15 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
       .section-block .section-head {
         align-items: flex-end;
         min-height: 0;
+      }
+      /*
+       * A row's name wraps rather than eliding. The kit ellipsises because a
+       * card row is one line of a tile; here the name is the row's whole point,
+       * and "Back / home / …" beside a generic icon told you nothing.
+       */
+      ul.list li.row .primary span {
+        white-space: normal;
+        overflow-wrap: anywhere;
       }
       /* The kit sizes icon buttons for a card; an editor row is tighter. */
       .icon-button {

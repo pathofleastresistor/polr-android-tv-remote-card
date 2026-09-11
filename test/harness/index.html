@@ -209,6 +209,15 @@
         // no volume level and no mute state. No bar, no percentage chip.
         { title: "audio on a soundbar (no volume state)", config: { entity: "remote.main_tv", apps: APPS.slice(0, 5) }, hass: { playerAttrs: { volume_level: null, is_volume_muted: null } } },
         { title: "volume_entity -> soundbar", config: { entity: "remote.main_tv", volume_entity: "media_player.soundbar", apps: APPS.slice(0, 5) }, hass: { playerAttrs: { volume_level: null, is_volume_muted: null } } },
+        // Layout: the remote is no longer pinned above everything a user adds.
+        { title: "layout: section above the pad", config: { entity: "remote.main_tv", apps: APPS.slice(0, 4), layout: [
+          { type: "section", name: "Home theater", buttons: [
+            { name: "Movie mode", icon: "mdi:theater", entity: "select.baton_activity", action: { action: "service", service: "select.select_option" } },
+            { name: "Projector", icon: "mdi:projector", entity: "media_player.projector", action: { action: "service", service: "media_player.toggle" } },
+          ] },
+          "volume", "pad", "navigation", "transport", "apps",
+        ] } },
+        { title: "layout: volume first, no pad", config: { entity: "remote.main_tv", apps: APPS.slice(0, 3), layout: ["volume", "transport", "navigation", "apps"] } },
         { title: "TV off", config: { entity: "remote.main_tv", apps: APPS.slice(0, 4) }, hass: { playerState: "off" } },
         // A soundbar does not sleep with the TV, so volume routed to one keeps
         // its row on an off set -- the only way to turn down music playing
@@ -283,6 +292,19 @@
           { name: "Source", buttons: [
             { name: "Info", icon: "mdi:information-outline", entity: "media_player.soundbar", action: { action: "more-info" } },
           ] },
+        ] }],
+        // The Layout panel: every block in one ordered list, hidden ones struck
+        // through and still in place.
+        ["editor: layout", { entity: "remote.main_tv", apps: APPS.slice(0, 2), layout: [
+          "volume",
+          { type: "section", name: "Home Theater", buttons: [
+            { name: "TV", icon: "mdi:television", action: { action: "service", service: "remote.toggle" } },
+            { name: "AVR", icon: "mdi:audio-video", action: { action: "service", service: "media_player.toggle" } },
+          ] },
+          "pad",
+          "navigation",
+          { type: "transport", hidden: true },
+          "apps",
         ] }],
         ["editor: sections", { entity: "remote.main_tv", apps: APPS.slice(0, 2), sections: [
           { name: "Home Theater", buttons: [
