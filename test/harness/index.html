@@ -273,6 +273,9 @@
         { title: "no header, power on", config: { entity: "remote.main_tv", show_header: false, show_power: true, apps: APPS.slice(0, 3) } },
         { title: "no header, no power", config: { entity: "remote.main_tv", show_header: false, show_power: false, apps: APPS.slice(0, 3) } },
         { title: "TV off + power override", config: { entity: "remote.main_tv", apps: [], overrides: { power: { service: "remote.send_command", data: { command: "power", entity_id: "remote.living_room_rf" } } } }, hass: { playerState: "off" } },
+        // Power off means something else does the switching, so the card must
+        // not keep offering it in the one state where it is the whole card.
+        { title: "TV off, power hidden", config: { entity: "remote.main_tv", show_power: false, apps: APPS.slice(0, 3) }, hass: { playerState: "off" } },
         { title: "unavailable", config: { entity: "remote.main_tv" }, hass: { playerState: "unavailable", remoteState: "unavailable" } },
         { title: "no paired player", config: { entity: "remote.orphan_tv", apps: APPS.slice(0, 3) }, hass: { orphan: true } },
         { title: "reduced features (no next/prev)", config: { entity: "remote.main_tv" }, hass: { playerAttrs: { supported_features: 1 | 1024 | 8 | 128 | 256 } } },

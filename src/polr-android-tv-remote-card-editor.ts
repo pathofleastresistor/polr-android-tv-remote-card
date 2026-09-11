@@ -213,7 +213,7 @@ const LABELS: Record<string, string> = {
 
 const HELPERS: Record<string, string> = {
   show_power:
-    "In the header, or in the back / home / menu row when the header is hidden — that row then has to be in the layout for it to have anywhere to go.",
+    "In the header, or in the back / home / menu row when the header is hidden — that row then has to be in the layout for it to have anywhere to go. Off also drops the big Turn on button an off TV shows.",
   volume_entity:
     "Point this at a soundbar or receiver that exposes a media player. A TV passing audio through reports no volume level, so the card shows no level bar for it.",
   power_action:

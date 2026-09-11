@@ -638,11 +638,19 @@ export class PolrAndroidTvRemoteCard extends LitElement {
         ${!live
           ? html`<div class="empty-state">This device is unavailable.</div>`
           : html`
-              ${device.on
+              <!--
+                The one control an off TV can use, and only when the card is
+                showing power at all: "show power" off means something else
+                does the switching -- a receiver, an activity, an IR blaster --
+                and a card told not to offer power should not go on offering it
+                in the one state where it is the only thing on screen.
+
+                No "the TV is off" line to go with it: the header secondary
+                already says Off, and the button says Turn on.
+              -->
+              ${device.on || !config.show_power
                 ? nothing
                 : html`
-                    <!-- No "the TV is off" line: the header secondary already
-                         says Off, and the button says Turn on. -->
                     <div class="features">
                       <button
                         class="control-button accent wide"
