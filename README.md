@@ -374,13 +374,20 @@ the only way to mean anything but the remote.
 ### Text input
 
 `show_text_input: true` adds a field that types on the TV, which beats entering
-a search query with the d-pad. Two caveats, and the card can detect neither, so
-it fails silently rather than showing a false error:
+a search query with the d-pad. **Verified against real hardware** — it was
+built by reading the integration and its library rather than by sending
+anything, so until someone typed a query into a real TV with it, "almost
+certainly right" was all it was.
+
+Two caveats remain, and the card can detect neither, so it fails silently
+rather than showing a false error:
 
 - Text only lands while a text field is **focused on the TV**.
 - The device's config entry needs **Enable IME** turned on.
 
-Test it from Developer Tools → Actions with a search box open on the TV:
+If it does nothing, check those two before anything else. The same send, from
+Developer Tools → Actions with a search box open on the TV, tells you whether
+the problem is the card or the device:
 
 ```yaml
 action: remote.send_command
