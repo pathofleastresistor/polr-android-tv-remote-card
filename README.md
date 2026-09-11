@@ -63,7 +63,7 @@ entity: remote.living_room_tv
 | `pad`                 | buttons  | `buttons`, `dpad` or `touchpad`.                                        |
 | `show_transport`      | `true`   | Previous, rewind, play-pause, fast-forward, next.                       |
 | `transport_buttons`   | all five | Which of those to draw; they always render in playback order.           |
-| `show_volume`         | `true`   | Volume down / mute / up, plus a level bar where there is one.           |
+| `show_volume`         | `true`   | Down / mute / up, with the level and mute state shown on the mute key.  |
 | `volume_entity`       | player   | What the volume buttons drive. See [Volume](#volume).                   |
 | `show_text_input`     | `false`  | Type on the TV. See [Text input](#text-input).                          |
 | `show_apps`           | `true`   | The app launcher.                                                       |
@@ -213,13 +213,18 @@ Worth knowing:
 
 ### Volume
 
+Volume is one control, not three: the mute key is also the readout, filled to
+the current level and labelled with it, between the two steps that change it.
+With the volume row switched off the level moves to a chip under the header, so
+it is never in two places at once.
+
 The volume buttons always work — worst case they send key codes. Whether you can
 *see* the volume is another matter: `androidtv_remote` only reports a level when
 the TV itself handles the audio. Hand the sound to a soundbar over ARC and there
-is no level and no mute flag, so the card shows three buttons and nothing else
-rather than inventing a bar. Mute then falls back to the `MUTE` key, which is a
-real toggle, instead of `media_player.volume_mute`, which is absolute and would
-mute every time.
+is no level and no mute flag, so the mute key is just its icon rather than an
+invented number. Mute then falls back to the `MUTE` key, which is a real toggle,
+instead of `media_player.volume_mute`, which is absolute and would mute every
+time.
 
 If a soundbar or receiver exposes a media player, point the card at it:
 
@@ -272,7 +277,7 @@ Worth knowing, because it shapes the card:
   runtime signal is the app on screen right now — the editor offers to capture
   that, which is the easiest way to learn a package id.
 - **No volume setting.** Volume *steps* work, `volume_set` does not, so the
-  level bar is read-only and often absent — see [Volume](#volume).
+  level is read-only and often absent — see [Volume](#volume).
 - **No media title or artwork.** Only the app name is reported.
 
 ## Migrating

@@ -254,26 +254,41 @@ export const remoteStyles = css`
     pointer-events: none;
   }
 
-  /* ----------------------------------------------------------- volume bar -- */
-  .volume-bar {
-    height: 3px;
-    margin: 0 var(--ha-space-3, 12px) var(--ha-space-3, 12px);
-    border-radius: var(--radius-pill);
-    background-color: rgba(var(--rgb-primary-text-color, 0, 0, 0), 0.1);
-    overflow: hidden;
+  /* -------------------------------------------------------------- volume -- */
+  /*
+   * The mute toggle is also the level readout: the bar is drawn inside the
+   * button rather than under the row, and the percentage sits next to the
+   * icon. One control says what the volume is, whether it is muted, and
+   * changes it -- where three separate pieces of UI used to.
+   *
+   * It takes twice the width of a step button so the number has room and the
+   * eye lands on the state rather than on the two arrows either side.
+   */
+  .volume-level {
+    flex: 2 1 0;
   }
-  .volume-bar > span {
-    display: block;
-    height: 100%;
-    border-radius: inherit;
+  /* Beats the kit's .control-button > * rule on specificity, so the fill can
+     sit behind the icon and the number instead of in line with them. */
+  .volume-level .level {
+    position: absolute;
+    inset: 0 auto 0 0;
     background-color: var(--tile-color);
-    transition: width var(--duration) ease-in-out;
+    opacity: 0.35;
+    transition:
+      width var(--duration) ease-in-out,
+      opacity var(--duration) ease-in-out;
   }
-  /* Read-only by design: androidtv_remote supports VOLUME_STEP but not
-     VOLUME_SET, so there is nothing to drag to. */
-  .volume-bar.muted > span {
+  .volume-level .value {
+    /* Digits of one width: the number is under a repeating button, and
+       proportional digits made the label twitch on the way from 9% to 100%. */
+    font-variant-numeric: tabular-nums;
+  }
+  .volume-level.muted {
+    color: var(--secondary-text-color);
+  }
+  .volume-level.muted .level {
     filter: grayscale(1);
-    opacity: 0.4;
+    opacity: 0.2;
   }
 
   /* ------------------------------------------------------------ app grid -- */
@@ -408,7 +423,7 @@ export const remoteStyles = css`
     .pad-key,
     .app-tile,
     .touchpad-dot,
-    .volume-bar > span {
+    .volume-level .level {
       transition: none;
     }
   }

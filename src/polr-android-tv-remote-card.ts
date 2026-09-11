@@ -229,8 +229,16 @@ export class PolrAndroidTvRemoteCard extends LitElement {
     `;
   }
 
+  /**
+   * Volume state under the header -- only when there is no volume row.
+   *
+   * The row itself now carries the level and the mute state, so repeating them
+   * here put one number in two places and cost a whole band of the card for a
+   * single small pill. With the row switched off this is the only place left
+   * that can say it, so it comes back.
+   */
   private _renderChips(device: DeviceState): TemplateResult | typeof nothing {
-    if (!device.on || !device.available) return nothing;
+    if (!device.on || !device.available || this._config!.show_volume) return nothing;
 
     // Nothing here is invented: each chip needs state the device actually
     // reports. A TV feeding a soundbar reports neither, and shows no chips.
@@ -326,39 +334,48 @@ export class PolrAndroidTvRemoteCard extends LitElement {
   }
 
   /**
-   * Volume.
+   * Volume: one control, not three.
+   *
+   * The level used to be stated in three places -- a percentage chip under the
+   * header, a mute icon in the middle button, and a bar floating under the row
+   * -- so the one thing the user cares about was scattered across three bands
+   * of the card. It is now a single control: the mute toggle *is* the readout,
+   * filled to the current level, flanked by the two steps that change it.
    *
    * The buttons always work -- worst case they send key codes. The *state* is
    * another matter: androidtv_remote only reports a level when the TV itself
    * handles audio. Hand the sound to a soundbar over ARC and there is no level
-   * and no mute flag, so the bar, the percentage chip and the muted icon would
-   * all be invented. When that is the case the row is just three buttons.
+   * and no mute flag, so the fill and the percentage would both be invented.
+   * When that is the case the control is just its icon.
    */
   private _renderVolume(device: DeviceState): TemplateResult {
-    const known = hasVolumeState(device);
     const muted = device.muted === true;
+    const percent = hasVolumeState(device) ? Math.round(device.volume! * 100) : undefined;
 
     return html`
       <div class="features">
         ${this._button("volume_down", "mdi:volume-minus", "Volume down", { repeat: true })}
         <button
-          class="control-button"
+          class="control-button volume-level ${muted ? "muted" : ""}"
           type="button"
           aria-label=${muted ? "Unmute" : "Mute"}
           aria-pressed=${device.muted === undefined ? "undefined" : muted ? "true" : "false"}
           ${press(this._pressOptions("volume_mute"))}
         >
+          <!-- Read-only by design: androidtv_remote supports VOLUME_STEP but
+               not VOLUME_SET, so there is nothing to drag to. -->
+          ${percent === undefined
+            ? nothing
+            : html`<span class="level" style="width:${percent}%"></span>`}
           <ha-icon icon=${muted ? "mdi:volume-off" : "mdi:volume-high"}></ha-icon>
+          ${muted
+            ? html`<span class="value">Muted</span>`
+            : percent === undefined
+              ? nothing
+              : html`<span class="value">${percent}%</span>`}
         </button>
         ${this._button("volume_up", "mdi:volume-plus", "Volume up", { repeat: true })}
       </div>
-      ${known
-        ? html`
-            <div class="volume-bar ${muted ? "muted" : ""}">
-              <span style="width:${Math.round(device.volume! * 100)}%"></span>
-            </div>
-          `
-        : nothing}
     `;
   }
 
