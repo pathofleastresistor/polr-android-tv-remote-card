@@ -129,6 +129,136 @@ for (const dark of [false, true]) {
       `gestures: tap=${gestures.onTap} scroll=${gestures.onScroll} cancel=${gestures.onCancel}`,
     );
 
+    /*
+     * The volume bar is a button and a slider at once, and everything about it
+     * is in where one gesture stops being the other: a tap must mute without
+     * moving the level, a drag must set the level without muting, and a thumb
+     * scrolling the dashboard across it must do neither.
+     *
+     * Driven at the card whose volume_entity is a soundbar, because that is the
+     * only kind of target that advertises VOLUME_SET -- the TV's own player
+     * never does, which is the last case here.
+     */
+    const drag = await page.evaluate(async () => {
+      const caseNamed = (title) =>
+        [...document.querySelectorAll(".case")]
+          .find((c) => c.querySelector("h2")?.textContent === title)
+          ?.querySelector("polr-android-tv-remote-card");
+
+      const card = caseNamed("volume_entity -> soundbar");
+      const bar = card.shadowRoot.querySelector(".volume-level");
+      const box = bar.getBoundingClientRect();
+      const y = box.top + box.height / 2;
+      // A fraction along the bar, in page coordinates.
+      const at = (fraction) => box.left + box.width * fraction;
+      const send = (type, cx) =>
+        bar.dispatchEvent(
+          new PointerEvent(type, {
+            bubbles: true, composed: true, cancelable: true,
+            clientX: cx, clientY: y, button: 0, pointerId: 1, pointerType: "touch",
+          }),
+        );
+      const settle = () => new Promise((r) => setTimeout(r, 60));
+      const fill = () => bar.querySelector(".level")?.style.width ?? null;
+      const volumeSet = () =>
+        window.__calls.filter((c) => c[0] === "media_player" && c[1] === "volume_set");
+
+      const settable = bar.classList.contains("settable");
+
+      // A drag from the middle of the bar down to a fifth of the way along.
+      window.__calls = [];
+      send("pointerdown", at(0.5));
+      send("pointermove", at(0.2));
+      await settle();
+      const fillDuringDrag = fill();
+      const callsDuringDrag = window.__calls.length;
+      send("pointerup", at(0.2));
+      await settle();
+      const onDrag = volumeSet().map((c) => Math.round(c[2].volume_level * 100));
+      const mutedByDrag = window.__calls.some((c) => c[1] === "volume_mute");
+      // The bar must hold the level it was dragged to: the harness hass never
+      // echoes a new state back, which is exactly the window in which a real
+      // card would otherwise snap back to the old reading.
+      const fillAfterDrag = fill();
+
+      // A tap is still a tap: mute, and the level untouched.
+      window.__calls = [];
+      send("pointerdown", at(0.5));
+      send("pointerup", at(0.5));
+      await settle();
+      const onTap = {
+        set: volumeSet().length,
+        muted: window.__calls.some((c) => c[1] === "volume_mute" || c[1] === "send_command"),
+      };
+
+      // A thumb scrolling the page across the bar: the browser takes the
+      // gesture, and neither half of the control may act on it. Cancelled
+      // after it has already moved, which is the case that has something to
+      // throw away -- a half-finished drag must not be committed on the way out.
+      window.__calls = [];
+      send("pointerdown", at(0.5));
+      send("pointermove", at(0.8));
+      send("pointercancel", at(0.8));
+      send("pointerup", at(0.8));
+      await settle();
+      const onScroll = window.__calls.length;
+
+      // Off the right-hand end: the level comes from a pointer against a box,
+      // so it has to be clamped before it is sent.
+      window.__calls = [];
+      send("pointerdown", at(0.5));
+      send("pointermove", box.right + 200);
+      await settle();
+      // Clamped where it is read, not only where it is sent: a fill claiming
+      // 245% is the bar overrunning its own control.
+      const fillPastEnd = fill();
+      send("pointerup", box.right + 200);
+      await settle();
+      const pastTheEnd = volumeSet().map((c) => c[2].volume_level);
+
+      // And the TV's own player, which cannot be told a level at all.
+      const tvBar = caseNamed("buttons + apps")
+        ?.shadowRoot.querySelector(".volume-level");
+
+      return {
+        settable,
+        fillDuringDrag,
+        callsDuringDrag,
+        onDrag,
+        mutedByDrag,
+        fillAfterDrag,
+        onTap,
+        onScroll,
+        fillPastEnd,
+        pastTheEnd,
+        tvSettable: tvBar ? tvBar.classList.contains("settable") : "no volume bar",
+      };
+    });
+
+    const dragChecks = [
+      ["the bar is a slider when the target advertises VOLUME_SET", drag.settable, true],
+      ["the fill follows the finger", drag.fillDuringDrag, "20%"],
+      ["nothing is sent mid-drag", drag.callsDuringDrag, 0],
+      ["releasing sends the level once", JSON.stringify(drag.onDrag), "[20]"],
+      ["a drag does not also mute", drag.mutedByDrag, false],
+      ["the bar holds the level it was given", drag.fillAfterDrag, "20%"],
+      ["a tap sets no level", drag.onTap.set, 0],
+      ["a tap still mutes", drag.onTap.muted, true],
+      ["scrolling across the bar does nothing", drag.onScroll, 0],
+      ["a drag off the end fills no further", drag.fillPastEnd, "100%"],
+      ["a drag off the end is clamped", JSON.stringify(drag.pastTheEnd), "[1]"],
+      ["the TV's own player is not a slider", drag.tvSettable, false],
+    ];
+    for (const [name, actual, want] of dragChecks) {
+      if (actual !== want) {
+        failed = true;
+        console.error(`[volume] ${name}: expected ${JSON.stringify(want)}, got ${JSON.stringify(actual)}`);
+      }
+    }
+    console.log(
+      `volume drag: tap mutes, drag sets ${drag.onDrag?.[0]}%, scroll does neither`,
+    );
+
     // The off-state "Turn on" button is a second entry point to power, and must
     // honour a power override exactly as the header button does — otherwise a
     // blaster-driven TV turns on through the wrong path.

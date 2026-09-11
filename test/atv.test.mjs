@@ -25,6 +25,7 @@ import {
   runAppAction,
   sendKey,
   sendText,
+  setVolume,
 } from "./.build/atv.mjs";
 import { brandFor, normalizeConfig } from "./.build/config.mjs";
 
@@ -1030,4 +1031,73 @@ test("the list row names the entity a bare action will land on", () => {
   );
   // A tile with nothing to name keeps the old wording: the card's remote.
   assert.equal(describeAction({ action: "more-info" }), "Show more info");
+});
+
+/*
+ * Setting a level outright.
+ *
+ * The TV's own player cannot be told one -- androidtv_remote offers
+ * VOLUME_STEP and nothing else -- so whether the card's volume bar can be
+ * dragged is a question about whatever `volume_entity` points at, and is
+ * answered by that entity's own feature mask rather than by any setting.
+ */
+
+/** A soundbar that advertises VOLUME_SET, wired in as the volume target. */
+const withSoundbar = (features = FEATURE.VOLUME_STEP | FEATURE.VOLUME_MUTE | FEATURE.VOLUME_SET) => {
+  const hass = fixture();
+  hass.states["media_player.soundbar"] = {
+    entity_id: "media_player.soundbar",
+    state: "on",
+    attributes: { supported_features: features, volume_level: 0.62, is_volume_muted: false },
+  };
+  const cfg = config({ volume_entity: "media_player.soundbar" });
+  return { hass, cfg, device: readDevice(hass, cfg) };
+};
+
+test("a level goes to the volume target, not to the TV", async () => {
+  const { hass, device } = withSoundbar();
+  assert.equal(canVolume(device, FEATURE.VOLUME_SET), true);
+
+  await setVolume(hass, device, 0.35);
+  assert.deepEqual(hass.calls[0], {
+    domain: "media_player",
+    service: "volume_set",
+    data: { entity_id: "media_player.soundbar", volume_level: 0.35 },
+    target: undefined,
+  });
+});
+
+test("a level from off the end of the bar is clamped, not sent as is", async () => {
+  // The level comes from a pointer against a box, and a finger past the left
+  // edge is asking for silence rather than for -0.04.
+  const { hass, device } = withSoundbar();
+  await setVolume(hass, device, -0.04);
+  await setVolume(hass, device, 1.3);
+  assert.deepEqual(
+    hass.calls.map((call) => call.data.volume_level),
+    [0, 1],
+  );
+});
+
+test("a target that cannot be told a level is not told one", async () => {
+  // Sending volume_set to a player without the bit is an error in the HA log
+  // on every drag, and converting the level into a burst of steps would be the
+  // card inventing a capability the device declined to offer.
+  const { hass, device } = withSoundbar(FEATURE.VOLUME_STEP | FEATURE.VOLUME_MUTE);
+  assert.equal(canVolume(device, FEATURE.VOLUME_SET), false);
+
+  await setVolume(hass, device, 0.5);
+  assert.equal(hass.calls.length, 0);
+});
+
+test("the TV's own player is never a slider", async () => {
+  // The whole reason the bar was read-only until now, asserted rather than
+  // remembered: FULL_FEATURES is what androidtv_remote really advertises.
+  const hass = fixture();
+  const device = readDevice(hass, config());
+  assert.equal(device.volumeId, "media_player.main_tv");
+  assert.equal(canVolume(device, FEATURE.VOLUME_SET), false);
+
+  await setVolume(hass, device, 0.5);
+  assert.equal(hass.calls.length, 0);
 });

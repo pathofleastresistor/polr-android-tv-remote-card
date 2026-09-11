@@ -6,13 +6,14 @@
  * playing, or whether it was muted.
  */
 
-import { LitElement, html, nothing, type TemplateResult } from "lit";
+import { LitElement, html, nothing, type PropertyValues, type TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { repeat } from "lit/directives/repeat.js";
 
 import {
   FEATURE,
   can,
+  canVolume,
   hasExternalVolume,
   hasVolumeState,
   isTileActive,
@@ -20,6 +21,7 @@ import {
   readDevice,
   runAppAction,
   sendText,
+  setVolume,
   type DeviceState,
 } from "./atv";
 import {
@@ -35,7 +37,7 @@ import {
 } from "./config";
 import { BRAND_LOGOS } from "./icons";
 import { isActionable, runAction, type ActionConfig } from "./actions";
-import { press, type PressOptions } from "./press";
+import { SLOP_PX, press, type PressOptions } from "./press";
 import { remoteStyles } from "./styles";
 import { tileStyles } from "./kit/styles";
 import { stateColor, type HomeAssistant } from "./kit/types";
@@ -47,6 +49,21 @@ export const CARD_VERSION = "2.1.1-beta.11";
 
 const CARD_TYPE = "polr-android-tv-remote-card";
 
+/**
+ * How long a dragged level keeps the bar before the target's own reading takes
+ * it back, if the target never reports the level it was handed.
+ *
+ * A receiver that rounds to its own steps lands near the asked-for level rather
+ * than on it, and one that is busy may not report at all -- so the preview
+ * needs an ending that does not depend on an answer arriving.
+ */
+const VOLUME_SETTLE_MS = 2000;
+/**
+ * How close a reported level has to be to count as the one that was asked for.
+ * Receivers quantise: half-decibel steps land within a percent or two.
+ */
+const VOLUME_EPSILON = 0.02;
+
 @customElement(CARD_TYPE)
 export class PolrAndroidTvRemoteCard extends LitElement {
   static override styles = [tileStyles, remoteStyles];
@@ -56,6 +73,17 @@ export class PolrAndroidTvRemoteCard extends LitElement {
   @state() private _config?: ResolvedConfig;
   @state() private _text = "";
   @state() private _sending = false;
+  /** The level under the finger, while a volume drag is in progress. */
+  @state() private _dragVolume?: number;
+  /** The level just asked for, until the target reports it back. */
+  @state() private _sentVolume?: number;
+
+  /** A pointer is down on the volume bar. */
+  private _volumeDown = false;
+  /** ...and has travelled far enough to be a drag rather than a tap. */
+  private _volumeDragging = false;
+  private _volumeFrom = 0;
+  private _settleTimer?: number;
 
   public static getConfigElement(): HTMLElement {
     return document.createElement(`${CARD_TYPE}-editor`);
@@ -203,6 +231,123 @@ export class PolrAndroidTvRemoteCard extends LitElement {
     } finally {
       this._sending = false;
     }
+  }
+
+  /* ------------------------------------------------------- volume drag -- */
+
+  /**
+   * Where along the bar a pointer is, as a level.
+   *
+   * The bar is the whole button: its left edge is silence and its right edge
+   * is full, which is the mapping every slider in Home Assistant uses.
+   *
+   * Measured against the padding box rather than the border box, because that
+   * is what the fill inside is positioned against -- take the border box and
+   * the fill lands a pixel or two off the finger, which on a control this
+   * narrow is a visible percent.
+   */
+  private _levelAt(event: PointerEvent, bar: HTMLElement): number {
+    const box = bar.getBoundingClientRect();
+    const width = bar.clientWidth || box.width;
+    if (width === 0) return 0;
+    const from = box.left + bar.clientLeft;
+    return Math.min(1, Math.max(0, (event.clientX - from) / width));
+  }
+
+  private _onVolumeDown = (event: PointerEvent): void => {
+    if (event.button !== 0) return;
+    this._volumeDown = true;
+    this._volumeDragging = false;
+    this._volumeFrom = event.clientX;
+  };
+
+  /**
+   * Become a drag, but only once the gesture has declared itself one.
+   *
+   * Nothing happens on pointerdown. A thumb landing on the bar to scroll the
+   * dashboard must not move the volume, and until it travels there is no way
+   * to tell it from a tap on mute. Past the tap's own slop the question is
+   * settled, and only then is the pointer captured -- capturing on pointerdown
+   * would take the gesture away from the browser's scroll detection, which is
+   * precisely what press.ts is careful never to do.
+   */
+  private _onVolumeMove = (event: PointerEvent): void => {
+    if (!this._volumeDown) return;
+    const bar = event.currentTarget as HTMLElement;
+    if (!this._volumeDragging) {
+      if (Math.abs(event.clientX - this._volumeFrom) <= SLOP_PX) return;
+      this._volumeDragging = true;
+      // Best effort. It is what keeps the drag alive when the finger runs off
+      // the end of the bar, and a browser that refuses it -- for a pointer it
+      // does not consider active -- is not a reason to drop the drag, which
+      // still tracks perfectly well while the pointer is over the control.
+      try {
+        bar.setPointerCapture(event.pointerId);
+      } catch {
+        /* not captured */
+      }
+    }
+    this._dragVolume = this._levelAt(event, bar);
+  };
+
+  private _onVolumeUp = (event: PointerEvent): void => {
+    // A level exists only once the gesture became a drag, so this is also what
+    // keeps a tap on mute from setting the volume it happened to land on.
+    const level = this._dragVolume;
+    this._endVolumeDrag(event);
+    if (level === undefined) return;
+
+    const device = this._device;
+    if (!this.hass || !device) return;
+
+    // Keep the dragged level on the bar rather than letting it snap back to
+    // the old reading for the length of the round trip through Home Assistant.
+    this._sentVolume = level;
+    window.clearTimeout(this._settleTimer);
+    this._settleTimer = window.setTimeout(() => {
+      this._sentVolume = undefined;
+      this._settleTimer = undefined;
+    }, VOLUME_SETTLE_MS);
+
+    this._run(setVolume(this.hass, device, level));
+  };
+
+  /** The browser took the gesture for a scroll: it was never a volume drag. */
+  private _onVolumeCancel = (event: PointerEvent): void => {
+    this._endVolumeDrag(event);
+  };
+
+  private _endVolumeDrag(event: PointerEvent): void {
+    const bar = event.currentTarget as HTMLElement | null;
+    if (bar?.hasPointerCapture?.(event.pointerId)) {
+      bar.releasePointerCapture(event.pointerId);
+    }
+    this._volumeDown = false;
+    this._volumeDragging = false;
+    this._dragVolume = undefined;
+  }
+
+  /**
+   * Let go of a dragged level once the target confirms it.
+   *
+   * Without this the bar has two ways to lie: snap back to the stale reading
+   * for the length of the round trip, or sit on the dragged number forever
+   * when the target rounds it to a step of its own.
+   */
+  protected override willUpdate(changed: PropertyValues): void {
+    if (this._sentVolume === undefined || !changed.has("hass")) return;
+    const reported = this._device?.volume;
+    if (reported === undefined) return;
+    if (Math.abs(reported - this._sentVolume) > VOLUME_EPSILON) return;
+    window.clearTimeout(this._settleTimer);
+    this._settleTimer = undefined;
+    this._sentVolume = undefined;
+  }
+
+  public override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    window.clearTimeout(this._settleTimer);
+    this._settleTimer = undefined;
   }
 
   /* ------------------------------------------------------------- header -- */
@@ -375,21 +520,48 @@ export class PolrAndroidTvRemoteCard extends LitElement {
     const reported = device.on || device.volumeId !== device.playerId;
     const muted = reported && device.muted === true;
     const mutedKnown = reported && device.muted !== undefined;
-    const percent =
-      reported && hasVolumeState(device) ? Math.round(device.volume! * 100) : undefined;
+    const known = reported && hasVolumeState(device) ? device.volume! : undefined;
+
+    /*
+     * Drag to set, where the target says it can be told a level.
+     *
+     * The TV's own player never can -- androidtv_remote offers VOLUME_STEP and
+     * nothing else -- so on most cards this stays the bar it has always been.
+     * A soundbar or receiver on `volume_entity` is a different device with a
+     * different feature mask, and those usually can. The capability bit decides
+     * it; there is no setting, because a setting would only be a way to be
+     * wrong about the device.
+     *
+     * It stays one control: tap to mute, drag to set. The tap's own slop is
+     * what separates them, so a finger does one or the other and never both.
+     * Pointer-only by nature, which is why the step buttons either side keep
+     * their place -- they remain the whole of the keyboard and screen-reader
+     * path to the volume, and they reach targets that cannot be told a level
+     * at all.
+     */
+    const settable = known !== undefined && canVolume(device, FEATURE.VOLUME_SET);
+    // The finger first, then the level just handed over, then the reading --
+    // each only while it is more current than the one underneath it.
+    const level = settable ? (this._dragVolume ?? this._sentVolume ?? known) : known;
+    const percent = level === undefined ? undefined : Math.round(level * 100);
 
     return html`
       <div class="features">
         ${this._button("volume_down", "mdi:volume-minus", "Volume down", { repeat: true })}
         <button
-          class="control-button volume-level ${muted ? "muted" : ""}"
+          class="control-button volume-level ${muted ? "muted" : ""} ${settable
+            ? "settable"
+            : ""} ${this._volumeDragging ? "dragging" : ""}"
           type="button"
           aria-label=${muted ? "Unmute" : "Mute"}
+          title=${settable ? "Tap to mute, drag to set the volume" : nothing}
           aria-pressed=${mutedKnown ? (muted ? "true" : "false") : "undefined"}
+          @pointerdown=${settable ? this._onVolumeDown : undefined}
+          @pointermove=${settable ? this._onVolumeMove : undefined}
+          @pointerup=${settable ? this._onVolumeUp : undefined}
+          @pointercancel=${settable ? this._onVolumeCancel : undefined}
           ${press(this._pressOptions("volume_mute"))}
         >
-          <!-- Read-only by design: androidtv_remote supports VOLUME_STEP but
-               not VOLUME_SET, so there is nothing to drag to. -->
           ${percent === undefined
             ? nothing
             : html`<span class="level" style="width:${percent}%"></span>`}

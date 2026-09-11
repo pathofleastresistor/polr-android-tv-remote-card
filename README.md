@@ -344,6 +344,15 @@ If a soundbar or receiver exposes a media player, point the card at it:
 volume_entity: media_player.living_room_soundbar
 ```
 
+**Drag it, where the target can be told a level.** A TV cannot: the integration
+offers volume *steps* and nothing else, so there the bar is the readout it has
+always been. A soundbar or receiver usually can, and when it says so — the
+`VOLUME_SET` feature bit, read off the entity rather than configured — the same
+bar becomes a slider: tap it to mute, drag along it to set. Nothing to turn on,
+and nothing to get wrong: a target that cannot take a level is never asked for
+one. The step buttons either side keep their place, and remain the whole of the
+keyboard and screen-reader path to the volume.
+
 **The row outlives the TV.** A soundbar does not sleep when the set does, so
 when volume is routed away from the TV — `volume_entity` set to another entity,
 or a `tap_action` override on any of the three buttons — the row stays on an

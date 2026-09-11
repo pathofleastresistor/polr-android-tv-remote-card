@@ -215,7 +215,7 @@ const HELPERS: Record<string, string> = {
   show_power:
     "In the header, or in the back / home / menu row when the header is hidden — that row then has to be in the layout for it to have anywhere to go. Off also drops the big Turn on button an off TV shows.",
   volume_entity:
-    "Point this at a soundbar or receiver that exposes a media player. A TV passing audio through reports no volume level, so the card shows no level bar for it.",
+    "Point this at a soundbar or receiver that exposes a media player. A TV passing audio through reports no volume level, so the card shows no level bar for it. One that can be set to a level outright — most receivers can — makes the bar draggable.",
   power_action:
     "Leave empty to toggle the TV itself. Set it when something else does the switching — an IR or RF blaster, or a script that also powers a receiver.",
   volume_up_action:
