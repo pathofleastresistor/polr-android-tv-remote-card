@@ -127,13 +127,41 @@ export type AppConfig = TileConfig;
  * is what lets a card carry controls the remote itself has no concept of — an
  * AV receiver, a projector, a hub activity.
  */
-export interface SectionConfig {
+interface SectionConfig {
   /** Shown only when `show_section_labels` is on, like the built-in sections. */
   name?: string;
   /** Buttons per row. Falls back to `app_columns`. */
   columns?: number;
   buttons: TileConfig[];
 }
+
+/**
+ * The blocks a card stacks, in the order `layout` lists them.
+ *
+ * Ids name what the thing *is* on screen rather than the flag that used to
+ * govern it: `navigation` is the back / home / menu row, `text` is the field
+ * that types on the TV.
+ */
+const BLOCK_IDS = [
+  "pad",
+  "navigation",
+  "transport",
+  "volume",
+  "text",
+  "apps",
+] as const;
+export type BlockId = (typeof BLOCK_IDS)[number];
+
+/**
+ * One entry of `layout`: a built-in block, or a section of buttons.
+ *
+ * `hidden` rather than absence, because a hidden block still has a *place*.
+ * Drop it from the list and turning it back on has to guess where it went --
+ * the editor's eye toggle would rearrange the card behind the user's back.
+ */
+export type LayoutBlock =
+  | { type: BlockId; hidden?: boolean }
+  | ({ type: "section"; hidden?: boolean } & SectionConfig);
 
 export interface PolrAtvRemoteCardConfig {
   type: string;
@@ -161,7 +189,20 @@ export interface PolrAtvRemoteCardConfig {
   show_section_labels?: boolean;
 
   apps?: AppConfig[];
-  /** User-defined rows of buttons, drawn before the app launcher. */
+  /**
+   * Every block on the card, in the order they are drawn.
+   *
+   * Absent, the order is the one the card always had and the `show_*` flags
+   * decide what appears in it. Present, it is the whole answer -- order and
+   * visibility both -- and those flags are not consulted.
+   */
+  layout?: (BlockId | LayoutBlock)[];
+  /**
+   * User-defined rows of buttons, drawn before the app launcher.
+   *
+   * Superseded by `layout`, which can put them anywhere; still read when there
+   * is no layout, which is every config written before there was one.
+   */
   sections?: SectionConfig[];
   /** Most app buttons on one row before wrapping. */
   app_columns?: number;
@@ -185,17 +226,25 @@ export interface PolrAtvRemoteCardConfig {
 export interface ResolvedConfig extends PolrAtvRemoteCardConfig {
   show_header: boolean;
   show_power: boolean;
-  show_nav: boolean;
   pad: PadStyle;
-  show_transport: boolean;
   transport_buttons: ButtonId[];
-  show_volume: boolean;
-  show_text_input: boolean;
-  show_apps: boolean;
   show_section_labels: boolean;
+  /*
+   * show_nav / show_transport / show_volume / show_text_input / show_apps are
+   * deliberately absent: they are input spellings, folded into `layout` at
+   * resolution. Leaving them here as resolved values would leave a flag that
+   * could disagree with the list, which is the bug this shape exists to stop.
+   */
   show_favorite: boolean;
   apps: AppConfig[];
-  sections: SectionConfig[];
+  /**
+   * The card's blocks in order, every one of them, hidden or not.
+   *
+   * Resolution folds the `show_*` flags and `sections` into this, so render and
+   * the editor read one list and nothing else: there is no second place a block
+   * can come from, and no flag left that can disagree with it.
+   */
+  layout: LayoutBlock[];
   app_columns: number;
   hold_repeat: boolean;
   haptics: boolean;
@@ -371,6 +420,110 @@ export const _resetWarnings = (): void => {
   warned = new Set();
 };
 
+/**
+ * Normalise one section.
+ *
+ * Sections keep their shape even when empty. Emptiness is a *rendering*
+ * decision, not a config one: dropping empty sections here deleted every
+ * section the editor created, because "Add section" emits one with no buttons
+ * yet and HA immediately hands the config back through setConfig -- so the
+ * button appeared to do nothing at all. Malformed entries are still dropped.
+ */
+const normalizeSection = (entry: unknown): SectionConfig | null => {
+  if (!isRecord(entry)) {
+    warnOnce(`section is not an object and was skipped: ${JSON.stringify(entry)}`);
+    return null;
+  }
+  const buttons = (Array.isArray(entry["buttons"]) ? entry["buttons"] : [])
+    .map(normalizeApp)
+    .filter((button): button is TileConfig => button !== null);
+  return {
+    ...(typeof entry["name"] === "string" ? { name: entry["name"] } : {}),
+    ...(typeof entry["columns"] === "number" && entry["columns"] > 0
+      ? { columns: entry["columns"] }
+      : {}),
+    buttons,
+  };
+};
+
+const isBlockId = (value: unknown): value is BlockId =>
+  typeof value === "string" && (BLOCK_IDS as readonly string[]).includes(value);
+
+/** Normalise one entry of `layout`: an id, a `{type}`, or a section. */
+const normalizeBlock = (entry: unknown): LayoutBlock | null => {
+  if (isBlockId(entry)) return { type: entry };
+
+  if (!isRecord(entry)) {
+    warnOnce(`layout entry is not a block and was skipped: ${JSON.stringify(entry)}`);
+    return null;
+  }
+
+  const hidden = entry["hidden"] === true ? { hidden: true as const } : {};
+  const type = entry["type"];
+
+  if (isBlockId(type)) return { type, ...hidden };
+
+  // A section says so, or simply carries buttons -- which is what the `sections`
+  // shape has always looked like, so one can be pasted straight into a layout.
+  if (type === "section" || Array.isArray(entry["buttons"])) {
+    const section = normalizeSection(entry);
+    return section ? { type: "section", ...hidden, ...section } : null;
+  }
+
+  warnOnce(`unknown layout block ${JSON.stringify(entry)} was skipped`);
+  return null;
+};
+
+/**
+ * The card's blocks, in order, with every built-in accounted for.
+ *
+ * Two shapes come in and one goes out. Without a `layout` the order is the one
+ * the card has always drawn and the `show_*` flags say what is hidden; with
+ * one, the list is the order and anything it leaves out is hidden. Either way
+ * every built-in block ends up in the result exactly once, because the editor
+ * needs a row to toggle for the blocks that are currently off -- a list that
+ * only holds what is visible cannot offer to bring anything back.
+ */
+const buildLayout = (
+  raw: Record<string, unknown>,
+  sections: SectionConfig[],
+  visible: Record<BlockId, boolean>,
+): LayoutBlock[] => {
+  const blocks: LayoutBlock[] = Array.isArray(raw["layout"])
+    ? raw["layout"]
+        .map(normalizeBlock)
+        .filter((block): block is LayoutBlock => block !== null)
+    : [
+        { type: "pad", ...(visible.pad ? {} : { hidden: true as const }) },
+        { type: "navigation", ...(visible.navigation ? {} : { hidden: true as const }) },
+        { type: "transport", ...(visible.transport ? {} : { hidden: true as const }) },
+        { type: "volume", ...(visible.volume ? {} : { hidden: true as const }) },
+        { type: "text", ...(visible.text ? {} : { hidden: true as const }) },
+        ...sections.map((section): LayoutBlock => ({ type: "section", ...section })),
+        { type: "apps", ...(visible.apps ? {} : { hidden: true as const }) },
+      ];
+
+  // A built-in the layout never mentions is hidden, and lands at the end so it
+  // has somewhere to be turned back on from.
+  const named = new Set(blocks.map((block) => block.type));
+  const missing = BLOCK_IDS.filter((id) => !named.has(id)).map(
+    (type): LayoutBlock => ({ type, hidden: true }),
+  );
+
+  // One of each: a layout naming a block twice would draw it twice, and the
+  // editor's arrows would then swap rows that look identical.
+  const seen = new Set<string>();
+  return [...blocks, ...missing].filter((block) => {
+    if (block.type === "section") return true;
+    if (seen.has(block.type)) {
+      warnOnce(`layout lists ${block.type} more than once; only the first is drawn`);
+      return false;
+    }
+    seen.add(block.type);
+    return true;
+  });
+};
+
 /** Normalise one entry of `apps`, in either v1 or v2 shape. */
 const normalizeApp = (entry: unknown): AppConfig | null => {
   // v1: a bare brand id.
@@ -529,22 +682,7 @@ export const normalizeConfig = (raw: PolrAtvRemoteCardConfig): ResolvedConfig =>
    * with no buttons, so nothing renders as an empty labelled row.
    */
   const sections = (Array.isArray(raw.sections) ? raw.sections : [])
-    .map((entry): SectionConfig | null => {
-      if (!isRecord(entry)) {
-        warnOnce(`section is not an object and was skipped: ${JSON.stringify(entry)}`);
-        return null;
-      }
-      const buttons = (Array.isArray(entry["buttons"]) ? entry["buttons"] : [])
-        .map(normalizeApp)
-        .filter((button): button is TileConfig => button !== null);
-      return {
-        ...(typeof entry["name"] === "string" ? { name: entry["name"] } : {}),
-        ...(typeof entry["columns"] === "number" && entry["columns"] > 0
-          ? { columns: entry["columns"] }
-          : {}),
-        buttons,
-      };
-    })
+    .map(normalizeSection)
     .filter((section): section is SectionConfig => section !== null);
 
   const rawApps = Array.isArray(raw.apps) ? raw.apps : [];
@@ -555,7 +693,15 @@ export const normalizeConfig = (raw: PolrAtvRemoteCardConfig): ResolvedConfig =>
   const pick = <T>(value: T | undefined, fallback: T): T =>
     value === undefined ? fallback : value;
 
-  return {
+  /*
+   * The five visibility flags do not come out the other side.
+   *
+   * They are an input spelling and `layout` is what the card reads; handing
+   * them back resolved would put one fact in two places. The editor spreads
+   * this object into what it stores, so a flag surviving here is a flag written
+   * back into YAML beside the layout that supersedes it.
+   */
+  const resolved = {
     ...raw,
     type: raw.type,
     entity,
@@ -566,24 +712,32 @@ export const normalizeConfig = (raw: PolrAtvRemoteCardConfig): ResolvedConfig =>
 
     show_header: pick(raw.show_header, DEFAULTS.show_header),
     show_power: pick(raw.show_power, DEFAULTS.show_power),
-    show_nav: pick(raw.show_nav, branch.show_nav ?? DEFAULTS.show_nav),
     pad,
-    show_transport: pick(raw.show_transport, branch.show_transport ?? DEFAULTS.show_transport),
     transport_buttons: transportButtons,
-    show_volume: pick(raw.show_volume, branch.show_volume ?? legacyVolume ?? DEFAULTS.show_volume),
-    show_text_input: pick(
-      raw.show_text_input,
-      branch.show_text_input ?? DEFAULTS.show_text_input,
-    ),
-    show_apps: pick(raw.show_apps, branch.show_apps ?? DEFAULTS.show_apps),
     show_section_labels: pick(raw.show_section_labels, DEFAULTS.show_section_labels),
+
 
     // v1 always drew a favourite button on the default pad, and threw when it
     // had no override to call. Draw it only when it does something.
     show_favorite: overrides.favorite !== undefined,
 
     apps,
-    sections,
+    layout: buildLayout(raw, sections, {
+      pad: pick(raw.show_nav, branch.show_nav ?? DEFAULTS.show_nav),
+      // The back / home / menu row has never had a flag: it was always drawn.
+      // A layout can now hide it, which is the only way it ever goes away.
+      navigation: true,
+      transport: pick(
+        raw.show_transport,
+        branch.show_transport ?? DEFAULTS.show_transport,
+      ),
+      volume: pick(
+        raw.show_volume,
+        branch.show_volume ?? legacyVolume ?? DEFAULTS.show_volume,
+      ),
+      text: pick(raw.show_text_input, branch.show_text_input ?? DEFAULTS.show_text_input),
+      apps: pick(raw.show_apps, branch.show_apps ?? DEFAULTS.show_apps),
+    }),
     // "auto" was the v2-beta spelling, before the tiles became fixed-width.
     app_columns:
       typeof raw.app_columns === "number" && raw.app_columns > 0
@@ -592,8 +746,21 @@ export const normalizeConfig = (raw: PolrAtvRemoteCardConfig): ResolvedConfig =>
     hold_repeat: pick(raw.hold_repeat, DEFAULTS.hold_repeat),
     haptics: pick(raw.haptics, DEFAULTS.haptics),
     overrides,
-  };
+  } as ResolvedConfig;
+
+  for (const flag of FOLDED_FLAGS) delete (resolved as Record<string, unknown>)[flag];
+  return resolved;
 };
+
+/** Input spellings that `layout` replaces, dropped once it is built. */
+const FOLDED_FLAGS = [
+  "show_nav",
+  "show_transport",
+  "show_volume",
+  "show_text_input",
+  "show_apps",
+  "sections",
+] as const;
 
 /**
  * Strip keys that must never reach stored YAML: v1 spellings the editor has

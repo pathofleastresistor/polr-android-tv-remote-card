@@ -257,13 +257,27 @@ for (const dark of [false, true]) {
         el.click();
       };
 
-      clickByText("add section");
-      await editor.updateComplete;
       // HA echoes every change back through setConfig; without that the editor
       // is testing its own optimism rather than the round-trip.
-      if (emitted) editor.setConfig(emitted);
+      const settle = async () => {
+        if (emitted) editor.setConfig(emitted);
+        await editor.updateComplete;
+      };
+      const sections = () =>
+        (emitted?.layout ?? []).filter((block) => block.type === "section");
+
+      clickByText("add section");
       await editor.updateComplete;
-      const sectionsAfterAdd = emitted?.sections?.length;
+      await settle();
+      const sectionsAfterAdd = sections().length;
+
+      // A legacy `sections:` config migrates into the layout on the first edit,
+      // so the section from the config is now a row in that list. Open it: its
+      // name is only editable once its own editor is expanded.
+      const rows = [...editor.shadowRoot.querySelectorAll("ul.list > li.row")];
+      const row = rows.find((r) => r.textContent.includes("Home theater"));
+      row?.querySelector("button[title='Edit']")?.click();
+      await editor.updateComplete;
 
       const nameInput = [...editor.shadowRoot.querySelectorAll("input")].find(
         (i) => i.value === "Theater" || i.value === "Home theater",
@@ -272,9 +286,10 @@ for (const dark of [false, true]) {
         nameInput.value = "Theater";
         nameInput.dispatchEvent(new Event("change", { bubbles: true }));
         await editor.updateComplete;
+        await settle();
       }
 
-      const section = emitted?.sections?.[0];
+      const section = sections()[0];
       return {
         sectionsAfterAdd,
         renamed: section?.name,
@@ -282,6 +297,10 @@ for (const dark of [false, true]) {
         entityKept: section?.buttons?.[0]?.entity,
         blindButtonStaysBlind: section?.buttons?.[1]?.entity ?? null,
         appsUntouched: emitted?.apps?.[0]?.icon,
+        // The retired spellings must not be written back beside the layout.
+        flagsRetired: ["sections", "show_nav", "show_volume", "show_apps"].every(
+          (key) => emitted?.[key] === undefined,
+        ),
       };
     });
 
@@ -293,6 +312,7 @@ for (const dark of [false, true]) {
       entityKept: "media_player.projector",
       blindButtonStaysBlind: null,
       appsUntouched: "brand:netflix",
+      flagsRetired: true,
     };
     for (const [key, want] of Object.entries(expected)) {
       if (roundTrip[key] !== want) {
@@ -302,7 +322,9 @@ for (const dark of [false, true]) {
         );
       }
     }
-    console.log("editor round-trip: sections survive an edit, apps untouched");
+    console.log(
+      "editor round-trip: sections survive an edit as layout blocks, apps untouched",
+    );
   }
 
   // The editor's spacing is a claim like any other, and the kind that rots
@@ -313,19 +335,24 @@ for (const dark of [false, true]) {
   if (!dark) {
     const spacing = await page.evaluate(async () => {
       const kase = [...document.querySelectorAll(".case")].find(
-        (c) => c.querySelector("h2")?.textContent === "editor: sections",
+        (c) => c.querySelector("h2")?.textContent === "editor: layout",
       );
       const editor = kase.querySelector("polr-android-tv-remote-card-editor");
       const name = (el) => el.className || el.tagName.toLowerCase();
 
-      // Open a row's inline form: it is the one surface only reachable by
-      // clicking, and the one whose padding was silently stripped once because
-      // nothing here looked inside it.
-      const pencil = editor.shadowRoot
-        .querySelector(".section-block ul.list > li.row")
-        .querySelector("button[title='Edit']");
-      pencil.click();
-      await editor.updateComplete;
+      // Open the inline forms: they are the surfaces only reachable by
+      // clicking, and the ones whose padding was silently stripped once because
+      // nothing here looked inside them. The layout list's only Edit button is
+      // the section's; opening it reveals that section's own button list.
+      const open = async (root) => {
+        const pencil = root.querySelector("ul.list > li.row button[title='Edit']");
+        if (pencil) {
+          pencil.click();
+          await editor.updateComplete;
+        }
+      };
+      await open(editor.shadowRoot);
+      await open(editor.shadowRoot.querySelector("li.form-host"));
 
       // A heading hugs what follows it, so 8 is as legal as the 16 between
       // blocks; inside a section block everything is 8; rows are 4 apart. The
@@ -359,9 +386,6 @@ for (const dark of [false, true]) {
       for (const panel of editor.shadowRoot.querySelectorAll("ha-expansion-panel")) {
         const content = panel.querySelector(".content");
         problems.push(...measure(content, [8, 16], 12, "panel"));
-        for (const block of content.querySelectorAll(".section-block")) {
-          problems.push(...measure(block, [8], 12, "section"));
-        }
         for (const list of content.querySelectorAll("ul.list")) {
           problems.push(...measure(list, [4, 8], 0, "list"));
         }

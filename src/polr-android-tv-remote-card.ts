@@ -29,6 +29,7 @@ import {
   type TileConfig,
   type ButtonId,
   type BrandId,
+  type LayoutBlock,
   type PolrAtvRemoteCardConfig,
   type ResolvedConfig,
 } from "./config";
@@ -78,17 +79,34 @@ export class PolrAndroidTvRemoteCard extends LitElement {
     this._config = normalizeConfig(config);
   }
 
+  /** Rows each kind of block occupies, in HA's ~50px units. */
+  private static readonly BLOCK_ROWS = {
+    navigation: 1,
+    transport: 1,
+    volume: 1,
+    text: 1,
+    apps: 2,
+    section: 2,
+  } as const;
+
   public getCardSize(): number {
     const config = this._config;
     if (!config) return 6;
     let size = config.show_header ? 2 : 0;
-    if (config.show_nav) size += config.pad === "buttons" ? 5 : 6;
-    size += 1; // back / home / menu
-    if (config.show_transport) size += 1;
-    if (config.show_volume) size += 1;
-    if (config.show_text_input) size += 1;
-    if (config.show_apps && config.apps.length) size += 2;
+    for (const block of config.layout) {
+      if (block.hidden) continue;
+      if (block.type === "pad") size += config.pad === "buttons" ? 5 : 6;
+      else if (block.type === "apps") size += config.apps.length ? 2 : 0;
+      else size += PolrAndroidTvRemoteCard.BLOCK_ROWS[block.type];
+    }
     return Math.max(size, 3);
+  }
+
+  /** Is this block on the card at all? */
+  private _shows(type: LayoutBlock["type"]): boolean {
+    return (this._config?.layout ?? []).some(
+      (block) => block.type === type && !block.hidden,
+    );
   }
 
   /**
@@ -107,7 +125,7 @@ export class PolrAndroidTvRemoteCard extends LitElement {
       columns: 12,
       min_columns: 6,
       rows: "auto",
-      min_rows: this._config?.show_nav ? 6 : 2,
+      min_rows: this._shows("pad") ? 6 : 2,
     };
   }
 
@@ -239,7 +257,7 @@ export class PolrAndroidTvRemoteCard extends LitElement {
    * that can say it, so it comes back.
    */
   private _renderChips(device: DeviceState): TemplateResult | typeof nothing {
-    if (!device.on || !device.available || this._config!.show_volume) return nothing;
+    if (!device.on || !device.available || this._shows("volume")) return nothing;
 
     // Nothing here is invented: each chip needs state the device actually
     // reports. A TV feeding a soundbar reports neither, and shows no chips.
@@ -478,24 +496,79 @@ export class PolrAndroidTvRemoteCard extends LitElement {
     `;
   }
 
-  private _renderApps(): TemplateResult | typeof nothing {
+  /**
+   * One block of the layout.
+   *
+   * Every block is drawn here and nowhere else, so the order on screen is the
+   * order of the list and nothing can quietly re-sort it -- which is what the
+   * old fixed template did: sections came after the remote because that is
+   * where they were typed, not because anyone chose it.
+   */
+  private _renderBlock(
+    block: LayoutBlock,
+    index: number,
+    device: DeviceState,
+  ): TemplateResult | typeof nothing {
     const config = this._config!;
-    return this._renderSection(config.apps, "Apps", config.app_columns, "apps");
+
+    switch (block.type) {
+      case "pad":
+        return html`<polr-atv-nav-pad
+          .pad=${config.pad}
+          .repeat=${config.hold_repeat}
+          .haptics=${config.haptics}
+          @atv-nav=${this._navigate}
+        ></polr-atv-nav-pad>`;
+
+      case "navigation":
+        return this._renderNavigationRow();
+
+      case "transport":
+        return this._renderTransport(device);
+
+      case "volume":
+        return this._renderVolume(device);
+
+      case "text":
+        return this._renderTextInput();
+
+      case "apps":
+        return this._renderSection(config.apps, "Apps", config.app_columns, "apps");
+
+      case "section":
+        return this._renderSection(
+          block.buttons,
+          block.name ?? "",
+          block.columns ?? config.app_columns,
+          `s${index}`,
+        );
+    }
   }
 
-  /** User-defined rows, in declared order, ahead of the app launcher. */
-  private _renderCustomSections(): TemplateResult | typeof nothing {
+  /**
+   * The layout, minus what this device state cannot support.
+   *
+   * A pad, a transport row and a text field all talk to a TV that is awake, so
+   * an off TV drops them -- but only them, and the rest keep their order. The
+   * volume row stays when the sound is not the TV's, which is the same rule it
+   * follows when the card is on.
+   */
+  private _renderLayout(device: DeviceState): TemplateResult {
     const config = this._config!;
-    if (!config.sections.length) return nothing;
+    const live = device.on;
+
     return html`
-      ${config.sections.map((section, index) =>
-        this._renderSection(
-          section.buttons,
-          section.name ?? "",
-          section.columns ?? config.app_columns,
-          `s${index}`,
-        ),
-      )}
+      ${config.layout.map((block, index) => {
+        if (block.hidden) return nothing;
+        if (live) return this._renderBlock(block, index, device);
+        if (block.type === "section" || block.type === "apps") {
+          return this._renderBlock(block, index, device);
+        }
+        if (block.type === "volume" && hasExternalVolume(config, device)) {
+          return this._renderBlock(block, index, device);
+        }
+        return nothing;
+      })}
     `;
   }
 
@@ -535,44 +608,24 @@ export class PolrAndroidTvRemoteCard extends LitElement {
           : nothing}
         ${!live
           ? html`<div class="empty-state">This device is unavailable.</div>`
-          : !device.on
-            ? html`
-                <!-- No "the TV is off" line: the header secondary already says
-                     Off, and the button says Turn on. -->
-                <div class="features">
-                  <button
-                    class="control-button accent wide"
-                    type="button"
-                    ${press(this._pressOptions("power"))}
-                  >
-                    <ha-icon icon="mdi:power"></ha-icon><span>Turn on</span>
-                  </button>
-                </div>
-                <!-- A soundbar does not go to sleep with the TV: when volume is
-                     routed to one, the row is the only way to turn down music
-                     playing through it, so it outlives the set's power state. -->
-                ${config.show_volume && hasExternalVolume(config, device)
-                  ? this._renderVolume(device)
-                  : nothing}
-                ${this._renderCustomSections()}
-                ${config.show_apps ? this._renderApps() : nothing}
-              `
-            : html`
-                ${config.show_nav
-                  ? html`<polr-atv-nav-pad
-                      .pad=${config.pad}
-                      .repeat=${config.hold_repeat}
-                      .haptics=${config.haptics}
-                      @atv-nav=${this._navigate}
-                    ></polr-atv-nav-pad>`
-                  : nothing}
-                ${this._renderNavigationRow()}
-                ${config.show_transport ? this._renderTransport(device) : nothing}
-                ${config.show_volume ? this._renderVolume(device) : nothing}
-                ${config.show_text_input ? this._renderTextInput() : nothing}
-                ${this._renderCustomSections()}
-                ${config.show_apps ? this._renderApps() : nothing}
-              `}
+          : html`
+              ${device.on
+                ? nothing
+                : html`
+                    <!-- No "the TV is off" line: the header secondary already
+                         says Off, and the button says Turn on. -->
+                    <div class="features">
+                      <button
+                        class="control-button accent wide"
+                        type="button"
+                        ${press(this._pressOptions("power"))}
+                      >
+                        <ha-icon icon="mdi:power"></ha-icon><span>Turn on</span>
+                      </button>
+                    </div>
+                  `}
+              ${this._renderLayout(device)}
+            `}
       </ha-card>
     `;
   }

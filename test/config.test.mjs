@@ -35,6 +35,24 @@ const tap = ({ service, data, target }) => ({
 
 test.beforeEach(() => _resetWarnings());
 
+/**
+ * The sections of a resolved config.
+ *
+ * Sections used to be their own list; they are blocks of `layout` now, so that
+ * one list is the whole answer to what a card draws and in what order. What
+ * these tests assert about them -- normalisation, survival, malformed entries
+ * dropped -- is unchanged, so they read the same things out of the new place.
+ */
+const sectionsOf = (config) => config.layout.filter((block) => block.type === "section");
+
+/** Visible blocks, in the order the card draws them; sections by name. */
+const orderOf = (config) =>
+  config.layout.filter((block) => !block.hidden).map((block) => block.name ?? block.type);
+
+/** Is this block drawn? What the five retired show_* flags now mean. */
+const shows = (config, type) =>
+  config.layout.some((block) => block.type === type && !block.hidden);
+
 test("entity_id becomes entity", () => {
   const config = normalizeConfig(base({ entity_id: "remote.atv" }));
   assert.equal(config.entity, "remote.atv");
@@ -86,15 +104,20 @@ test("a v2 pad wins over a v1 remote key", () => {
   assert.equal(config.pad, "dpad");
 });
 
-test("volume: false becomes show_volume: false", () => {
+test("volume: false hides the volume block", () => {
   const config = normalizeConfig(base({ entity_id: "remote.atv", volume: false }));
-  assert.equal(config.show_volume, false);
+  assert.equal(shows(config, "volume"), false);
+  // Hidden, not gone: the editor needs a row to turn it back on from.
+  assert.equal(
+    config.layout.some((block) => block.type === "volume"),
+    true,
+  );
 });
 
 test("volume defaults to shown, matching v1", () => {
-  assert.equal(normalizeConfig(base({ entity_id: "remote.atv" })).show_volume, true);
+  assert.equal(shows(normalizeConfig(base({ entity_id: "remote.atv" })), "volume"), true);
   assert.equal(
-    normalizeConfig(base({ entity_id: "remote.atv", volume: true })).show_volume,
+    shows(normalizeConfig(base({ entity_id: "remote.atv", volume: true })), "volume"),
     true,
   );
 });
@@ -291,7 +314,7 @@ test("the README's v1 example still resolves", () => {
   assert.equal(config.apps.length, 5);
   assert.equal(config.apps[0].action.activity, "https://www.disneyplus.com");
   assert.equal(config.apps[4].action.activity, "https://www.youtube.com");
-  assert.equal(config.show_volume, true);
+  assert.equal(shows(config, "volume"), true);
 });
 
 test("the README's v1 customisation example still resolves", () => {
@@ -519,11 +542,11 @@ test("branch booleans map onto their v2 equivalents", () => {
       showURLSearch: true,
     }),
   );
-  assert.equal(config.show_nav, false);
-  assert.equal(config.show_apps, false);
-  assert.equal(config.show_volume, false);
-  assert.equal(config.show_transport, false);
-  assert.equal(config.show_text_input, true, "showURLSearch became the text field");
+  assert.equal(shows(config, "pad"), false);
+  assert.equal(shows(config, "apps"), false);
+  assert.equal(shows(config, "volume"), false);
+  assert.equal(shows(config, "transport"), false);
+  assert.equal(shows(config, "text"), true, "showURLSearch became the text field");
 });
 
 test("media_controls picks which transport buttons are drawn", () => {
@@ -567,10 +590,10 @@ test("the author's live Main TV card migrates intact", () => {
 
   assert.equal(config.entity, "remote.main_tv");
   assert.equal(config.pad, "buttons");
-  assert.equal(config.show_apps, true);
-  assert.equal(config.show_volume, true);
-  assert.equal(config.show_transport, true);
-  assert.equal(config.show_text_input, false);
+  assert.equal(shows(config, "apps"), true);
+  assert.equal(shows(config, "volume"), true);
+  assert.equal(shows(config, "transport"), true);
+  assert.equal(shows(config, "text"), false);
   assert.deepEqual(config.transport_buttons, [
     "previous",
     "rewind",
@@ -607,7 +630,7 @@ test("the author's live Gym TV card keeps its URL search as a text field", () =>
     media_controls: ["previous", "rewind", "play_pause", "fast_forward", "next"],
     showURLSearch: true,
   });
-  assert.equal(config.show_text_input, true);
+  assert.equal(shows(config, "text"), true);
   // Gym TV has no volume override: it falls through to the TV itself.
   assert.equal(config.overrides.volume_up, undefined);
 });
@@ -638,7 +661,128 @@ test("branch keys are stripped when the editor writes back", () => {
   for (const key of ["showRemote", "showApps", "showVolume", "showMedia", "showURLSearch", "showBasic", "media_controls"]) {
     assert.equal(stripped[key], undefined, `${key} should not survive`);
   }
-  assert.equal(stripped.show_text_input, true);
+  // showURLSearch meant the text field, and that is what it still means.
+  assert.equal(shows(stripped, "text"), true);
+});
+
+/* ------------------------------------------------------------------------ *
+ * layout: one list for what a card draws, and in what order.
+ *
+ * The remote used to be pinned above everything a user could add, because the
+ * template said so -- a receiver row could never sit above the d-pad however
+ * the config was written.
+ * ------------------------------------------------------------------------ */
+
+test("without a layout the order is the one the card always drew", () => {
+  const config = normalizeConfig(
+    base({ entity: "remote.atv", sections: [{ name: "Home theater", buttons: [] }] }),
+  );
+  assert.deepEqual(orderOf(config), [
+    "pad",
+    "navigation",
+    "transport",
+    "volume",
+    "Home theater",
+    "apps",
+  ]);
+});
+
+test("a layout puts the blocks where it says, sections included", () => {
+  const config = normalizeConfig(
+    base({
+      entity: "remote.atv",
+      layout: [
+        { type: "section", name: "Home theater", buttons: [{ icon: "mdi:power", url: "x" }] },
+        "volume",
+        "pad",
+        "apps",
+      ],
+    }),
+  );
+  assert.deepEqual(orderOf(config), ["Home theater", "volume", "pad", "apps"]);
+  assert.equal(sectionsOf(config)[0].buttons.length, 1, "its buttons normalise as ever");
+});
+
+test("a block the layout leaves out is hidden, and lands at the end to be found", () => {
+  const config = normalizeConfig(base({ entity: "remote.atv", layout: ["volume"] }));
+  assert.deepEqual(orderOf(config), ["volume"]);
+  // Every built-in is still in the list: a list of only what is on cannot
+  // offer to turn anything back on.
+  assert.deepEqual(
+    config.layout.map((block) => block.type),
+    ["volume", "pad", "navigation", "transport", "text", "apps"],
+  );
+  assert.equal(config.layout.filter((block) => block.hidden).length, 5);
+});
+
+test("hidden keeps its place rather than dropping out of the list", () => {
+  const config = normalizeConfig(
+    base({
+      entity: "remote.atv",
+      layout: ["volume", { type: "pad", hidden: true }, "navigation"],
+    }),
+  );
+  assert.deepEqual(orderOf(config), ["volume", "navigation"]);
+  assert.equal(config.layout[1].type, "pad", "still second, so showing it puts it back here");
+});
+
+test("a layout is the whole answer: the old flags do not argue with it", () => {
+  const config = normalizeConfig(
+    base({
+      entity: "remote.atv",
+      show_volume: false,
+      show_apps: false,
+      layout: ["volume", "apps"],
+    }),
+  );
+  assert.deepEqual(orderOf(config), ["volume", "apps"]);
+});
+
+test("sections are ignored once a layout exists, so nothing renders twice", () => {
+  const config = normalizeConfig(
+    base({
+      entity: "remote.atv",
+      sections: [{ name: "Old", buttons: [] }],
+      layout: [{ type: "section", name: "New", buttons: [] }],
+    }),
+  );
+  assert.deepEqual(
+    sectionsOf(config).map((section) => section.name),
+    ["New"],
+  );
+});
+
+test("a bare section object in a layout is read as one", () => {
+  // The `sections:` shape pasted straight into a layout, with no type: key.
+  const config = normalizeConfig(
+    base({ entity: "remote.atv", layout: [{ name: "Pasted", buttons: [] }, "apps"] }),
+  );
+  assert.deepEqual(orderOf(config), ["Pasted", "apps"]);
+});
+
+test("a block named twice is drawn once", () => {
+  _resetWarnings();
+  const config = normalizeConfig(
+    base({ entity: "remote.atv", layout: ["volume", "volume", "apps"] }),
+  );
+  assert.deepEqual(orderOf(config), ["volume", "apps"]);
+});
+
+test("junk in a layout is skipped, not fatal", () => {
+  _resetWarnings();
+  const config = normalizeConfig(
+    base({ entity: "remote.atv", layout: ["volume", "nonsense", 7, { type: "wat" }] }),
+  );
+  assert.deepEqual(orderOf(config), ["volume"]);
+});
+
+test("a layout survives the round-trip HA performs on every edit", () => {
+  const before = normalizeConfig(
+    base({ entity: "remote.atv", layout: ["volume", "pad", { type: "section", name: "A", buttons: [] }] }),
+  );
+  const after = normalizeConfig(stripLegacyKeys(before));
+  assert.deepEqual(orderOf(after), orderOf(before));
+  assert.deepEqual(orderOf(normalizeConfig(stripLegacyKeys(after))), orderOf(before));
 });
 
 test("brandFor matches the names a TV actually reports", () => {
@@ -703,12 +847,13 @@ test("a section normalises its buttons like apps, keeping entity", () => {
     }),
   );
 
-  assert.equal(config.sections.length, 1);
-  assert.equal(config.sections[0].name, "Home theater");
-  assert.equal(config.sections[0].buttons.length, 2);
-  assert.equal(config.sections[0].buttons[0].entity, "select.media_room_baton_activity");
-  assert.equal(config.sections[0].buttons[1].entity, undefined);
-  assert.equal(config.sections[0].buttons[1].action.activity, "IR");
+  const sections = sectionsOf(config);
+  assert.equal(sections.length, 1);
+  assert.equal(sections[0].name, "Home theater");
+  assert.equal(sections[0].buttons.length, 2);
+  assert.equal(sections[0].buttons[0].entity, "select.media_room_baton_activity");
+  assert.equal(sections[0].buttons[1].entity, undefined);
+  assert.equal(sections[0].buttons[1].action.activity, "IR");
 });
 
 test("an empty section survives normalisation", () => {
@@ -719,8 +864,8 @@ test("an empty section survives normalisation", () => {
   const config = normalizeConfig(
     base({ entity: "remote.atv", sections: [{ name: "New section", buttons: [] }] }),
   );
-  assert.equal(config.sections.length, 1);
-  assert.deepEqual(config.sections[0], { name: "New section", buttons: [] });
+  assert.equal(sectionsOf(config).length, 1);
+  assert.deepEqual(sectionsOf(config)[0], { type: "section", name: "New section", buttons: [] });
 });
 
 test("adding a section in the editor survives the round-trip HA performs", () => {
@@ -728,13 +873,13 @@ test("adding a section in the editor survives the round-trip HA performs", () =>
   const before = normalizeConfig(base({ entity: "remote.atv" }));
   const emitted = stripLegacyKeys({
     ...before,
-    sections: [...before.sections, { name: "New section", buttons: [] }],
+    layout: [...before.layout, { type: "section", name: "New section", buttons: [] }],
   });
   const after = normalizeConfig(emitted);
-  assert.equal(after.sections.length, 1, "the new section must still be there");
+  assert.equal(sectionsOf(after).length, 1, "the new section must still be there");
 
   // And again, since the editor re-emits on every subsequent keystroke.
-  assert.equal(normalizeConfig(stripLegacyKeys(after)).sections.length, 1);
+  assert.equal(sectionsOf(normalizeConfig(stripLegacyKeys(after))).length, 1);
 });
 
 test("malformed sections and buttons are still dropped", () => {
@@ -748,12 +893,12 @@ test("malformed sections and buttons are still dropped", () => {
       ],
     }),
   );
-  assert.equal(config.sections.length, 1);
-  assert.equal(config.sections[0].buttons.length, 1, "the malformed button is gone");
+  assert.equal(sectionsOf(config).length, 1);
+  assert.equal(sectionsOf(config)[0].buttons.length, 1, "the malformed button is gone");
 });
 
 test("absent sections yield an empty list", () => {
-  assert.deepEqual(normalizeConfig(base({ entity: "remote.atv" })).sections, []);
+  assert.deepEqual(sectionsOf(normalizeConfig(base({ entity: "remote.atv" }))), []);
 });
 
 test("a section may override columns, otherwise it inherits app_columns", () => {
@@ -767,16 +912,17 @@ test("a section may override columns, otherwise it inherits app_columns", () => 
       ],
     }),
   );
-  assert.equal(config.sections[0].columns, 2);
-  assert.equal(config.sections[1].columns, undefined, "falls back at render time");
+  assert.equal(sectionsOf(config)[0].columns, 2);
+  assert.equal(sectionsOf(config)[1].columns, undefined, "falls back at render time");
   assert.equal(config.app_columns, 4);
 });
 
-test("sections survive stripLegacyKeys", () => {
+test("sections survive stripLegacyKeys, as layout blocks", () => {
   const stripped = stripLegacyKeys(
     normalizeConfig(
       base({ entity: "remote.atv", sections: [{ name: "A", buttons: [{ icon: "mdi:power", url: "x" }] }] }),
     ),
   );
-  assert.equal(stripped.sections.length, 1);
+  assert.equal(sectionsOf(stripped).length, 1);
+  assert.equal(stripped.sections, undefined, "the input spelling does not come back out");
 });
