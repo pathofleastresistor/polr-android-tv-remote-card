@@ -785,34 +785,72 @@ test("a layout survives the round-trip HA performs on every edit", () => {
   assert.deepEqual(orderOf(normalizeConfig(stripLegacyKeys(after))), orderOf(before));
 });
 
-test("any block can carry a title", () => {
+test("any block can carry a name", () => {
+  const config = normalizeConfig(
+    base({
+      entity: "remote.atv",
+      layout: [
+        { type: "volume", name: "Sound" },
+        { type: "pad", name: "" },
+        { type: "section", name: "Home theater", buttons: [] },
+        "apps",
+      ],
+    }),
+  );
+  const names = config.layout.map((block) => block.name);
+  assert.equal(names[0], "Sound");
+  assert.equal(names[1], undefined, "an empty name is no name");
+  assert.equal(names[2], "Home theater");
+  assert.equal(names[3], undefined);
+  assert.equal(sectionsOf(config)[0].buttons.length, 0, "and nothing else moved");
+});
+
+test("title, which only ever reached a beta, is read as the name it became", () => {
   const config = normalizeConfig(
     base({
       entity: "remote.atv",
       layout: [
         { type: "volume", title: "Sound" },
-        { type: "pad", title: "" },
-        { type: "section", title: "Home theater", name: "ht", buttons: [] },
-        "apps",
+        { type: "section", title: "Home theater", buttons: [] },
       ],
     }),
   );
-  const titles = config.layout.map((block) => block.title);
-  assert.equal(titles[0], "Sound");
-  assert.equal(titles[1], undefined, "an empty title is no title");
-  assert.equal(titles[2], "Home theater");
-  assert.equal(titles[3], undefined);
-  // A title does not disturb what the block is or what it holds.
-  assert.equal(config.layout[2].name, "ht");
-  assert.equal(sectionsOf(config)[0].buttons.length, 0);
+  assert.equal(config.layout[0].name, "Sound");
+  assert.equal(sectionsOf(config)[0].name, "Home theater");
+  assert.equal(config.layout[0].title, undefined, "and does not come back out");
 });
 
-test("a title survives the round-trip HA performs", () => {
+test("a section's own name wins over a title beside it", () => {
+  // Both spellings in one block can only come from a beta config that was
+  // edited by hand. The one with history behind it is the one that survives.
+  const config = normalizeConfig(
+    base({
+      entity: "remote.atv",
+      layout: [{ type: "section", name: "Home theater", title: "Theater", buttons: [] }],
+    }),
+  );
+  assert.equal(sectionsOf(config)[0].name, "Home theater");
+});
+
+test("a name survives the round-trip HA performs", () => {
   const before = normalizeConfig(
-    base({ entity: "remote.atv", layout: [{ type: "volume", title: "Sound" }] }),
+    base({ entity: "remote.atv", layout: [{ type: "volume", name: "Sound" }] }),
   );
   const after = normalizeConfig(stripLegacyKeys(before));
-  assert.equal(after.layout[0].title, "Sound");
+  assert.equal(after.layout[0].name, "Sound");
+});
+
+test("sections keep the name they were written with, untouched", () => {
+  // The oldest spelling in the config: `sections:` with names, from before
+  // layout existed. Nothing here may lose that value.
+  const config = normalizeConfig(
+    base({
+      entity: "remote.atv",
+      show_section_labels: true,
+      sections: [{ name: "Home theater", buttons: [] }],
+    }),
+  );
+  assert.equal(sectionsOf(config)[0].name, "Home theater");
 });
 
 test("brandFor matches the names a TV actually reports", () => {
