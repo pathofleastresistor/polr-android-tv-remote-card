@@ -90,7 +90,6 @@ const TAIL_SCHEMA = [
     schema: [
       { name: "hold_repeat", selector: { boolean: {} } },
       { name: "haptics", selector: { boolean: {} } },
-      { name: "show_section_labels", selector: { boolean: {} } },
     ],
   },
 ] as const;
@@ -210,7 +209,6 @@ const LABELS: Record<string, string> = {
   app_columns: "Buttons per row",
   hold_repeat: "Hold to repeat",
   haptics: "Haptic feedback",
-  show_section_labels: "Section labels",
 };
 
 const HELPERS: Record<string, string> = {
@@ -461,24 +459,27 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
     this._editing = null;
   }
 
-  /** A heading above the block, or none when the field is emptied. */
-  private _setTitle(index: number, title: string): void {
+  /**
+   * What a block is called, or nothing when the field is emptied.
+   *
+   * One key: sections have always had `name`, the betas briefly grew a `title`
+   * beside it, and two fields for what a block is called is one too many. The
+   * older spelling is the one with configs behind it, so it is the one kept.
+   */
+  private _setName(index: number, name: string): void {
     this._setLayout(
       this._config!.layout.map((block, i) => {
         if (i !== index) return block;
-        const { title: _old, ...rest } = block;
-        return title ? { ...rest, title } : rest;
+        const { name: _name, ...rest } = block as LayoutBlock & { name?: string };
+        return name ? { ...rest, name } : rest;
       }),
     );
   }
 
-  private _renameSection(index: number, name: string): void {
-    this._setLayout(
-      this._config!.layout.map((block, i) =>
-        i === index && block.type === "section" ? { ...block, name } : block,
-      ),
-    );
+  private _setLabelled(labelled: boolean): void {
+    this._emit({ ...this._config!, show_section_labels: labelled });
   }
+
 
   private _removeSection(index: number): void {
     this._setLayout(this._config!.layout.filter((_, i) => i !== index));
@@ -851,7 +852,7 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
         <div class="tile-info">
           <div class="primary">
             <span>
-              ${block.title || (section ? section.name || "Untitled section" : meta!.label)}
+              ${block.name || (section ? "Untitled section" : meta!.label)}
             </span>
           </div>
           ${secondary ? html`<div class="secondary"><span>${secondary}</span></div>` : nothing}
@@ -915,33 +916,18 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
               inert unknown element and could not be typed in at all.
             -->
             <label class="field">
-              <span>Title</span>
+              <span>Name</span>
               <input
                 type="text"
-                .value=${block.title ?? ""}
+                .value=${block.name ?? ""}
                 @change=${(event: Event) =>
-                  this._setTitle(index, (event.target as HTMLInputElement).value.trim())}
+                  this._setName(index, (event.target as HTMLInputElement).value.trim())}
               />
             </label>
-            <div class="hint">A heading above this block. Empty for none.</div>
-
-            ${section
-              ? html`
-                  <label class="field">
-                    <span>Section name</span>
-                    <input
-                      type="text"
-                      .value=${section.name ?? ""}
-                      @change=${(event: Event) =>
-                        this._renameSection(index, (event.target as HTMLInputElement).value)}
-                    />
-                  </label>
-                  <div class="hint">
-                    Names this row in the editor. It is also the heading when
-                    “Section labels” is on under Advanced and no title is set.
-                  </div>
-                `
-              : nothing}
+            <div class="hint">
+              What this row is called here, and the heading above it on the card
+              while “Show names” is on.
+            </div>
           </div>
 
           ${section
@@ -997,8 +983,23 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
           <div class="hint">
             Everything on the card, in the order it is drawn, under the header.
             Move a row to move the block; hide one and it keeps its place for
-            when you bring it back. Open a row to give the block a heading.
+            when you bring it back. Open a row to name it.
           </div>
+
+          <!--
+            The switch that draws those names, beside them rather than under
+            Advanced: a field whose effect is decided two panels away is a field
+            that reads as broken.
+          -->
+          <label class="check">
+            <input
+              type="checkbox"
+              .checked=${config.show_section_labels}
+              @change=${(event: Event) =>
+                this._setLabelled((event.target as HTMLInputElement).checked)}
+            />
+            <span>Show names as headings on the card</span>
+          </label>
 
           ${this._renderLayoutList()}
 
@@ -1186,6 +1187,15 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
       }
       ha-expansion-panel .content .form {
         margin: 0;
+      }
+      /*
+       * The kit's checkbox aligns itself to the end of its row, where it sits
+       * beside a field in a two-column grid. This panel is a stack, so that put
+       * its left edge somewhere nothing else in the panel starts -- which the
+       * spacing check caught before anyone had to look at it.
+       */
+      ha-expansion-panel .content > label.check {
+        align-self: stretch;
       }
       /*
        * A heading belongs to what follows it, so it sits nearer that than the

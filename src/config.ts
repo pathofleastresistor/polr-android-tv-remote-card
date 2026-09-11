@@ -159,15 +159,14 @@ export type BlockId = (typeof BLOCK_IDS)[number];
  * Drop it from the list and turning it back on has to guess where it went --
  * the editor's eye toggle would rearrange the card behind the user's back.
  *
- * `title` draws a heading above the block, and does so because it is set:
- * a field that only takes effect once a switch two panels away is found is a
- * field that reads as broken. A section's `name` keeps its older behaviour --
- * shown only when `show_section_labels` is on -- so no card that predates this
- * suddenly sprouts headings.
+ * `name` is what a block is called: the heading above it, and the row the
+ * editor lists it by. Sections have always had one and now every block can,
+ * because a card that puts volume above the pad wants to say which row is
+ * which. `title`, from the betas, is read as a spelling of the same thing.
  */
 export type LayoutBlock =
-  | { type: BlockId; hidden?: boolean; title?: string }
-  | ({ type: "section"; hidden?: boolean; title?: string } & SectionConfig);
+  | { type: BlockId; hidden?: boolean; name?: string }
+  | ({ type: "section"; hidden?: boolean } & SectionConfig);
 
 export interface PolrAtvRemoteCardConfig {
   type: string;
@@ -524,19 +523,20 @@ const normalizeBlock = (entry: unknown): LayoutBlock | null => {
   }
 
   const hidden = entry["hidden"] === true ? { hidden: true as const } : {};
-  const title =
-    typeof entry["title"] === "string" && entry["title"]
-      ? { title: entry["title"] }
-      : {};
+  // `title` is the beta spelling of `name`, and only ever reached beta configs.
+  const named = [entry["name"], entry["title"]].find(
+    (value): value is string => typeof value === "string" && value !== "",
+  );
+  const name = named ? { name: named } : {};
   const type = entry["type"];
 
-  if (isBlockId(type)) return { type, ...hidden, ...title };
+  if (isBlockId(type)) return { type, ...hidden, ...name };
 
   // A section says so, or simply carries buttons -- which is what the `sections`
   // shape has always looked like, so one can be pasted straight into a layout.
   if (type === "section" || Array.isArray(entry["buttons"])) {
     const section = normalizeSection(entry);
-    return section ? { type: "section", ...hidden, ...title, ...section } : null;
+    return section ? { type: "section", ...hidden, ...section, ...name } : null;
   }
 
   warnOnce(`unknown layout block ${JSON.stringify(entry)} was skipped`);

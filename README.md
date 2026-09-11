@@ -65,7 +65,7 @@ entity: remote.living_room_tv
 | `volume_entity`       | player   | What the volume buttons drive. See [Volume](#volume).                   |
 | `apps`                | `[]`     | See [Apps](#apps).                                                      |
 | `app_columns`         | `5`      | Most app buttons on one row before wrapping.                            |
-| `show_section_labels` | `false`  | Show section names as headings. Per-block `title` needs no switch.       |
+| `show_section_labels` | `false`  | Draw block names as headings. See [Layout](#layout).                    |
 | `hold_repeat`         | `true`   | Hold a d-pad or volume button to repeat it.                             |
 | `haptics`             | `true`   | Haptic feedback (Companion app only).                                   |
 | `overrides`           | `{}`     | See [Pointing buttons elsewhere](#pointing-buttons-elsewhere).          |
@@ -122,22 +122,29 @@ layout:
 That is what the editor's eye toggle writes, which is why hiding a block and
 showing it again does not shuffle the card.
 
-**Any block can carry a title**, which is drawn as a heading above it:
+**Any block can carry a name** — the heading above it on the card, and what the
+editor lists that row as. Sections have always had one; every block can now,
+because a card that puts volume above the pad wants to say which row is which:
 
 ```yaml
+show_section_labels: true
 layout:
-  - { type: volume, title: Sound }
-  - { type: pad, title: Remote }
+  - { type: volume, name: Sound }
+  - { type: pad, name: Remote }
   - navigation
-  - { type: apps, title: Streaming }
+  - { type: apps, name: Streaming }
 ```
 
-A title shows because it is set — there is no second switch to find. Sections
-predate it and keep their older behaviour: a section's `name` is its heading
-only when `show_section_labels` is on, so no existing card sprouts headings it
-never had. Give a section a `title` and that wins, shown either way.
+`show_section_labels` draws them, and the editor keeps that switch beside the
+names rather than two panels away. With it off the names stay where they are and
+nothing is drawn — turning it on is what shows them, and no card starts showing
+headings it never had. The launcher answers to "Apps" unless it is named
+something else.
 
 A heading over nothing is never drawn: an empty section draws neither.
+
+> `title:` appeared in a beta as a second name for the same thing and is read as
+> one, but `name` is the spelling to write.
 
 **Without a `layout`** the order is the one the card has always drawn — pad,
 back/home/menu, transport, volume, text input, your sections, apps — with

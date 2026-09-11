@@ -451,8 +451,8 @@ export class PolrAndroidTvRemoteCard extends LitElement {
    * One row of tiles.
    *
    * The app launcher is the built-in caller; user-defined sections are the same
-   * grid with their own name. Labels gate on `show_section_labels`, so a custom
-   * section is indistinguishable from a native one.
+   * grid. Their heading, if any, is drawn by the layout rather than here, so a
+   * custom section is indistinguishable from a native one.
    */
   private _renderSection(
     tiles: TileConfig[],
@@ -539,17 +539,19 @@ export class PolrAndroidTvRemoteCard extends LitElement {
   }
 
   /**
-   * The heading above a block, if it has earned one.
+   * The heading above a block, if it is showing them.
    *
-   * `title` draws because it is set -- that is what setting it means. The older
-   * rule still holds underneath it: with section labels on, a section falls
-   * back to its name and the launcher to "Apps", so a card written before
-   * titles existed looks exactly as it did.
+   * One name per block and one switch over all of them. Section labels used to
+   * govern sections and the launcher alone, because they were the only blocks
+   * with a name; now that any block can be called something, it governs any
+   * block that is.
    *
-   * The count belongs to lists of tiles. "Volume 1" would be counting nothing.
+   * The count belongs to lists of tiles. "Sound 1" would be counting nothing.
    */
   private _renderHeading(block: LayoutBlock): TemplateResult | typeof nothing {
     const config = this._config!;
+    if (!config.show_section_labels) return nothing;
+
     const tiles =
       block.type === "section"
         ? block.buttons
@@ -557,15 +559,8 @@ export class PolrAndroidTvRemoteCard extends LitElement {
           ? config.apps
           : undefined;
 
-    const legacy = config.show_section_labels
-      ? block.type === "section"
-        ? block.name
-        : block.type === "apps"
-          ? "Apps"
-          : undefined
-      : undefined;
-
-    const label = block.title ?? legacy;
+    // The launcher answers to "Apps" unless it has been called something else.
+    const label = block.name ?? (block.type === "apps" ? "Apps" : undefined);
     if (!label) return nothing;
 
     return html`<div class="section-head">

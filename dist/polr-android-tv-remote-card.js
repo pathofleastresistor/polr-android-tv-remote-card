@@ -3,16 +3,16 @@
  * Copyright 2019 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const Q = globalThis, vt = Q.ShadowRoot && (Q.ShadyCSS === void 0 || Q.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, ft = Symbol(), Ct = /* @__PURE__ */ new WeakMap();
+const Q = globalThis, ft = Q.ShadowRoot && (Q.ShadyCSS === void 0 || Q.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, vt = Symbol(), Ct = /* @__PURE__ */ new WeakMap();
 let ne = class {
   constructor(e, i, o) {
-    if (this._$cssResult$ = !0, o !== ft) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
+    if (this._$cssResult$ = !0, o !== vt) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
     this.cssText = e, this.t = i;
   }
   get styleSheet() {
     let e = this.o;
     const i = this.t;
-    if (vt && e === void 0) {
+    if (ft && e === void 0) {
       const o = i !== void 0 && i.length === 1;
       o && (e = Ct.get(i)), e === void 0 && ((this.o = e = new CSSStyleSheet()).replaceSync(this.cssText), o && Ct.set(i, e));
     }
@@ -22,20 +22,20 @@ let ne = class {
     return this.cssText;
   }
 };
-const xe = (t) => new ne(typeof t == "string" ? t : t + "", void 0, ft), _t = (t, ...e) => {
-  const i = t.length === 1 ? t[0] : e.reduce((o, n, s) => o + ((a) => {
-    if (a._$cssResult$ === !0) return a.cssText;
-    if (typeof a == "number") return a;
-    throw Error("Value passed to 'css' function must be a 'css' function result: " + a + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
-  })(n) + t[s + 1], t[0]);
-  return new ne(i, t, ft);
+const xe = (t) => new ne(typeof t == "string" ? t : t + "", void 0, vt), _t = (t, ...e) => {
+  const i = t.length === 1 ? t[0] : e.reduce((o, n, a) => o + ((s) => {
+    if (s._$cssResult$ === !0) return s.cssText;
+    if (typeof s == "number") return s;
+    throw Error("Value passed to 'css' function must be a 'css' function result: " + s + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
+  })(n) + t[a + 1], t[0]);
+  return new ne(i, t, vt);
 }, Ae = (t, e) => {
-  if (vt) t.adoptedStyleSheets = e.map((i) => i instanceof CSSStyleSheet ? i : i.styleSheet);
+  if (ft) t.adoptedStyleSheets = e.map((i) => i instanceof CSSStyleSheet ? i : i.styleSheet);
   else for (const i of e) {
     const o = document.createElement("style"), n = Q.litNonce;
     n !== void 0 && o.setAttribute("nonce", n), o.textContent = i.cssText, t.appendChild(o);
   }
-}, Ot = vt ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((e) => {
+}, Ot = ft ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((e) => {
   let i = "";
   for (const o of e.cssRules) i += o.cssText;
   return xe(i);
@@ -45,7 +45,7 @@ const xe = (t) => new ne(typeof t == "string" ? t : t + "", void 0, ft), _t = (t
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const { is: ke, defineProperty: Se, getOwnPropertyDescriptor: Te, getOwnPropertyNames: Ee, getOwnPropertySymbols: Pe, getPrototypeOf: Ce } = Object, nt = globalThis, Mt = nt.trustedTypes, Oe = Mt ? Mt.emptyScript : "", Me = nt.reactiveElementPolyfillSupport, F = (t, e) => t, tt = { toAttribute(t, e) {
+const { is: ke, defineProperty: Te, getOwnPropertyDescriptor: Se, getOwnPropertyNames: Ee, getOwnPropertySymbols: Pe, getPrototypeOf: Ce } = Object, nt = globalThis, Mt = nt.trustedTypes, Oe = Mt ? Mt.emptyScript : "", Me = nt.reactiveElementPolyfillSupport, F = (t, e) => t, tt = { toAttribute(t, e) {
   switch (e) {
     case Boolean:
       t = t ? Oe : null;
@@ -85,18 +85,18 @@ let N = class extends HTMLElement {
   static createProperty(e, i = zt) {
     if (i.state && (i.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(e) && ((i = Object.create(i)).wrapped = !0), this.elementProperties.set(e, i), !i.noAccessor) {
       const o = Symbol(), n = this.getPropertyDescriptor(e, o, i);
-      n !== void 0 && Se(this.prototype, e, n);
+      n !== void 0 && Te(this.prototype, e, n);
     }
   }
   static getPropertyDescriptor(e, i, o) {
-    const { get: n, set: s } = Te(this.prototype, e) ?? { get() {
+    const { get: n, set: a } = Se(this.prototype, e) ?? { get() {
       return this[i];
-    }, set(a) {
-      this[i] = a;
+    }, set(s) {
+      this[i] = s;
     } };
-    return { get: n, set(a) {
+    return { get: n, set(s) {
       const r = n?.call(this);
-      s?.call(this, a), this.requestUpdate(e, r, o);
+      a?.call(this, s), this.requestUpdate(e, r, o);
     }, configurable: !0, enumerable: !0 };
   }
   static getPropertyOptions(e) {
@@ -172,29 +172,29 @@ let N = class extends HTMLElement {
   _$ET(e, i) {
     const o = this.constructor.elementProperties.get(e), n = this.constructor._$Eu(e, o);
     if (n !== void 0 && o.reflect === !0) {
-      const s = (o.converter?.toAttribute !== void 0 ? o.converter : tt).toAttribute(i, o.type);
-      this._$Em = e, s == null ? this.removeAttribute(n) : this.setAttribute(n, s), this._$Em = null;
+      const a = (o.converter?.toAttribute !== void 0 ? o.converter : tt).toAttribute(i, o.type);
+      this._$Em = e, a == null ? this.removeAttribute(n) : this.setAttribute(n, a), this._$Em = null;
     }
   }
   _$AK(e, i) {
     const o = this.constructor, n = o._$Eh.get(e);
     if (n !== void 0 && this._$Em !== n) {
-      const s = o.getPropertyOptions(n), a = typeof s.converter == "function" ? { fromAttribute: s.converter } : s.converter?.fromAttribute !== void 0 ? s.converter : tt;
+      const a = o.getPropertyOptions(n), s = typeof a.converter == "function" ? { fromAttribute: a.converter } : a.converter?.fromAttribute !== void 0 ? a.converter : tt;
       this._$Em = n;
-      const r = a.fromAttribute(i, s.type);
+      const r = s.fromAttribute(i, a.type);
       this[n] = r ?? this._$Ej?.get(n) ?? r, this._$Em = null;
     }
   }
-  requestUpdate(e, i, o, n = !1, s) {
+  requestUpdate(e, i, o, n = !1, a) {
     if (e !== void 0) {
-      const a = this.constructor;
-      if (n === !1 && (s = this[e]), o ??= a.getPropertyOptions(e), !((o.hasChanged ?? gt)(s, i) || o.useDefault && o.reflect && s === this._$Ej?.get(e) && !this.hasAttribute(a._$Eu(e, o)))) return;
+      const s = this.constructor;
+      if (n === !1 && (a = this[e]), o ??= s.getPropertyOptions(e), !((o.hasChanged ?? gt)(a, i) || o.useDefault && o.reflect && a === this._$Ej?.get(e) && !this.hasAttribute(s._$Eu(e, o)))) return;
       this.C(e, i, o);
     }
     this.isUpdatePending === !1 && (this._$ES = this._$EP());
   }
-  C(e, i, { useDefault: o, reflect: n, wrapped: s }, a) {
-    o && !(this._$Ej ??= /* @__PURE__ */ new Map()).has(e) && (this._$Ej.set(e, a ?? i ?? this[e]), s !== !0 || a !== void 0) || (this._$AL.has(e) || (this.hasUpdated || o || (i = void 0), this._$AL.set(e, i)), n === !0 && this._$Em !== e && (this._$Eq ??= /* @__PURE__ */ new Set()).add(e));
+  C(e, i, { useDefault: o, reflect: n, wrapped: a }, s) {
+    o && !(this._$Ej ??= /* @__PURE__ */ new Map()).has(e) && (this._$Ej.set(e, s ?? i ?? this[e]), a !== !0 || s !== void 0) || (this._$AL.has(e) || (this.hasUpdated || o || (i = void 0), this._$AL.set(e, i)), n === !0 && this._$Em !== e && (this._$Eq ??= /* @__PURE__ */ new Set()).add(e));
   }
   async _$EP() {
     this.isUpdatePending = !0;
@@ -213,13 +213,13 @@ let N = class extends HTMLElement {
     if (!this.isUpdatePending) return;
     if (!this.hasUpdated) {
       if (this.renderRoot ??= this.createRenderRoot(), this._$Ep) {
-        for (const [n, s] of this._$Ep) this[n] = s;
+        for (const [n, a] of this._$Ep) this[n] = a;
         this._$Ep = void 0;
       }
       const o = this.constructor.elementProperties;
-      if (o.size > 0) for (const [n, s] of o) {
-        const { wrapped: a } = s, r = this[n];
-        a !== !0 || this._$AL.has(n) || r === void 0 || this.C(n, void 0, s, r);
+      if (o.size > 0) for (const [n, a] of o) {
+        const { wrapped: s } = a, r = this[n];
+        s !== !0 || this._$AL.has(n) || r === void 0 || this.C(n, void 0, a, r);
       }
     }
     let e = !1;
@@ -262,55 +262,55 @@ N.elementStyles = [], N.shadowRootOptions = { mode: "open" }, N[F("elementProper
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const bt = globalThis, Lt = (t) => t, et = bt.trustedTypes, Ht = et ? et.createPolicy("lit-html", { createHTML: (t) => t }) : void 0, ae = "$lit$", T = `lit$${Math.random().toFixed(9).slice(2)}$`, se = "?" + T, ze = `<${se}>`, L = document, q = () => L.createComment(""), X = (t) => t === null || typeof t != "object" && typeof t != "function", yt = Array.isArray, Le = (t) => yt(t) || typeof t?.[Symbol.iterator] == "function", lt = `[ 	
-\f\r]`, K = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Dt = /-->/g, Rt = />/g, P = RegExp(`>|${lt}(?:([^\\s"'>=/]+)(${lt}*=${lt}*(?:[^ 	
-\f\r"'\`<>=]|("|')|))|$)`, "g"), Nt = /'/g, Ut = /"/g, re = /^(?:script|style|textarea|title)$/i, le = (t) => (e, ...i) => ({ _$litType$: t, strings: e, values: i }), l = le(1), He = le(2), A = Symbol.for("lit-noChange"), d = Symbol.for("lit-nothing"), It = /* @__PURE__ */ new WeakMap(), M = L.createTreeWalker(L, 129);
-function ce(t, e) {
+const bt = globalThis, Lt = (t) => t, et = bt.trustedTypes, Ht = et ? et.createPolicy("lit-html", { createHTML: (t) => t }) : void 0, ae = "$lit$", S = `lit$${Math.random().toFixed(9).slice(2)}$`, se = "?" + S, ze = `<${se}>`, L = document, q = () => L.createComment(""), X = (t) => t === null || typeof t != "object" && typeof t != "function", yt = Array.isArray, Le = (t) => yt(t) || typeof t?.[Symbol.iterator] == "function", ct = `[ 	
+\f\r]`, K = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Dt = /-->/g, Rt = />/g, P = RegExp(`>|${ct}(?:([^\\s"'>=/]+)(${ct}*=${ct}*(?:[^ 	
+\f\r"'\`<>=]|("|')|))|$)`, "g"), Nt = /'/g, Ut = /"/g, re = /^(?:script|style|textarea|title)$/i, ce = (t) => (e, ...i) => ({ _$litType$: t, strings: e, values: i }), c = ce(1), He = ce(2), A = Symbol.for("lit-noChange"), d = Symbol.for("lit-nothing"), It = /* @__PURE__ */ new WeakMap(), M = L.createTreeWalker(L, 129);
+function le(t, e) {
   if (!yt(t) || !t.hasOwnProperty("raw")) throw Error("invalid template strings array");
   return Ht !== void 0 ? Ht.createHTML(e) : e;
 }
 const De = (t, e) => {
   const i = t.length - 1, o = [];
-  let n, s = e === 2 ? "<svg>" : e === 3 ? "<math>" : "", a = K;
+  let n, a = e === 2 ? "<svg>" : e === 3 ? "<math>" : "", s = K;
   for (let r = 0; r < i; r++) {
-    const c = t[r];
-    let m, f, h = -1, u = 0;
-    for (; u < c.length && (a.lastIndex = u, f = a.exec(c), f !== null); ) u = a.lastIndex, a === K ? f[1] === "!--" ? a = Dt : f[1] !== void 0 ? a = Rt : f[2] !== void 0 ? (re.test(f[2]) && (n = RegExp("</" + f[2], "g")), a = P) : f[3] !== void 0 && (a = P) : a === P ? f[0] === ">" ? (a = n ?? K, h = -1) : f[1] === void 0 ? h = -2 : (h = a.lastIndex - f[2].length, m = f[1], a = f[3] === void 0 ? P : f[3] === '"' ? Ut : Nt) : a === Ut || a === Nt ? a = P : a === Dt || a === Rt ? a = K : (a = P, n = void 0);
-    const v = a === P && t[r + 1].startsWith("/>") ? " " : "";
-    s += a === K ? c + ze : h >= 0 ? (o.push(m), c.slice(0, h) + ae + c.slice(h) + T + v) : c + T + (h === -2 ? r : v);
+    const l = t[r];
+    let m, v, h = -1, u = 0;
+    for (; u < l.length && (s.lastIndex = u, v = s.exec(l), v !== null); ) u = s.lastIndex, s === K ? v[1] === "!--" ? s = Dt : v[1] !== void 0 ? s = Rt : v[2] !== void 0 ? (re.test(v[2]) && (n = RegExp("</" + v[2], "g")), s = P) : v[3] !== void 0 && (s = P) : s === P ? v[0] === ">" ? (s = n ?? K, h = -1) : v[1] === void 0 ? h = -2 : (h = s.lastIndex - v[2].length, m = v[1], s = v[3] === void 0 ? P : v[3] === '"' ? Ut : Nt) : s === Ut || s === Nt ? s = P : s === Dt || s === Rt ? s = K : (s = P, n = void 0);
+    const f = s === P && t[r + 1].startsWith("/>") ? " " : "";
+    a += s === K ? l + ze : h >= 0 ? (o.push(m), l.slice(0, h) + ae + l.slice(h) + S + f) : l + S + (h === -2 ? r : f);
   }
-  return [ce(t, s + (t[i] || "<?>") + (e === 2 ? "</svg>" : e === 3 ? "</math>" : "")), o];
+  return [le(t, a + (t[i] || "<?>") + (e === 2 ? "</svg>" : e === 3 ? "</math>" : "")), o];
 };
 class Z {
   constructor({ strings: e, _$litType$: i }, o) {
     let n;
     this.parts = [];
-    let s = 0, a = 0;
-    const r = e.length - 1, c = this.parts, [m, f] = De(e, i);
+    let a = 0, s = 0;
+    const r = e.length - 1, l = this.parts, [m, v] = De(e, i);
     if (this.el = Z.createElement(m, o), M.currentNode = this.el.content, i === 2 || i === 3) {
       const h = this.el.content.firstChild;
       h.replaceWith(...h.childNodes);
     }
-    for (; (n = M.nextNode()) !== null && c.length < r; ) {
+    for (; (n = M.nextNode()) !== null && l.length < r; ) {
       if (n.nodeType === 1) {
         if (n.hasAttributes()) for (const h of n.getAttributeNames()) if (h.endsWith(ae)) {
-          const u = f[a++], v = n.getAttribute(h).split(T), p = /([.?@])?(.*)/.exec(u);
-          c.push({ type: 1, index: s, name: p[2], strings: v, ctor: p[1] === "." ? Ne : p[1] === "?" ? Ue : p[1] === "@" ? Ie : at }), n.removeAttribute(h);
-        } else h.startsWith(T) && (c.push({ type: 6, index: s }), n.removeAttribute(h));
+          const u = v[s++], f = n.getAttribute(h).split(S), p = /([.?@])?(.*)/.exec(u);
+          l.push({ type: 1, index: a, name: p[2], strings: f, ctor: p[1] === "." ? Ne : p[1] === "?" ? Ue : p[1] === "@" ? Ie : at }), n.removeAttribute(h);
+        } else h.startsWith(S) && (l.push({ type: 6, index: a }), n.removeAttribute(h));
         if (re.test(n.tagName)) {
-          const h = n.textContent.split(T), u = h.length - 1;
+          const h = n.textContent.split(S), u = h.length - 1;
           if (u > 0) {
             n.textContent = et ? et.emptyScript : "";
-            for (let v = 0; v < u; v++) n.append(h[v], q()), M.nextNode(), c.push({ type: 2, index: ++s });
+            for (let f = 0; f < u; f++) n.append(h[f], q()), M.nextNode(), l.push({ type: 2, index: ++a });
             n.append(h[u], q());
           }
         }
-      } else if (n.nodeType === 8) if (n.data === se) c.push({ type: 2, index: s });
+      } else if (n.nodeType === 8) if (n.data === se) l.push({ type: 2, index: a });
       else {
         let h = -1;
-        for (; (h = n.data.indexOf(T, h + 1)) !== -1; ) c.push({ type: 7, index: s }), h += T.length - 1;
+        for (; (h = n.data.indexOf(S, h + 1)) !== -1; ) l.push({ type: 7, index: a }), h += S.length - 1;
       }
-      s++;
+      a++;
     }
   }
   static createElement(e, i) {
@@ -321,8 +321,8 @@ class Z {
 function V(t, e, i = t, o) {
   if (e === A) return e;
   let n = o !== void 0 ? i._$Co?.[o] : i._$Cl;
-  const s = X(e) ? void 0 : e._$litDirective$;
-  return n?.constructor !== s && (n?._$AO?.(!1), s === void 0 ? n = void 0 : (n = new s(t), n._$AT(t, i, o)), o !== void 0 ? (i._$Co ??= [])[o] = n : i._$Cl = n), n !== void 0 && (e = V(t, n._$AS(t, e.values), n, o)), e;
+  const a = X(e) ? void 0 : e._$litDirective$;
+  return n?.constructor !== a && (n?._$AO?.(!1), a === void 0 ? n = void 0 : (n = new a(t), n._$AT(t, i, o)), o !== void 0 ? (i._$Co ??= [])[o] = n : i._$Cl = n), n !== void 0 && (e = V(t, n._$AS(t, e.values), n, o)), e;
 }
 class Re {
   constructor(e, i) {
@@ -337,13 +337,13 @@ class Re {
   u(e) {
     const { el: { content: i }, parts: o } = this._$AD, n = (e?.creationScope ?? L).importNode(i, !0);
     M.currentNode = n;
-    let s = M.nextNode(), a = 0, r = 0, c = o[0];
-    for (; c !== void 0; ) {
-      if (a === c.index) {
+    let a = M.nextNode(), s = 0, r = 0, l = o[0];
+    for (; l !== void 0; ) {
+      if (s === l.index) {
         let m;
-        c.type === 2 ? m = new B(s, s.nextSibling, this, e) : c.type === 1 ? m = new c.ctor(s, c.name, c.strings, this, e) : c.type === 6 && (m = new Ve(s, this, e)), this._$AV.push(m), c = o[++r];
+        l.type === 2 ? m = new B(a, a.nextSibling, this, e) : l.type === 1 ? m = new l.ctor(a, l.name, l.strings, this, e) : l.type === 6 && (m = new Ve(a, this, e)), this._$AV.push(m), l = o[++r];
       }
-      a !== c?.index && (s = M.nextNode(), a++);
+      s !== l?.index && (a = M.nextNode(), s++);
     }
     return M.currentNode = L, n;
   }
@@ -383,11 +383,11 @@ class B {
     this._$AH !== d && X(this._$AH) ? this._$AA.nextSibling.data = e : this.T(L.createTextNode(e)), this._$AH = e;
   }
   $(e) {
-    const { values: i, _$litType$: o } = e, n = typeof o == "number" ? this._$AC(e) : (o.el === void 0 && (o.el = Z.createElement(ce(o.h, o.h[0]), this.options)), o);
+    const { values: i, _$litType$: o } = e, n = typeof o == "number" ? this._$AC(e) : (o.el === void 0 && (o.el = Z.createElement(le(o.h, o.h[0]), this.options)), o);
     if (this._$AH?._$AD === n) this._$AH.p(i);
     else {
-      const s = new Re(n, this), a = s.u(this.options);
-      s.p(i), this.T(a), this._$AH = s;
+      const a = new Re(n, this), s = a.u(this.options);
+      a.p(i), this.T(s), this._$AH = a;
     }
   }
   _$AC(e) {
@@ -398,7 +398,7 @@ class B {
     yt(this._$AH) || (this._$AH = [], this._$AR());
     const i = this._$AH;
     let o, n = 0;
-    for (const s of e) n === i.length ? i.push(o = new B(this.O(q()), this.O(q()), this, this.options)) : o = i[n], o._$AI(s), n++;
+    for (const a of e) n === i.length ? i.push(o = new B(this.O(q()), this.O(q()), this, this.options)) : o = i[n], o._$AI(a), n++;
     n < i.length && (this._$AR(o && o._$AB.nextSibling, n), i.length = n);
   }
   _$AR(e = this._$AA.nextSibling, i) {
@@ -418,19 +418,19 @@ class at {
   get _$AU() {
     return this._$AM._$AU;
   }
-  constructor(e, i, o, n, s) {
-    this.type = 1, this._$AH = d, this._$AN = void 0, this.element = e, this.name = i, this._$AM = n, this.options = s, o.length > 2 || o[0] !== "" || o[1] !== "" ? (this._$AH = Array(o.length - 1).fill(new String()), this.strings = o) : this._$AH = d;
+  constructor(e, i, o, n, a) {
+    this.type = 1, this._$AH = d, this._$AN = void 0, this.element = e, this.name = i, this._$AM = n, this.options = a, o.length > 2 || o[0] !== "" || o[1] !== "" ? (this._$AH = Array(o.length - 1).fill(new String()), this.strings = o) : this._$AH = d;
   }
   _$AI(e, i = this, o, n) {
-    const s = this.strings;
-    let a = !1;
-    if (s === void 0) e = V(this, e, i, 0), a = !X(e) || e !== this._$AH && e !== A, a && (this._$AH = e);
+    const a = this.strings;
+    let s = !1;
+    if (a === void 0) e = V(this, e, i, 0), s = !X(e) || e !== this._$AH && e !== A, s && (this._$AH = e);
     else {
       const r = e;
-      let c, m;
-      for (e = s[0], c = 0; c < s.length - 1; c++) m = V(this, r[o + c], i, c), m === A && (m = this._$AH[c]), a ||= !X(m) || m !== this._$AH[c], m === d ? e = d : e !== d && (e += (m ?? "") + s[c + 1]), this._$AH[c] = m;
+      let l, m;
+      for (e = a[0], l = 0; l < a.length - 1; l++) m = V(this, r[o + l], i, l), m === A && (m = this._$AH[l]), s ||= !X(m) || m !== this._$AH[l], m === d ? e = d : e !== d && (e += (m ?? "") + a[l + 1]), this._$AH[l] = m;
     }
-    a && !n && this.j(e);
+    s && !n && this.j(e);
   }
   j(e) {
     e === d ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, e ?? "");
@@ -453,13 +453,13 @@ class Ue extends at {
   }
 }
 class Ie extends at {
-  constructor(e, i, o, n, s) {
-    super(e, i, o, n, s), this.type = 5;
+  constructor(e, i, o, n, a) {
+    super(e, i, o, n, a), this.type = 5;
   }
   _$AI(e, i = this) {
     if ((e = V(this, e, i, 0) ?? d) === A) return;
-    const o = this._$AH, n = e === d && o !== d || e.capture !== o.capture || e.once !== o.once || e.passive !== o.passive, s = e !== d && (o === d || n);
-    n && this.element.removeEventListener(this.name, this, o), s && this.element.addEventListener(this.name, this, e), this._$AH = e;
+    const o = this._$AH, n = e === d && o !== d || e.capture !== o.capture || e.once !== o.once || e.passive !== o.passive, a = e !== d && (o === d || n);
+    n && this.element.removeEventListener(this.name, this, o), a && this.element.addEventListener(this.name, this, e), this._$AH = e;
   }
   handleEvent(e) {
     typeof this._$AH == "function" ? this._$AH.call(this.options?.host ?? this.element, e) : this._$AH.handleEvent(e);
@@ -482,8 +482,8 @@ const Ke = (t, e, i) => {
   const o = i?.renderBefore ?? e;
   let n = o._$litPart$;
   if (n === void 0) {
-    const s = i?.renderBefore ?? null;
-    o._$litPart$ = n = new B(e.insertBefore(q(), s), s, void 0, i ?? {});
+    const a = i?.renderBefore ?? null;
+    o._$litPart$ = n = new B(e.insertBefore(q(), a), a, void 0, i ?? {});
   }
   return n._$AI(t), n;
 };
@@ -536,29 +536,29 @@ const $t = (t) => (e, i) => {
  */
 const Fe = { attribute: !0, type: String, converter: tt, reflect: !1, hasChanged: gt }, Ye = (t = Fe, e, i) => {
   const { kind: o, metadata: n } = i;
-  let s = globalThis.litPropertyMetadata.get(n);
-  if (s === void 0 && globalThis.litPropertyMetadata.set(n, s = /* @__PURE__ */ new Map()), o === "setter" && ((t = Object.create(t)).wrapped = !0), s.set(i.name, t), o === "accessor") {
-    const { name: a } = i;
+  let a = globalThis.litPropertyMetadata.get(n);
+  if (a === void 0 && globalThis.litPropertyMetadata.set(n, a = /* @__PURE__ */ new Map()), o === "setter" && ((t = Object.create(t)).wrapped = !0), a.set(i.name, t), o === "accessor") {
+    const { name: s } = i;
     return { set(r) {
-      const c = e.get.call(this);
-      e.set.call(this, r), this.requestUpdate(a, c, t, !0, r);
+      const l = e.get.call(this);
+      e.set.call(this, r), this.requestUpdate(s, l, t, !0, r);
     }, init(r) {
-      return r !== void 0 && this.C(a, void 0, t, r), r;
+      return r !== void 0 && this.C(s, void 0, t, r), r;
     } };
   }
   if (o === "setter") {
-    const { name: a } = i;
+    const { name: s } = i;
     return function(r) {
-      const c = this[a];
-      e.call(this, r), this.requestUpdate(a, c, t, !0, r);
+      const l = this[s];
+      e.call(this, r), this.requestUpdate(s, l, t, !0, r);
     };
   }
   throw Error("Unsupported decorator location: " + o);
 };
 function j(t) {
-  return (e, i) => typeof i == "object" ? Ye(t, e, i) : ((o, n, s) => {
-    const a = n.hasOwnProperty(s);
-    return n.constructor.createProperty(s, o), a ? Object.getOwnPropertyDescriptor(n, s) : void 0;
+  return (e, i) => typeof i == "object" ? Ye(t, e, i) : ((o, n, a) => {
+    const s = n.hasOwnProperty(a);
+    return n.constructor.createProperty(a, o), s ? Object.getOwnPropertyDescriptor(n, a) : void 0;
   })(t, e, i);
 }
 /**
@@ -582,9 +582,9 @@ const qe = (t, e, i) => (i.configurable = !0, i.enumerable = !0, Reflect.decorat
  */
 function de(t, e) {
   return (i, o, n) => {
-    const s = (a) => a.renderRoot?.querySelector(t) ?? null;
+    const a = (s) => s.renderRoot?.querySelector(t) ?? null;
     return qe(i, o, { get() {
-      return s(this);
+      return a(this);
     } });
   };
 }
@@ -618,24 +618,24 @@ let pe = class {
 const { I: Xe } = Be, Vt = (t) => t, Ze = (t) => t.strings === void 0, Bt = () => document.createComment(""), W = (t, e, i) => {
   const o = t._$AA.parentNode, n = e === void 0 ? t._$AB : e._$AA;
   if (i === void 0) {
-    const s = o.insertBefore(Bt(), n), a = o.insertBefore(Bt(), n);
-    i = new Xe(s, a, t, t.options);
+    const a = o.insertBefore(Bt(), n), s = o.insertBefore(Bt(), n);
+    i = new Xe(a, s, t, t.options);
   } else {
-    const s = i._$AB.nextSibling, a = i._$AM, r = a !== t;
+    const a = i._$AB.nextSibling, s = i._$AM, r = s !== t;
     if (r) {
-      let c;
-      i._$AQ?.(t), i._$AM = t, i._$AP !== void 0 && (c = t._$AU) !== a._$AU && i._$AP(c);
+      let l;
+      i._$AQ?.(t), i._$AM = t, i._$AP !== void 0 && (l = t._$AU) !== s._$AU && i._$AP(l);
     }
-    if (s !== n || r) {
-      let c = i._$AA;
-      for (; c !== s; ) {
-        const m = Vt(c).nextSibling;
-        Vt(o).insertBefore(c, n), c = m;
+    if (a !== n || r) {
+      let l = i._$AA;
+      for (; l !== a; ) {
+        const m = Vt(l).nextSibling;
+        Vt(o).insertBefore(l, n), l = m;
       }
     }
   }
   return i;
-}, C = (t, e, i = t) => (t._$AI(e, i), t), Ge = {}, Je = (t, e = Ge) => t._$AH = e, Qe = (t) => t._$AH, ct = (t) => {
+}, C = (t, e, i = t) => (t._$AI(e, i), t), Ge = {}, Je = (t, e = Ge) => t._$AH = e, Qe = (t) => t._$AH, lt = (t) => {
   t._$AR(), t._$AA.remove();
 };
 /**
@@ -654,43 +654,43 @@ const jt = (t, e, i) => {
   dt(t, e, i) {
     let o;
     i === void 0 ? i = e : e !== void 0 && (o = e);
-    const n = [], s = [];
-    let a = 0;
-    for (const r of t) n[a] = o ? o(r, a) : a, s[a] = i(r, a), a++;
-    return { values: s, keys: n };
+    const n = [], a = [];
+    let s = 0;
+    for (const r of t) n[s] = o ? o(r, s) : s, a[s] = i(r, s), s++;
+    return { values: a, keys: n };
   }
   render(t, e, i) {
     return this.dt(t, e, i).values;
   }
   update(t, [e, i, o]) {
-    const n = Qe(t), { values: s, keys: a } = this.dt(e, i, o);
-    if (!Array.isArray(n)) return this.ut = a, s;
-    const r = this.ut ??= [], c = [];
-    let m, f, h = 0, u = n.length - 1, v = 0, p = s.length - 1;
-    for (; h <= u && v <= p; ) if (n[h] === null) h++;
+    const n = Qe(t), { values: a, keys: s } = this.dt(e, i, o);
+    if (!Array.isArray(n)) return this.ut = s, a;
+    const r = this.ut ??= [], l = [];
+    let m, v, h = 0, u = n.length - 1, f = 0, p = a.length - 1;
+    for (; h <= u && f <= p; ) if (n[h] === null) h++;
     else if (n[u] === null) u--;
-    else if (r[h] === a[v]) c[v] = C(n[h], s[v]), h++, v++;
-    else if (r[u] === a[p]) c[p] = C(n[u], s[p]), u--, p--;
-    else if (r[h] === a[p]) c[p] = C(n[h], s[p]), W(t, c[p + 1], n[h]), h++, p--;
-    else if (r[u] === a[v]) c[v] = C(n[u], s[v]), W(t, n[h], n[u]), u--, v++;
-    else if (m === void 0 && (m = jt(a, v, p), f = jt(r, h, u)), m.has(r[h])) if (m.has(r[u])) {
-      const _ = f.get(a[v]), $ = _ !== void 0 ? n[_] : null;
+    else if (r[h] === s[f]) l[f] = C(n[h], a[f]), h++, f++;
+    else if (r[u] === s[p]) l[p] = C(n[u], a[p]), u--, p--;
+    else if (r[h] === s[p]) l[p] = C(n[h], a[p]), W(t, l[p + 1], n[h]), h++, p--;
+    else if (r[u] === s[f]) l[f] = C(n[u], a[f]), W(t, n[h], n[u]), u--, f++;
+    else if (m === void 0 && (m = jt(s, f, p), v = jt(r, h, u)), m.has(r[h])) if (m.has(r[u])) {
+      const _ = v.get(s[f]), $ = _ !== void 0 ? n[_] : null;
       if ($ === null) {
         const Pt = W(t, n[h]);
-        C(Pt, s[v]), c[v] = Pt;
-      } else c[v] = C($, s[v]), W(t, n[h], $), n[_] = null;
-      v++;
-    } else ct(n[u]), u--;
-    else ct(n[h]), h++;
-    for (; v <= p; ) {
-      const _ = W(t, c[p + 1]);
-      C(_, s[v]), c[v++] = _;
+        C(Pt, a[f]), l[f] = Pt;
+      } else l[f] = C($, a[f]), W(t, n[h], $), n[_] = null;
+      f++;
+    } else lt(n[u]), u--;
+    else lt(n[h]), h++;
+    for (; f <= p; ) {
+      const _ = W(t, l[p + 1]);
+      C(_, a[f]), l[f++] = _;
     }
     for (; h <= u; ) {
       const _ = n[h++];
-      _ !== null && ct(_);
+      _ !== null && lt(_);
     }
-    return this.ut = a, Je(t, c), A;
+    return this.ut = s, Je(t, l), A;
   }
 }), st = (t, e, i) => {
   t.dispatchEvent(
@@ -726,13 +726,13 @@ const jt = (t, e, i) => {
       return window.open(i.url_path, "_blank", "noreferrer"), Promise.resolve();
     case "perform-action":
     case "call-service": {
-      const n = i.action === "perform-action" ? i.perform_action : i.service, s = At(n);
-      if (!s)
+      const n = i.action === "perform-action" ? i.perform_action : i.service, a = At(n);
+      if (!a)
         return Promise.reject(
           new Error(`polr-android-tv-remote-card: invalid action "${n}"`)
         );
-      const [a, r] = s, c = i.action === "perform-action" ? i.data : i.data ?? i.service_data;
-      return e.callService(a, r, c ?? {}, i.target);
+      const [s, r] = a, l = i.action === "perform-action" ? i.data : i.data ?? i.service_data;
+      return e.callService(s, r, l ?? {}, i.target);
     }
   }
 }, ni = ["buttons", "dpad", "touchpad"], ai = {
@@ -799,13 +799,13 @@ const jt = (t, e, i) => {
   // people look at the header to learn.
   "com.google.android.tvlauncher": "Home screen",
   "com.google.android.apps.tv.launcherx": "Home screen"
-}, li = (t) => /^[a-z][\w]*(\.[\w]+)+$/.test(t), ci = (t) => {
-  if (!t || !li(t)) return t;
+}, ci = (t) => /^[a-z][\w]*(\.[\w]+)+$/.test(t), li = (t) => {
+  if (!t || !ci(t)) return t;
   const e = ri[t];
   if (e) return e;
-  const i = St(t);
+  const i = Tt(t);
   return i ? E[i].label : t;
-}, St = (t) => {
+}, Tt = (t) => {
   if (!t) return;
   const e = t.toLowerCase().replace(/[^a-z]/g, "");
   if (e)
@@ -823,7 +823,7 @@ const jt = (t, e, i) => {
   volumeup: "volume_up",
   volumedown: "volume_down",
   volumemute: "volume_mute"
-}, ve = {
+}, fe = {
   showRemote: "show_nav",
   showApps: "show_apps",
   showVolume: "show_volume",
@@ -833,7 +833,7 @@ const jt = (t, e, i) => {
   default: "buttons",
   touch: "touchpad",
   dpad: "dpad"
-}, b = (t) => typeof t == "object" && t !== null && !Array.isArray(t), fe = (t) => b(t) && typeof t.service == "string", Kt = (t, e) => {
+}, b = (t) => typeof t == "object" && t !== null && !Array.isArray(t), ve = (t) => b(t) && typeof t.service == "string", Kt = (t, e) => {
   if (typeof t == "string") {
     const i = si(t);
     if (i)
@@ -855,7 +855,7 @@ const jt = (t, e, i) => {
     }
     return i;
   }
-  if (fe(t))
+  if (ve(t))
     return {
       tap_action: ht(
         t.service,
@@ -881,11 +881,13 @@ const y = (t) => {
   if (Ft(t)) return { type: t };
   if (!b(t))
     return y(`layout entry is not a block and was skipped: ${JSON.stringify(t)}`), null;
-  const e = t.hidden === !0 ? { hidden: !0 } : {}, i = typeof t.title == "string" && t.title ? { title: t.title } : {}, o = t.type;
-  if (Ft(o)) return { type: o, ...e, ...i };
-  if (o === "section" || Array.isArray(t.buttons)) {
-    const n = _e(t);
-    return n ? { type: "section", ...e, ...i, ...n } : null;
+  const e = t.hidden === !0 ? { hidden: !0 } : {}, i = [t.name, t.title].find(
+    (a) => typeof a == "string" && a !== ""
+  ), o = i ? { name: i } : {}, n = t.type;
+  if (Ft(n)) return { type: n, ...e, ...o };
+  if (n === "section" || Array.isArray(t.buttons)) {
+    const a = _e(t);
+    return a ? { type: "section", ...e, ...a, ...o } : null;
   }
   return y(`unknown layout block ${JSON.stringify(t)} was skipped`), null;
 }, pi = (t, e, i) => {
@@ -897,17 +899,17 @@ const y = (t) => {
     { type: "text", ...i.text ? {} : { hidden: !0 } },
     ...e.map((r) => ({ type: "section", ...r })),
     { type: "apps", ...i.apps ? {} : { hidden: !0 } }
-  ], n = new Set(o.map((r) => r.type)), s = ue.filter((r) => !n.has(r)).map(
+  ], n = new Set(o.map((r) => r.type)), a = ue.filter((r) => !n.has(r)).map(
     (r) => ({ type: r, hidden: !0 })
-  ), a = /* @__PURE__ */ new Set();
-  return [...o, ...s].filter((r) => r.type === "section" ? !0 : a.has(r.type) ? (y(`layout lists ${r.type} more than once; only the first is drawn`), !1) : (a.add(r.type), !0));
+  ), s = /* @__PURE__ */ new Set();
+  return [...o, ...a].filter((r) => r.type === "section" ? !0 : s.has(r.type) ? (y(`layout lists ${r.type} more than once; only the first is drawn`), !1) : (s.add(r.type), !0));
 }, ge = (t) => {
   if (typeof t == "string") {
-    const s = E[t];
-    return s ? {
-      name: s.label,
+    const a = E[t];
+    return a ? {
+      name: a.label,
       icon: `brand:${t}`,
-      action: { action: "activity", activity: s.activity }
+      action: { action: "activity", activity: a.activity }
     } : (y(
       `unknown app "${t}" — treating it as an activity. Use an object with an icon and action instead.`
     ), {
@@ -920,7 +922,7 @@ const y = (t) => {
   if (b(t.action))
     return t;
   const e = typeof t.icon == "string" ? t.icon : void 0, i = typeof t.name == "string" ? t.name : void 0, o = typeof t.color == "string" ? t.color : void 0, n = typeof t.entity == "string" ? t.entity : void 0;
-  return fe(t) ? {
+  return ve(t) ? {
     ...i ? { name: i } : {},
     ...e ? { icon: e } : {},
     ...o ? { color: o } : {},
@@ -946,23 +948,23 @@ const y = (t) => {
     throw new Error("polr-android-tv-remote-card: 'entity' is required");
   const i = typeof t.remote == "string" ? di[t.remote] : void 0;
   typeof t.remote == "string" && !i && y(`unknown remote style "${t.remote}" — falling back to ${g.pad}`);
-  const o = ni.includes(t.pad) ? t.pad : i ?? g.pad, n = typeof t.volume == "boolean" ? t.volume : void 0, s = {};
+  const o = ni.includes(t.pad) ? t.pad : i ?? g.pad, n = typeof t.volume == "boolean" ? t.volume : void 0, a = {};
   if (b(t.overrides))
     for (const [p, _] of Object.entries(t.overrides)) {
       const $ = Kt(_, p);
-      $ && (s[p] = $);
+      $ && (a[p] = $);
     }
   for (const [p, _] of Object.entries(me)) {
-    if (s[_]) continue;
+    if (a[_]) continue;
     const $ = Kt(t[p], p);
-    $ && (s[_] = $);
+    $ && (a[_] = $);
   }
-  const a = {};
-  for (const [p, _] of Object.entries(ve))
-    typeof t[p] == "boolean" && (a[_] = t[p]);
-  const r = Array.isArray(t.transport_buttons) ? t.transport_buttons : Array.isArray(t.media_controls) ? t.media_controls : void 0, c = r ? r.filter(
+  const s = {};
+  for (const [p, _] of Object.entries(fe))
+    typeof t[p] == "boolean" && (s[_] = t[p]);
+  const r = Array.isArray(t.transport_buttons) ? t.transport_buttons : Array.isArray(t.media_controls) ? t.media_controls : void 0, l = r ? r.filter(
     (p) => typeof p == "string" && g.transport_buttons.includes(p)
-  ) : g.transport_buttons, m = (Array.isArray(t.sections) ? t.sections : []).map(_e).filter((p) => p !== null), h = (Array.isArray(t.apps) ? t.apps : []).map(ge).filter((p) => p !== null), u = (p, _) => p === void 0 ? _ : p, v = {
+  ) : g.transport_buttons, m = (Array.isArray(t.sections) ? t.sections : []).map(_e).filter((p) => p !== null), h = (Array.isArray(t.apps) ? t.apps : []).map(ge).filter((p) => p !== null), u = (p, _) => p === void 0 ? _ : p, f = {
     ...t,
     type: t.type,
     entity: e,
@@ -971,33 +973,33 @@ const y = (t) => {
     show_header: u(t.show_header, g.show_header),
     show_power: u(t.show_power, g.show_power),
     pad: o,
-    transport_buttons: c,
+    transport_buttons: l,
     show_section_labels: u(t.show_section_labels, g.show_section_labels),
     // v1 always drew a favourite button on the default pad, and threw when it
     // had no override to call. Draw it only when it does something.
-    show_favorite: s.favorite !== void 0,
+    show_favorite: a.favorite !== void 0,
     apps: h,
     layout: pi(t, m, {
-      pad: u(t.show_nav, a.show_nav ?? g.show_nav),
+      pad: u(t.show_nav, s.show_nav ?? g.show_nav),
       transport: u(
         t.show_transport,
-        a.show_transport ?? g.show_transport
+        s.show_transport ?? g.show_transport
       ),
       volume: u(
         t.show_volume,
-        a.show_volume ?? n ?? g.show_volume
+        s.show_volume ?? n ?? g.show_volume
       ),
-      text: u(t.show_text_input, a.show_text_input ?? g.show_text_input),
-      apps: u(t.show_apps, a.show_apps ?? g.show_apps)
+      text: u(t.show_text_input, s.show_text_input ?? g.show_text_input),
+      apps: u(t.show_apps, s.show_apps ?? g.show_apps)
     }),
     // "auto" was the v2-beta spelling, before the tiles became fixed-width.
     app_columns: typeof t.app_columns == "number" && t.app_columns > 0 ? t.app_columns : g.app_columns,
     hold_repeat: u(t.hold_repeat, g.hold_repeat),
     haptics: u(t.haptics, g.haptics),
-    overrides: s
+    overrides: a
   };
-  for (const p of ui) delete v[p];
-  return v;
+  for (const p of ui) delete f[p];
+  return f;
 }, ui = [
   "show_nav",
   "show_transport",
@@ -1017,7 +1019,7 @@ const y = (t) => {
     "media_player_entity",
     "showBasic",
     "media_controls",
-    ...Object.keys(ve),
+    ...Object.keys(fe),
     ...Object.keys(me)
   ]), i = {};
   for (const [o, n] of Object.entries(t))
@@ -1031,7 +1033,7 @@ const y = (t) => {
   TURN_ON: 128,
   TURN_OFF: 256,
   VOLUME_STEP: 1024
-}, vi = {
+}, fi = {
   up: "DPAD_UP",
   down: "DPAD_DOWN",
   left: "DPAD_LEFT",
@@ -1052,7 +1054,7 @@ const y = (t) => {
   // position, which a TV cannot report. These are always key codes.
   rewind: "MEDIA_REWIND",
   fast_forward: "MEDIA_FAST_FORWARD"
-}, fi = "text:", ye = (t, e) => {
+}, vi = "text:", ye = (t, e) => {
   const i = t.entities?.[e.entity]?.device_id;
   if (!i) return null;
   for (const o of Object.values(t.entities ?? {}))
@@ -1060,7 +1062,7 @@ const y = (t) => {
       return o.entity_id;
   return null;
 }, dt = (t) => t === void 0 || t.state === "unavailable" || t.state === "unknown", _i = (t, e) => {
-  const i = t.states?.[e.entity], o = ye(t, e), n = o ? t.states?.[o] : void 0, s = n?.attributes ?? {}, a = i?.attributes ?? {}, r = e.volume_entity ?? o, m = (e.volume_entity && e.volume_entity !== o ? t.states?.[e.volume_entity] : n)?.attributes ?? {}, f = n && !dt(n) ? n.state !== "off" : i?.state === "on";
+  const i = t.states?.[e.entity], o = ye(t, e), n = o ? t.states?.[o] : void 0, a = n?.attributes ?? {}, s = i?.attributes ?? {}, r = e.volume_entity ?? o, m = (e.volume_entity && e.volume_entity !== o ? t.states?.[e.volume_entity] : n)?.attributes ?? {}, v = n && !dt(n) ? n.state !== "off" : i?.state === "on";
   return {
     remoteId: e.entity,
     playerId: o,
@@ -1068,18 +1070,18 @@ const y = (t) => {
     player: n,
     found: i !== void 0,
     available: !dt(i) && (n === void 0 || !dt(n)),
-    on: f,
-    name: e.name ?? a.friendly_name ?? e.entity,
+    on: v,
+    name: e.name ?? s.friendly_name ?? e.entity,
     // app_name is all the integration provides. It never sets media_title or
     // entity_picture, so there is no now-playing text or artwork to read -- and
     // it is a package id unless the app was named in the integration's options,
     // which appLabel is what stands between the header and "com.netflix.ninja".
-    appName: ci(
-      s.app_name ?? a.current_activity
+    appName: li(
+      a.app_name ?? s.current_activity
     ),
-    appId: s.app_id,
+    appId: a.app_id,
     playing: n?.state === "playing",
-    features: s.supported_features ?? 0,
+    features: a.supported_features ?? 0,
     volumeId: r,
     volumeFeatures: m.supported_features ?? 0,
     volume: typeof m.volume_level == "number" ? m.volume_level : void 0,
@@ -1101,40 +1103,40 @@ const y = (t) => {
   return i ? t.callService(i[0], i[1], e.data ?? {}, e.target) : Promise.reject(
     new Error(`polr-android-tv-remote-card: invalid service "${e.service}"`)
   );
-}, Tt = (t, e, i) => t.callService("remote", "send_command", {
+}, St = (t, e, i) => t.callService("remote", "send_command", {
   entity_id: e.remoteId,
   command: i
-}), xi = (t, e, i) => Tt(t, e, `${fi}${i}`), Ai = (t, e, i, o, n) => {
-  const s = e.overrides[o]?.tap_action;
-  if (it(s))
-    return kt(n, t, s, i.remoteId);
-  if (s && s.action === "none") return Promise.resolve();
-  const a = i.playerId;
+}), xi = (t, e, i) => St(t, e, `${vi}${i}`), Ai = (t, e, i, o, n) => {
+  const a = e.overrides[o]?.tap_action;
+  if (it(a))
+    return kt(n, t, a, i.remoteId);
+  if (a && a.action === "none") return Promise.resolve();
+  const s = i.playerId;
   switch (o) {
     case "power":
-      return a && I(i, i.on ? x.TURN_OFF : x.TURN_ON) ? t.callService(
+      return s && I(i, i.on ? x.TURN_OFF : x.TURN_ON) ? t.callService(
         "media_player",
         i.on ? "turn_off" : "turn_on",
-        { entity_id: a }
+        { entity_id: s }
       ) : t.callService("remote", i.on ? "turn_off" : "turn_on", {
         entity_id: i.remoteId
       });
     case "play_pause":
-      if (a && I(i, x.PAUSE))
+      if (s && I(i, x.PAUSE))
         return t.callService("media_player", "media_play_pause", {
-          entity_id: a
+          entity_id: s
         });
       break;
     case "next":
-      if (a && I(i, x.NEXT_TRACK))
+      if (s && I(i, x.NEXT_TRACK))
         return t.callService("media_player", "media_next_track", {
-          entity_id: a
+          entity_id: s
         });
       break;
     case "previous":
-      if (a && I(i, x.PREVIOUS_TRACK))
+      if (s && I(i, x.PREVIOUS_TRACK))
         return t.callService("media_player", "media_previous_track", {
-          entity_id: a
+          entity_id: s
         });
       break;
     case "volume_up":
@@ -1154,8 +1156,8 @@ const y = (t) => {
         });
       break;
   }
-  const r = vi[o];
-  return r ? Tt(t, i, r) : Promise.resolve();
+  const r = fi[o];
+  return r ? St(t, i, r) : Promise.resolve();
 }, ki = (t, e, i, o) => {
   const n = i.action;
   switch (n.action) {
@@ -1175,7 +1177,7 @@ const y = (t) => {
         )
       );
     case "key":
-      return Tt(t, e, n.key);
+      return St(t, e, n.key);
     // v1's shape.
     case "service":
       return $i(t, n);
@@ -1201,7 +1203,7 @@ const y = (t) => {
         i.entity ?? e.remoteId
       );
   }
-}, Si = (t, e) => {
+}, Ti = (t, e) => {
   switch (t.action) {
     case "activity":
       return `Launch ${t.activity}`;
@@ -1276,17 +1278,17 @@ const Y = (t, e) => {
     i.add(t), Pi(e);
   }
 };
-function Ti(t) {
+function Si(t) {
   this._$AN !== void 0 ? (ot(this), this._$AM = t, we(this)) : this._$AM = t;
 }
 function Ei(t, e = !1, i = 0) {
   const o = this._$AH, n = this._$AN;
-  if (n !== void 0 && n.size !== 0) if (e) if (Array.isArray(o)) for (let s = i; s < o.length; s++) Y(o[s], !1), ot(o[s]);
+  if (n !== void 0 && n.size !== 0) if (e) if (Array.isArray(o)) for (let a = i; a < o.length; a++) Y(o[a], !1), ot(o[a]);
   else o != null && (Y(o, !1), ot(o));
   else Y(this, t);
 }
 const Pi = (t) => {
-  t.type == xt.CHILD && (t._$AP ??= Ei, t._$AQ ??= Ti);
+  t.type == xt.CHILD && (t._$AP ??= Ei, t._$AQ ??= Si);
 };
 class Ci extends pe {
   constructor() {
@@ -2427,8 +2429,8 @@ const O = he(Mi), $e = _t`
   }
 `;
 var zi = Object.defineProperty, Li = Object.getOwnPropertyDescriptor, D = (t, e, i, o) => {
-  for (var n = o > 1 ? void 0 : o ? Li(e, i) : e, s = t.length - 1, a; s >= 0; s--)
-    (a = t[s]) && (n = (o ? a(e, i, n) : a(n)) || n);
+  for (var n = o > 1 ? void 0 : o ? Li(e, i) : e, a = t.length - 1, s; a >= 0; a--)
+    (s = t[a]) && (n = (o ? s(e, i, n) : s(n)) || n);
   return o && n && zi(e, i, n), n;
 };
 const te = 0.06, Hi = {
@@ -2467,7 +2469,7 @@ let k = class extends z {
     st(this, "atv-nav", { direction: t });
   }
   _key(t, e, i, o = "") {
-    return l`
+    return c`
       <button
         class="pad-key ${o}"
         type="button"
@@ -2483,7 +2485,7 @@ let k = class extends z {
     `;
   }
   _blank() {
-    return l`<span class="pad-key blank" aria-hidden="true"></span>`;
+    return c`<span class="pad-key blank" aria-hidden="true"></span>`;
   }
   /**
    * A plus-shaped button pad.
@@ -2494,7 +2496,7 @@ let k = class extends z {
    * setting to reconcile the two.
    */
   _renderButtons() {
-    return l`
+    return c`
       <div class="button-pad" role="group" aria-label="Directional pad">
         ${this._blank()} ${this._key("up", "mdi:chevron-up", "Up")} ${this._blank()}
         ${this._key("left", "mdi:chevron-left", "Left")}
@@ -2505,7 +2507,7 @@ let k = class extends z {
     `;
   }
   _renderDpad() {
-    return l`
+    return c`
       <div class="dpad" role="group" aria-label="Directional pad">
         ${this._key("up", "mdi:chevron-up", "Up", "up")}
         ${this._key("left", "mdi:chevron-left", "Left", "left")}
@@ -2529,7 +2531,7 @@ let k = class extends z {
    * otherwise completely unusable from a keyboard — which is what v1 shipped.
    */
   _renderTouchpad() {
-    return l`
+    return c`
       <div
         class="touchpad"
         role="application"
@@ -2554,7 +2556,7 @@ let k = class extends z {
     i.style.transform = `translate(${t.clientX - o.left}px, ${t.clientY - o.top}px)`;
   }
   render() {
-    return l`
+    return c`
       <div class="pad">
         ${this.pad === "touchpad" ? this._renderTouchpad() : this.pad === "dpad" ? this._renderDpad() : this._renderButtons()}
       </div>
@@ -2584,8 +2586,8 @@ k = D([
   $t("polr-atv-nav-pad")
 ], k);
 var Di = Object.defineProperty, Ri = Object.getOwnPropertyDescriptor, G = (t, e, i, o) => {
-  for (var n = o > 1 ? void 0 : o ? Ri(e, i) : e, s = t.length - 1, a; s >= 0; s--)
-    (a = t[s]) && (n = (o ? a(e, i, n) : a(n)) || n);
+  for (var n = o > 1 ? void 0 : o ? Ri(e, i) : e, a = t.length - 1, s; a >= 0; a--)
+    (s = t[a]) && (n = (o ? s(e, i, n) : s(n)) || n);
   return o && n && Di(e, i, n), n;
 };
 const Ni = {
@@ -2610,8 +2612,7 @@ const Ni = {
     icon: "mdi:tune",
     schema: [
       { name: "hold_repeat", selector: { boolean: {} } },
-      { name: "haptics", selector: { boolean: {} } },
-      { name: "show_section_labels", selector: { boolean: {} } }
+      { name: "haptics", selector: { boolean: {} } }
     ]
   }
 ], Vi = () => [
@@ -2721,8 +2722,7 @@ const Ni = {
   transport_buttons: "Buttons",
   app_columns: "Buttons per row",
   hold_repeat: "Hold to repeat",
-  haptics: "Haptic feedback",
-  show_section_labels: "Section labels"
+  haptics: "Haptic feedback"
 }, Ki = {
   show_power: "In the header, or in the back / home / menu row when the header is hidden — that row then has to be in the layout for it to have anywhere to go.",
   volume_entity: "Point this at a soundbar or receiver that exposes a media player. A TV passing audio through reports no volume level, so the card shows no level bar for it.",
@@ -2759,10 +2759,10 @@ let w = class extends z {
     for (const o of w.ACTION_BUTTONS) {
       const n = `${o}_action`;
       if (!(n in e)) continue;
-      const s = e[n];
+      const a = e[n];
       delete e[n];
-      const a = { ...this._config.overrides[o] ?? {} };
-      U(s) && s.action !== "none" ? i[o] = { ...a, tap_action: s } : (delete a.tap_action, Object.keys(a).length ? i[o] = a : delete i[o]);
+      const s = { ...this._config.overrides[o] ?? {} };
+      U(a) && a.action !== "none" ? i[o] = { ...s, tap_action: a } : (delete s.tap_action, Object.keys(s).length ? i[o] = s : delete i[o]);
     }
     this._emit({
       ...this._config,
@@ -2854,7 +2854,7 @@ let w = class extends z {
     const i = [...this._config.layout], o = t + e;
     if (o < 0 || o >= i.length) return;
     [i[t], i[o]] = [i[o], i[t]], this._setLayout(i);
-    const n = (s) => s === t ? o : s === o ? t : s;
+    const n = (a) => a === t ? o : a === o ? t : a;
     this._openSection = n(this._openSection), typeof this._editing?.path == "number" && (this._editing = { ...this._editing, path: n(this._editing.path) });
   }
   _toggleBlock(t) {
@@ -2873,22 +2873,24 @@ let w = class extends z {
       { type: "section", name: "New section", buttons: [] }
     ]), this._openSection = t.length, this._editing = null;
   }
-  /** A heading above the block, or none when the field is emptied. */
-  _setTitle(t, e) {
+  /**
+   * What a block is called, or nothing when the field is emptied.
+   *
+   * One key: sections have always had `name`, the betas briefly grew a `title`
+   * beside it, and two fields for what a block is called is one too many. The
+   * older spelling is the one with configs behind it, so it is the one kept.
+   */
+  _setName(t, e) {
     this._setLayout(
       this._config.layout.map((i, o) => {
         if (o !== t) return i;
-        const { title: n, ...s } = i;
-        return e ? { ...s, title: e } : s;
+        const { name: n, ...a } = i;
+        return e ? { ...a, name: e } : a;
       })
     );
   }
-  _renameSection(t, e) {
-    this._setLayout(
-      this._config.layout.map(
-        (i, o) => o === t && i.type === "section" ? { ...i, name: e } : i
-      )
-    );
+  _setLabelled(t) {
+    this._emit({ ...this._config, show_section_labels: t });
   }
   _removeSection(t) {
     this._setLayout(this._config.layout.filter((e, i) => i !== t)), this._openSection = null, this._editing = null;
@@ -2897,9 +2899,9 @@ let w = class extends z {
     const e = t.icon ?? "mdi:application";
     if (e.startsWith("brand:")) {
       const i = ut[e.slice(6)];
-      if (i) return l`<span class="brand">${i}</span>`;
+      if (i) return c`<span class="brand">${i}</span>`;
     }
-    return e.startsWith("/") || e.startsWith("http") ? l`<img class="brand" src=${e} alt="" />` : l`<ha-icon .icon=${e}></ha-icon>`;
+    return e.startsWith("/") || e.startsWith("http") ? c`<img class="brand" src=${e} alt="" />` : c`<ha-icon .icon=${e}></ha-icon>`;
   }
   /**
    * One list row.
@@ -2916,23 +2918,23 @@ let w = class extends z {
    * here rather than returned together — see _renderAppRow.
    */
   _renderTileList(t, e, i) {
-    return e.length ? l`<ul class="list">
+    return e.length ? c`<ul class="list">
       ${e.flatMap(
       (o, n) => this._isEditing(t, n) ? [
         this._renderAppRow(t, o, n, e.length),
         this._renderAppForm(t, o, n)
       ] : [this._renderAppRow(t, o, n, e.length)]
     )}
-    </ul>` : l`<div class="empty-state">${i}</div>`;
+    </ul>` : c`<div class="empty-state">${i}</div>`;
   }
   _renderAppRow(t, e, i, o) {
     const n = this._isEditing(t, i);
-    return l`
+    return c`
       <li class="row">
         <div class="tile-icon">${this._renderIcon(e)}</div>
         <div class="tile-info">
           <div class="primary"><span>${e.name ?? "Untitled app"}</span></div>
-          <div class="secondary"><span>${Si(e.action, e.entity)}</span></div>
+          <div class="secondary"><span>${Ti(e.action, e.entity)}</span></div>
         </div>
         <button
           class="icon-button"
@@ -2966,8 +2968,8 @@ let w = class extends z {
     `;
   }
   _renderAppForm(t, e, i) {
-    const o = mt(e.action), n = ee.find((a) => a.value === o), s = Wi(e.action);
-    return l`
+    const o = mt(e.action), n = ee.find((s) => s.value === o), a = Wi(e.action);
+    return c`
       <li class="form-host">
         <div class="form">
           <div class="fields">
@@ -2976,8 +2978,8 @@ let w = class extends z {
               <input
                 type="text"
                 .value=${e.name ?? ""}
-                @change=${(a) => this._updateTile(t, i, {
-      name: a.target.value || void 0
+                @change=${(s) => this._updateTile(t, i, {
+      name: s.target.value || void 0
     })}
               />
             </label>
@@ -2996,22 +2998,22 @@ let w = class extends z {
               <ha-icon-picker
                 .hass=${this.hass}
                 .value=${e.icon ?? ""}
-                @value-changed=${(a) => {
-      const r = a.detail?.value;
+                @value-changed=${(s) => {
+      const r = s.detail?.value;
       !r && e.icon && !e.icon.startsWith("mdi:") || this._updateTile(t, i, { icon: r || void 0 });
     }}
               ></ha-icon-picker>
             </label>
 
-            ${t !== "apps" ? l`
+            ${t !== "apps" ? c`
                   <label class="field">
                     <span>Lights up when this entity is on</span>
                     <ha-entity-picker
                       .hass=${this.hass}
                       .value=${e.entity ?? ""}
                       allow-custom-entity
-                      @value-changed=${(a) => this._updateTile(t, i, {
-      entity: a.detail?.value || void 0
+                      @value-changed=${(s) => this._updateTile(t, i, {
+      entity: s.detail?.value || void 0
     })}
                     ></ha-entity-picker>
                   </label>
@@ -3019,16 +3021,16 @@ let w = class extends z {
 
             <!-- Streaming logos are app suggestions; a section button is a
                  projector or a receiver, so they are only offered for apps. -->
-            ${t === "apps" ? l`
+            ${t === "apps" ? c`
                   <div class="chips">
                     ${pt.map(
-      (a) => l`
+      (s) => c`
                         <button
-                          class="chip ${e.icon === `brand:${a}` ? "accent" : ""}"
-                          title=${`Use the ${E[a].label} logo`}
-                          @click=${() => this._updateTile(t, i, { icon: `brand:${a}` })}
+                          class="chip ${e.icon === `brand:${s}` ? "accent" : ""}"
+                          title=${`Use the ${E[s].label} logo`}
+                          @click=${() => this._updateTile(t, i, { icon: `brand:${s}` })}
                         >
-                          ${E[a].label}
+                          ${E[s].label}
                         </button>
                       `
     )}
@@ -3039,19 +3041,19 @@ let w = class extends z {
               <span>Does what</span>
               <select
                 .value=${o}
-                @change=${(a) => this._setActionKind(t, i, a.target.value)}
+                @change=${(s) => this._setActionKind(t, i, s.target.value)}
               >
                 ${ee.map(
-      (a) => l`
-                    <option value=${a.value} ?selected=${a.value === o}>
-                      ${a.label}
+      (s) => c`
+                    <option value=${s.value} ?selected=${s.value === o}>
+                      ${s.label}
                     </option>
                   `
     )}
               </select>
             </label>
 
-            ${o === "action" ? l`
+            ${o === "action" ? c`
                   <!--
                     HA's own interactions editor, the same control the button
                     overrides use. It carries a service picker, a target and
@@ -3060,12 +3062,12 @@ let w = class extends z {
                   -->
                   <ha-form
                     .hass=${this.hass}
-                    .data=${{ action: s }}
+                    .data=${{ action: a }}
                     .schema=${Bi}
                     .computeLabel=${() => "Action"}
-                    @value-changed=${(a) => {
-      a.stopPropagation();
-      const r = a.detail?.value?.action;
+                    @value-changed=${(s) => {
+      s.stopPropagation();
+      const r = s.detail?.value?.action;
       U(r) && this._updateTile(t, i, { action: r });
     }}
                   ></ha-form>
@@ -3077,34 +3079,34 @@ let w = class extends z {
                     entity is a remote, so without this the one dialog the
                     button could open was the one it was not about.
                   -->
-                  ${s?.action === "more-info" ? l`
+                  ${a?.action === "more-info" ? c`
                         <label class="field">
                           <span>Dialog to open</span>
                           <ha-entity-picker
                             .hass=${this.hass}
-                            .value=${s.entity ?? ""}
+                            .value=${a.entity ?? ""}
                             allow-custom-entity
-                            @value-changed=${(a) => this._updateTile(t, i, {
+                            @value-changed=${(s) => this._updateTile(t, i, {
       action: {
         action: "more-info",
-        ...a.detail?.value ? { entity: a.detail.value } : {}
+        ...s.detail?.value ? { entity: s.detail.value } : {}
       }
     })}
                           ></ha-entity-picker>
                         </label>
                         <div class="hint">
-                          ${e.entity ? l`Leave empty to open ${e.entity}, the entity
-                              this button lights up for.` : l`Leave empty and it opens the card's remote,
+                          ${e.entity ? c`Leave empty to open ${e.entity}, the entity
+                              this button lights up for.` : c`Leave empty and it opens the card's remote,
                               which is rarely what a button is about.`}
                         </div>
                       ` : d}
-                ` : l`
+                ` : c`
                   <label class="field wide">
                     <span>${n.label}</span>
                     <input
                       type="text"
                       .value=${ie(e.action)}
-                      @change=${(a) => this._setActionValue(t, i, a.target.value)}
+                      @change=${(s) => this._setActionValue(t, i, s.target.value)}
                     />
                   </label>
                   <div class="hint">${n.hint}</div>
@@ -3125,12 +3127,12 @@ let w = class extends z {
   _renderCurrentApp() {
     const t = this._config, e = ye(this.hass, t), i = e ? this.hass.states?.[e] : void 0, o = i?.attributes?.app_id, n = i?.attributes?.app_name;
     if (!o) return d;
-    const s = t.apps.some(
-      (a) => a.action.action === "app" && a.action.app_id === o
+    const a = t.apps.some(
+      (s) => s.action.action === "app" && s.action.app_id === o
     );
-    return l`
+    return c`
       <div class="section-head"><span class="grow">Playing right now</span></div>
-      ${s ? l`<div class="hint">${n ?? o} is already in the list.</div>` : l`
+      ${a ? c`<div class="hint">${n ?? o} is already in the list.</div>` : c`
             <div class="chips">
               <button
                 class="chip accent"
@@ -3160,7 +3162,7 @@ let w = class extends z {
    */
   _renderLayoutList() {
     const t = this._config.layout;
-    return l`<ul class="list">
+    return c`<ul class="list">
       ${t.flatMap((e, i) => {
       const o = this._openSection === i;
       return [
@@ -3171,19 +3173,19 @@ let w = class extends z {
     </ul>`;
   }
   _renderLayoutRow(t, e, i, o) {
-    const n = t.type === "section" ? t : void 0, s = t.type === "section" ? void 0 : Ni[t.type], a = n?.buttons.length ?? 0, r = t.hidden ? "Hidden" : n ? `${a} ${a === 1 ? "button" : "buttons"}` : "";
-    return l`
+    const n = t.type === "section" ? t : void 0, a = t.type === "section" ? void 0 : Ni[t.type], s = n?.buttons.length ?? 0, r = t.hidden ? "Hidden" : n ? `${s} ${s === 1 ? "button" : "buttons"}` : "";
+    return c`
       <li class="row ${t.hidden ? "inactive" : ""}">
         <div class="tile-icon">
-          <ha-icon icon=${n ? "mdi:view-grid-outline" : s.icon}></ha-icon>
+          <ha-icon icon=${n ? "mdi:view-grid-outline" : a.icon}></ha-icon>
         </div>
         <div class="tile-info">
           <div class="primary">
             <span>
-              ${t.title || (n ? n.name || "Untitled section" : s.label)}
+              ${t.name || (n ? "Untitled section" : a.label)}
             </span>
           </div>
-          ${r ? l`<div class="secondary"><span>${r}</span></div>` : d}
+          ${r ? c`<div class="secondary"><span>${r}</span></div>` : d}
         </div>
         <button
           class="icon-button"
@@ -3228,7 +3230,7 @@ let w = class extends z {
   _renderBlockBody(t, e) {
     if (this._openSection !== e) return d;
     const i = t.type === "section" ? t : void 0;
-    return l`
+    return c`
       <li class="form-host">
         <div class="form">
           <div class="fields">
@@ -3238,32 +3240,20 @@ let w = class extends z {
               inert unknown element and could not be typed in at all.
             -->
             <label class="field">
-              <span>Title</span>
+              <span>Name</span>
               <input
                 type="text"
-                .value=${t.title ?? ""}
-                @change=${(o) => this._setTitle(e, o.target.value.trim())}
+                .value=${t.name ?? ""}
+                @change=${(o) => this._setName(e, o.target.value.trim())}
               />
             </label>
-            <div class="hint">A heading above this block. Empty for none.</div>
-
-            ${i ? l`
-                  <label class="field">
-                    <span>Section name</span>
-                    <input
-                      type="text"
-                      .value=${i.name ?? ""}
-                      @change=${(o) => this._renameSection(e, o.target.value)}
-                    />
-                  </label>
-                  <div class="hint">
-                    Names this row in the editor. It is also the heading when
-                    “Section labels” is on under Advanced and no title is set.
-                  </div>
-                ` : d}
+            <div class="hint">
+              What this row is called here, and the heading above it on the card
+              while “Show names” is on.
+            </div>
           </div>
 
-          ${i ? l`
+          ${i ? c`
                 ${this._renderTileList(e, i.buttons, "No buttons yet.")}
 
                 <div class="form-actions">
@@ -3291,8 +3281,8 @@ let w = class extends z {
   }
   render() {
     if (!this.hass || !this._config) return d;
-    const e = this._config.apps;
-    return l`
+    const t = this._config, e = t.apps;
+    return c`
       <ha-form
         .hass=${this.hass}
         .data=${this._formData}
@@ -3310,8 +3300,22 @@ let w = class extends z {
           <div class="hint">
             Everything on the card, in the order it is drawn, under the header.
             Move a row to move the block; hide one and it keeps its place for
-            when you bring it back. Open a row to give the block a heading.
+            when you bring it back. Open a row to name it.
           </div>
+
+          <!--
+            The switch that draws those names, beside them rather than under
+            Advanced: a field whose effect is decided two panels away is a field
+            that reads as broken.
+          -->
+          <label class="check">
+            <input
+              type="checkbox"
+              .checked=${t.show_section_labels}
+              @change=${(i) => this._setLabelled(i.target.checked)}
+            />
+            <span>Show names as headings on the card</span>
+          </label>
 
           ${this._renderLayoutList()}
 
@@ -3354,7 +3358,7 @@ let w = class extends z {
               <div class="section-head"><span class="grow">Add a known app</span></div>
               <div class="chips">
                 ${pt.map(
-      (i) => l`
+      (i) => c`
                     <button
                       class="chip"
                       @click=${() => this._addTile("apps", {
@@ -3503,6 +3507,15 @@ w.styles = [
       }
       ha-expansion-panel .content .form {
         margin: 0;
+      }
+      /*
+       * The kit's checkbox aligns itself to the end of its row, where it sits
+       * beside a field in a two-column grid. This panel is a stack, so that put
+       * its left edge somewhere nothing else in the panel starts -- which the
+       * spacing check caught before anyone had to look at it.
+       */
+      ha-expansion-panel .content > label.check {
+        align-self: stretch;
       }
       /*
        * A heading belongs to what follows it, so it sits nearer that than the
@@ -3685,16 +3698,16 @@ const mt = (t) => t.action === "activity" || t.action === "app" || t.action === 
       return { action: "perform-action", perform_action: e };
   }
 }, Fi = (t) => {
-  const e = St(t);
+  const e = Tt(t);
   return e ? `brand:${e}` : "mdi:application";
 };
 var Yi = Object.defineProperty, qi = Object.getOwnPropertyDescriptor, J = (t, e, i, o) => {
-  for (var n = o > 1 ? void 0 : o ? qi(e, i) : e, s = t.length - 1, a; s >= 0; s--)
-    (a = t[s]) && (n = (o ? a(e, i, n) : a(n)) || n);
+  for (var n = o > 1 ? void 0 : o ? qi(e, i) : e, a = t.length - 1, s; a >= 0; a--)
+    (s = t[a]) && (n = (o ? s(e, i, n) : s(n)) || n);
   return o && n && Yi(e, i, n), n;
 };
 const Xi = "2.1.1-beta.10", rt = "polr-android-tv-remote-card";
-let S = class extends z {
+let T = class extends z {
   constructor() {
     super(...arguments), this._text = "", this._sending = !1;
   }
@@ -3719,7 +3732,7 @@ let S = class extends z {
     if (!t) return 6;
     let e = t.show_header ? 2 : 0;
     for (const i of t.layout)
-      i.hidden || (i.type === "pad" ? e += t.pad === "buttons" ? 5 : 6 : i.type === "apps" ? e += t.apps.length ? 2 : 0 : e += S.BLOCK_ROWS[i.type]);
+      i.hidden || (i.type === "pad" ? e += t.pad === "buttons" ? 5 : 6 : i.type === "apps" ? e += t.apps.length ? 2 : 0 : e += T.BLOCK_ROWS[i.type]);
     return Math.max(e, 3);
   }
   /** Is this block on the card at all? */
@@ -3775,13 +3788,13 @@ let S = class extends z {
    * handler replaces hold-to-repeat, so neither should exist by default.
    */
   _pressOptions(t, e = {}) {
-    const i = this._config, o = i.overrides[t], n = o?.hold_action, s = o?.double_tap_action, a = (r) => () => {
+    const i = this._config, o = i.overrides[t], n = o?.hold_action, a = o?.double_tap_action, s = (r) => () => {
       this.hass && this._run(kt(this, this.hass, r, i.entity));
     };
     return {
       onPress: () => this._press(t),
-      ...it(n) ? { onHold: a(n) } : {},
-      ...it(s) ? { onDoubleTap: a(s) } : {},
+      ...it(n) ? { onHold: s(n) } : {},
+      ...it(a) ? { onDoubleTap: s(a) } : {},
       repeat: e.repeat && i.hold_repeat,
       haptics: i.haptics
     };
@@ -3806,19 +3819,19 @@ let S = class extends z {
   }
   /* ------------------------------------------------------------- header -- */
   _renderHeader(t) {
-    const e = this._config, i = t.available ? t.on ? t.appName ?? "On" : "Off" : "Unavailable", o = t.on && t.available ? St(t.appName) : void 0;
-    return l`
+    const e = this._config, i = t.available ? t.on ? t.appName ?? "On" : "Off" : "Unavailable", o = t.on && t.available ? Tt(t.appName) : void 0;
+    return c`
       <div class="tile">
         <!-- Not interactive: the icon shows what is playing, and tapping it
              opened a more-info dialog nobody wanted from a remote. -->
         <div class="tile-icon">
-          ${o ? l`<span class="brand-mark">${ut[o]}</span>` : l`<ha-icon icon="mdi:television"></ha-icon>`}
+          ${o ? c`<span class="brand-mark">${ut[o]}</span>` : c`<ha-icon icon="mdi:television"></ha-icon>`}
         </div>
         <div class="tile-info">
           <div class="primary"><span>${t.name}</span></div>
           <div class="secondary" aria-live="polite"><span>${i}</span></div>
         </div>
-        ${e.show_power ? l`
+        ${e.show_power ? c`
               <button
                 class="icon-button"
                 type="button"
@@ -3843,13 +3856,13 @@ let S = class extends z {
   _renderChips(t) {
     if (!t.on || !t.available || this._shows("volume")) return d;
     const e = [];
-    return t.muted === !0 ? e.push(l`<span class="chip warn"><ha-icon icon="mdi:volume-off"></ha-icon>Muted</span>`) : qt(t) && e.push(l`<span class="chip accent">${Math.round(t.volume * 100)}%</span>`), e.length ? l`<div class="tile" style="padding-top:0;min-height:0">
+    return t.muted === !0 ? e.push(c`<span class="chip warn"><ha-icon icon="mdi:volume-off"></ha-icon>Muted</span>`) : qt(t) && e.push(c`<span class="chip accent">${Math.round(t.volume * 100)}%</span>`), e.length ? c`<div class="tile" style="padding-top:0;min-height:0">
       <div class="chips">${e}</div>
     </div>` : d;
   }
   /* -------------------------------------------------------------- rows -- */
   _button(t, e, i, o = {}) {
-    return l`
+    return c`
       <button
         class="control-button"
         type="button"
@@ -3863,7 +3876,7 @@ let S = class extends z {
   }
   _renderNavigationRow() {
     const t = this._config, e = t.show_power && !t.show_header;
-    return l`
+    return c`
       <div class="features">
         ${e ? this._button("power", "mdi:power", "Power") : d}
         ${this._button("back", "mdi:arrow-u-left-top", "Back")}
@@ -3880,7 +3893,7 @@ let S = class extends z {
    * codes work regardless — it is only the *player* route that needs the bit.
    */
   _renderTransport(t) {
-    const e = t.playerId === null, i = e || I(t, x.PREVIOUS_TRACK), o = e || I(t, x.NEXT_TRACK), n = new Set(this._config.transport_buttons), s = [
+    const e = t.playerId === null, i = e || I(t, x.PREVIOUS_TRACK), o = e || I(t, x.NEXT_TRACK), n = new Set(this._config.transport_buttons), a = [
       n.has("previous") && i ? this._button("previous", "mdi:skip-previous", "Previous") : d,
       n.has("rewind") ? this._button("rewind", "mdi:rewind", "Rewind", { repeat: !0 }) : d,
       n.has("play_pause") ? this._button(
@@ -3891,7 +3904,7 @@ let S = class extends z {
       n.has("fast_forward") ? this._button("fast_forward", "mdi:fast-forward", "Fast forward", { repeat: !0 }) : d,
       n.has("next") && o ? this._button("next", "mdi:skip-next", "Next") : d
     ];
-    return l`<div class="features">${s}</div>`;
+    return c`<div class="features">${a}</div>`;
   }
   /**
    * Volume: one control, not three.
@@ -3910,7 +3923,7 @@ let S = class extends z {
    */
   _renderVolume(t) {
     const e = t.on || t.volumeId !== t.playerId, i = e && t.muted === !0, o = e && t.muted !== void 0, n = e && qt(t) ? Math.round(t.volume * 100) : void 0;
-    return l`
+    return c`
       <div class="features">
         ${this._button("volume_down", "mdi:volume-minus", "Volume down", { repeat: !0 })}
         <button
@@ -3922,16 +3935,16 @@ let S = class extends z {
         >
           <!-- Read-only by design: androidtv_remote supports VOLUME_STEP but
                not VOLUME_SET, so there is nothing to drag to. -->
-          ${n === void 0 ? d : l`<span class="level" style="width:${n}%"></span>`}
+          ${n === void 0 ? d : c`<span class="level" style="width:${n}%"></span>`}
           <ha-icon icon=${i ? "mdi:volume-off" : "mdi:volume-high"}></ha-icon>
-          ${i ? l`<span class="value">Muted</span>` : n === void 0 ? d : l`<span class="value">${n}%</span>`}
+          ${i ? c`<span class="value">Muted</span>` : n === void 0 ? d : c`<span class="value">${n}%</span>`}
         </button>
         ${this._button("volume_up", "mdi:volume-plus", "Volume up", { repeat: !0 })}
       </div>
     `;
   }
   _renderTextInput() {
-    return l`
+    return c`
       <div class="text-row">
         <input
           type="text"
@@ -3962,34 +3975,34 @@ let S = class extends z {
     const e = t.icon ?? "mdi:application";
     if (e.startsWith("brand:")) {
       const i = ut[e.slice(6)];
-      if (i) return l`${i}`;
+      if (i) return c`${i}`;
     }
-    return e.startsWith("/") || e.startsWith("http") ? l`<img src=${e} alt="" />` : l`<ha-icon icon=${e}></ha-icon>`;
+    return e.startsWith("/") || e.startsWith("http") ? c`<img src=${e} alt="" />` : c`<ha-icon icon=${e}></ha-icon>`;
   }
   /**
    * One row of tiles.
    *
    * The app launcher is the built-in caller; user-defined sections are the same
-   * grid with their own name. Labels gate on `show_section_labels`, so a custom
-   * section is indistinguishable from a native one.
+   * grid. Their heading, if any, is drawn by the layout rather than here, so a
+   * custom section is indistinguishable from a native one.
    */
   _renderSection(t, e, i) {
     if (!t.length) return d;
     const o = this._config;
-    return l`
+    return c`
       <div class="app-grid" style="--app-per-row: ${e}">
         ${ti(
       t,
-      (n, s) => `${i}:${s}:${n.icon ?? ""}`,
+      (n, a) => `${i}:${a}:${n.icon ?? ""}`,
       (n) => {
-        const s = this.hass ? bi(this.hass, n.entity) : !1;
-        return l`
+        const a = this.hass ? bi(this.hass, n.entity) : !1;
+        return c`
               <button
-                class="app-tile ${s ? "active" : ""}"
+                class="app-tile ${a ? "active" : ""}"
                 type="button"
                 aria-label=${n.name ?? "Launch app"}
                 title=${n.name ?? ""}
-                aria-pressed=${n.entity ? String(s) : d}
+                aria-pressed=${n.entity ? String(a) : d}
                 style=${n.color ? `--app-color:${n.color}` : ""}
                 ${O({ onPress: () => this._launch(n), haptics: o.haptics })}
               >
@@ -4013,7 +4026,7 @@ let S = class extends z {
     const o = this._config;
     switch (t.type) {
       case "pad":
-        return l`<polr-atv-nav-pad
+        return c`<polr-atv-nav-pad
           .pad=${o.pad}
           .repeat=${o.hold_repeat}
           .haptics=${o.haptics}
@@ -4038,20 +4051,22 @@ let S = class extends z {
     }
   }
   /**
-   * The heading above a block, if it has earned one.
+   * The heading above a block, if it is showing them.
    *
-   * `title` draws because it is set -- that is what setting it means. The older
-   * rule still holds underneath it: with section labels on, a section falls
-   * back to its name and the launcher to "Apps", so a card written before
-   * titles existed looks exactly as it did.
+   * One name per block and one switch over all of them. Section labels used to
+   * govern sections and the launcher alone, because they were the only blocks
+   * with a name; now that any block can be called something, it governs any
+   * block that is.
    *
-   * The count belongs to lists of tiles. "Volume 1" would be counting nothing.
+   * The count belongs to lists of tiles. "Sound 1" would be counting nothing.
    */
   _renderHeading(t) {
-    const e = this._config, i = t.type === "section" ? t.buttons : t.type === "apps" ? e.apps : void 0, o = e.show_section_labels ? t.type === "section" ? t.name : t.type === "apps" ? "Apps" : void 0 : void 0, n = t.title ?? o;
-    return n ? l`<div class="section-head">
-      ${n}<span class="grow"></span>
-      ${i ? l`<span class="count">${i.length}</span>` : d}
+    const e = this._config;
+    if (!e.show_section_labels) return d;
+    const i = t.type === "section" ? t.buttons : t.type === "apps" ? e.apps : void 0, o = t.name ?? (t.type === "apps" ? "Apps" : void 0);
+    return o ? c`<div class="section-head">
+      ${o}<span class="grow"></span>
+      ${i ? c`<span class="count">${i.length}</span>` : d}
     </div>` : d;
   }
   /**
@@ -4064,11 +4079,11 @@ let S = class extends z {
    */
   _renderLayout(t) {
     const e = this._config, i = t.on, o = (n) => n.hidden ? !1 : i || n.type === "section" || n.type === "apps" ? !0 : n.type === "volume" && wi(e, t);
-    return l`
-      ${e.layout.map((n, s) => {
+    return c`
+      ${e.layout.map((n, a) => {
       if (!o(n)) return d;
-      const a = this._renderBlock(n, s, t);
-      return a === d ? d : l`${this._renderHeading(n)}${a}`;
+      const s = this._renderBlock(n, a, t);
+      return s === d ? d : c`${this._renderHeading(n)}${s}`;
     })}
     `;
   }
@@ -4077,7 +4092,7 @@ let S = class extends z {
     if (!this.hass || !this._config) return d;
     const t = this._config, e = this._device;
     if (!e.found)
-      return l`
+      return c`
         <ha-card>
           <div class="notice error">
             <ha-icon icon="mdi:alert-circle"></ha-icon>
@@ -4086,18 +4101,18 @@ let S = class extends z {
         </ha-card>
       `;
     const i = ii("media_player", e.on ? "on" : "off"), o = e.available;
-    return l`
+    return c`
       <ha-card class=${t.show_header ? "" : "headerless"} style="--tile-color:${i}">
         ${t.show_header ? this._renderHeader(e) : d}
-        ${t.show_header && e.playerId === null ? l`<div class="notice warn">
+        ${t.show_header && e.playerId === null ? c`<div class="notice warn">
               <ha-icon icon="mdi:information-outline"></ha-icon>
               <span class="grow">
                 This device has no media player, so power state, transport and
                 volume level are unavailable.
               </span>
             </div>` : d}
-        ${o ? l`
-              ${e.on ? d : l`
+        ${o ? c`
+              ${e.on ? d : c`
                     <!-- No "the TV is off" line: the header secondary already
                          says Off, and the button says Turn on. -->
                     <div class="features">
@@ -4111,13 +4126,13 @@ let S = class extends z {
                     </div>
                   `}
               ${this._renderLayout(e)}
-            ` : l`<div class="empty-state">This device is unavailable.</div>`}
+            ` : c`<div class="empty-state">This device is unavailable.</div>`}
       </ha-card>
     `;
   }
 };
-S.styles = [Et, $e];
-S.BLOCK_ROWS = {
+T.styles = [Et, $e];
+T.BLOCK_ROWS = {
   navigation: 1,
   transport: 1,
   volume: 1,
@@ -4127,19 +4142,19 @@ S.BLOCK_ROWS = {
 };
 J([
   j({ attribute: !1 })
-], S.prototype, "hass", 2);
+], T.prototype, "hass", 2);
 J([
   H()
-], S.prototype, "_config", 2);
+], T.prototype, "_config", 2);
 J([
   H()
-], S.prototype, "_text", 2);
+], T.prototype, "_text", 2);
 J([
   H()
-], S.prototype, "_sending", 2);
-S = J([
+], T.prototype, "_sending", 2);
+T = J([
   $t(rt)
-], S);
+], T);
 window.customCards = window.customCards ?? [];
 window.customCards.push({
   type: rt,
@@ -4151,6 +4166,6 @@ window.customCards.push({
 console.info(`%c ${rt} %c ${Xi} `, "background:#555;color:#fff", "background:#3f51b5;color:#fff");
 export {
   Xi as CARD_VERSION,
-  S as PolrAndroidTvRemoteCard
+  T as PolrAndroidTvRemoteCard
 };
 //# sourceMappingURL=polr-android-tv-remote-card.js.map

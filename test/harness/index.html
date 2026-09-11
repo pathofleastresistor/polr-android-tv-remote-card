@@ -220,12 +220,18 @@
           ] },
           "volume", "pad", "navigation", "transport", "apps",
         ] } },
-        // Titles: any block can have a heading, and it shows because it is set.
-        { title: "layout: titled blocks", config: { entity: "remote.main_tv", apps: APPS.slice(0, 4), layout: [
-          { type: "volume", title: "Sound" },
-          { type: "pad", title: "Remote" },
+        // Names: any block can have one, drawn while section labels are on.
+        { title: "layout: named blocks", config: { entity: "remote.main_tv", show_section_labels: true, apps: APPS.slice(0, 4), layout: [
+          { type: "volume", name: "Sound" },
+          { type: "pad", name: "Remote" },
           "navigation",
-          { type: "apps", title: "Streaming" },
+          { type: "apps", name: "Streaming" },
+        ] } },
+        // The same card with the switch off: names stay, headings do not.
+        { title: "layout: named blocks, labels off", config: { entity: "remote.main_tv", apps: APPS.slice(0, 4), layout: [
+          { type: "volume", name: "Sound" },
+          "navigation",
+          { type: "apps", name: "Streaming" },
         ] } },
         { title: "layout: volume first, no pad", config: { entity: "remote.main_tv", apps: APPS.slice(0, 3), layout: ["volume", "transport", "navigation", "apps"] } },
         // Hold and double tap only exist on a control that configures them, so
@@ -312,8 +318,8 @@
         ] }],
         // The Layout panel: every block in one ordered list, hidden ones struck
         // through and still in place.
-        ["editor: layout", { entity: "remote.main_tv", apps: APPS.slice(0, 2), layout: [
-          { type: "volume", title: "Sound" },
+        ["editor: layout", { entity: "remote.main_tv", show_section_labels: true, apps: APPS.slice(0, 2), layout: [
+          { type: "volume", name: "Sound" },
           { type: "section", name: "Home Theater", buttons: [
             { name: "TV", icon: "mdi:television", action: { action: "service", service: "remote.toggle" } },
             { name: "AVR", icon: "mdi:audio-video", action: { action: "service", service: "media_player.toggle" } },
