@@ -619,6 +619,19 @@ export class PolrAndroidTvRemoteCard extends LitElement {
     return html`<ha-icon icon=${icon}></ha-icon>`;
   }
 
+  /** The icon, the name or both, per the tile's `display`; never nothing. */
+  private _renderTileContent(tile: TileConfig): TemplateResult {
+    const hasText = !!tile.name?.trim();
+    const hasIcon = !!tile.icon;
+    const display = tile.display === "text" || tile.display === "both" ? tile.display : "icon";
+    const showText = hasText && (display !== "icon" || !hasIcon);
+    const showIcon = display !== "text" || !hasText;
+    return html`
+      ${showIcon ? this._renderAppIcon(tile) : nothing}
+      ${showText ? html`<span class="tile-label">${tile.name}</span>` : nothing}
+    `;
+  }
+
   /**
    * One row of tiles.
    *
@@ -645,7 +658,7 @@ export class PolrAndroidTvRemoteCard extends LitElement {
             const active = this.hass ? isTileActive(this.hass, tile) : false;
             return html`
               <button
-                class="app-tile ${active ? "active" : ""}"
+                class="app-tile ${active ? "active" : ""} ${tile.display === "both" ? "stacked" : ""}"
                 type="button"
                 aria-label=${tile.name ?? "Launch app"}
                 title=${tile.name ?? ""}
@@ -653,7 +666,7 @@ export class PolrAndroidTvRemoteCard extends LitElement {
                 style=${tile.color ? `--app-color:${tile.color}` : ""}
                 ${press({ onPress: () => this._launch(tile), haptics: config.haptics })}
               >
-                ${this._renderAppIcon(tile)}
+                ${this._renderTileContent(tile)}
               </button>
             `;
           },

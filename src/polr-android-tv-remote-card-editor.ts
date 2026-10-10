@@ -643,6 +643,32 @@ export class PolrAndroidTvRemoteCardEditor extends LitElement {
               ></ha-icon-picker>
             </label>
 
+            <label class="field">
+              <span>Show on the button</span>
+              <select
+                @change=${(event: Event) =>
+                  this._updateTile(path, index, {
+                    display: ((event.target as HTMLSelectElement).value || undefined) as
+                      | TileConfig["display"]
+                      | undefined,
+                  })}
+              >
+                ${(
+                  [
+                    ["", "Icon"],
+                    ["text", "Name"],
+                    ["both", "Icon and name"],
+                  ] as const
+                ).map(
+                  ([value, label]) => html`
+                    <option value=${value} ?selected=${(app.display ?? "") === value}>
+                      ${label}
+                    </option>
+                  `,
+                )}
+              </select>
+            </label>
+
             ${path !== "apps"
               ? html`
                   <label class="field">

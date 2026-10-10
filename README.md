@@ -161,6 +161,20 @@ playing, and power — so it stays at the top when it is shown at all. One knock
 worth knowing: with `show_header: false` the power button moves into the
 back/home/menu row, so hiding **that** row as well leaves it nowhere to go.
 
+### Text and icons on buttons
+
+Apps and section buttons show their icon by default. Set `display` to put the
+`name` on the button instead, or under the icon:
+
+```yaml
+- { name: Receiver, icon: mdi:audio-video, display: both, action: { action: toggle } }
+- { name: Movie mode, display: text, action: { action: toggle } }
+```
+
+`display` is `icon` (default), `text` or `both`. A button with no name still
+shows its icon, and one with no icon still shows its name. The editor has a
+**Show on the button** choice on every app and section button.
+
 ### Apps
 
 Add apps in the editor: pick from the six bundled brands, capture whatever is

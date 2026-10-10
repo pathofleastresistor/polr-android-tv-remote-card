@@ -99,6 +99,8 @@ export type AppAction =
   /** v1's shape. Still read; the editor writes `perform-action` instead. */
   | ({ action: "service" } & ServiceAction);
 
+type TileDisplay = "icon" | "text" | "both";
+
 /** One tile: an app in the launcher, or a button in a custom section. */
 export interface TileConfig {
   /** Tooltip and aria-label. Falls back to the action's target. */
@@ -107,6 +109,12 @@ export interface TileConfig {
   icon?: string;
   /** Overrides --tile-color for this tile only. */
   color?: string;
+  /**
+   * What the button shows: its icon (the default, so existing cards look the
+   * same), its `name`, or both. A button with no name or no icon shows
+   * whichever one it has rather than drawing nothing.
+   */
+  display?: TileDisplay;
   /**
    * Entity whose state lights the tile.
    *

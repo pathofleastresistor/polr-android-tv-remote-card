@@ -414,6 +414,34 @@ export const remoteStyles = css`
     fill: currentColor;
   }
 
+  /* Text on a tile: one line, trimmed rather than wrapped, so a long name
+     cannot make one button taller than the rest of its row. */
+  .app-tile .tile-label {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--ha-font-size-s, 12px);
+    font-weight: 500;
+    line-height: 1.2;
+  }
+  /* Icon above text. Taller than the 40px rows, because it has two lines of
+     content; icon-only and text-only tiles keep the usual height. */
+  .app-tile.stacked {
+    height: auto;
+    min-height: 52px;
+    grid-auto-flow: row;
+    gap: 2px;
+    align-content: center;
+  }
+  .app-tile.stacked svg,
+  .app-tile.stacked img {
+    max-height: 20px;
+  }
+  .app-tile.stacked {
+    --mdc-icon-size: 20px;
+  }
+
   /* ---------------------------------------------------------- text input -- */
   .text-row {
     display: flex;
