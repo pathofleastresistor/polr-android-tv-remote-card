@@ -4211,7 +4211,7 @@ let w = class extends D {
     if (!e.length) return h;
     const i = this._config;
     return l`
-      <div class="app-grid" style="--app-per-row: ${t}">
+      <div class="app-grid" style="--app-per-row: ${Math.min(t, e.length)}">
         ${eo(
       e,
       (n, a) => `${o}:${a}:${n.icon ?? ""}`,

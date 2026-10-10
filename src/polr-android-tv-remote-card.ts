@@ -648,7 +648,7 @@ export class PolrAndroidTvRemoteCard extends LitElement {
     const config = this._config!;
 
     return html`
-      <div class="app-grid" style="--app-per-row: ${columns}">
+      <div class="app-grid" style="--app-per-row: ${Math.min(columns, tiles.length)}">
         ${repeat(
           tiles,
           (tile, index) => `${key}:${index}:${tile.icon ?? ""}`,
