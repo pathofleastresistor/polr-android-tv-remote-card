@@ -3856,7 +3856,7 @@ var Go = Object.defineProperty, Jo = Object.getOwnPropertyDescriptor, I = (e, t,
     (s = e[a]) && (n = (i ? s(t, o, n) : s(n)) || n);
   return i && n && Go(t, o, n), n;
 };
-const Qo = "2.2.0", le = "polr-android-tv-remote-card", ei = 2e3, ti = 0.02;
+const Qo = "2.3.0", le = "polr-android-tv-remote-card", ei = 2e3, ti = 0.02;
 let w = class extends D {
   constructor() {
     super(...arguments), this._text = "", this._sending = !1, this._volumeDown = !1, this._volumeDragging = !1, this._volumeFrom = 0, this._onVolumeDown = (e) => {
